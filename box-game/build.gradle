@@ -17,7 +17,7 @@ apply plugin: 'org.hidetake.ssh'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 
 bukkitPlugin {
-    main = 'me.func.forest.Forest'
+    main = 'me.func.box.Box'
     depend << 'CoreAPI'
 }
 
@@ -26,7 +26,7 @@ version = '1.0-SNAPSHOT'
 
 afterEvaluate {
     jar {
-        archiveBaseName.set 'forest'
+        archiveBaseName.set 'box'
         from configurations.runtimeClasspath.collect { it.directory ? it : zipTree(it) }
         duplicatesStrategy DuplicatesStrategy.EXCLUDE
     }
@@ -60,6 +60,7 @@ dependencies {
 
 remotes {
     webServer {
+        port = project.properties["DEPLOY_PORT"] as int
         host = project.properties["DEPLOY_HOST"]
         user = project.properties["DEPLOY_USER"]
         identity = file(project.properties["DEPLOY_KEY_ROOT"])
@@ -76,7 +77,7 @@ task upload() {
         ssh.run {
             session(remotes.webServer) {
                 put from: jar.getArchiveFile().get().getAsFile(), into: "/home/func/forest/resources-bin/test"
-                execute 'netstat -tulpn | grep :10111 | grep --perl-regexp -o \"\\d+(?=/java)\" | xargs kill -TERM'
+                execute 'netstat -tulpn | grep :10112 | grep --perl-regexp -o \"\\d+(?=/java)\" | xargs kill -TERM'
             }
         }
     }
