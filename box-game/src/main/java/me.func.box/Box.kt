@@ -3,6 +3,7 @@ package me.func.box
 import clepto.bukkit.B
 import clepto.cristalix.WorldMeta
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
@@ -27,6 +28,7 @@ class Box : JavaPlugin() {
     private lateinit var worldMeta: WorldMeta
     lateinit var userManager: UserManager<User>
     private var status = Status.STARTING
+    private var slots = 2
 
     override fun onEnable() {
         B.plugin = this
@@ -38,8 +40,8 @@ class Box : JavaPlugin() {
         // Конфигурация реалма
         val info = IRealmService.get().currentRealmInfo
         info.status = RealmStatus.STARTING_GAME
-        info.extraSlots = 30
-        info.maxPlayers = 30
+        info.extraSlots = slots
+        info.maxPlayers = slots
         info.readableName = "Бедроковая коробка"
         info.groupName = "Бедроковая коробка"
 
@@ -64,6 +66,8 @@ class Box : JavaPlugin() {
 
         B.events(BlockListener())
 
+        Generator.generateCube(Location(worldMeta.world, 0.0, 0.0, 0.0), 40, 40, 40, 10, 5)
+
         var time = 0
 
         Bukkit.getScheduler().runTaskTimer(this, {
@@ -73,7 +77,7 @@ class Box : JavaPlugin() {
 
             when (status) {
                 Status.STARTING -> {
-                    if (time == 29 && Bukkit.getOnlinePlayers().size < 8) {
+                    if (time == 29 && Bukkit.getOnlinePlayers().size < slots) {
                         time = 9
                         return@runTaskTimer
                     }

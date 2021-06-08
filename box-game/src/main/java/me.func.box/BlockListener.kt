@@ -1,5 +1,6 @@
 package me.func.box
 
+import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
@@ -14,8 +15,8 @@ class BlockListener : Listener {
     @EventHandler
     fun PlayerJoinEvent.handle() {
         player.isOp = true
-        Generator.generateCube(player.location, 100, 100, 100)
-        player.teleport(player.location.clone().add(50.0, 101.0, 50.0))
+        player.gameMode = GameMode.CREATIVE
+        player.teleport(Location(app.getWorld(), 50.0, 101.0, 50.0))
         player.inventory.addItem(Items.builder().displayName("Хаха").type(Material.DIAMOND_PICKAXE).build())
     }
 

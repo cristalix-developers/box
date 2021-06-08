@@ -14,8 +14,9 @@ class MapLoader {
             val meta = WorldMeta(Cristalix.mapService().loadMap(mapInfo.latest, BukkitWorldLoader.INSTANCE).get())
             meta.world.setGameRuleValue("mobGriefing", "false")
             meta.world.setGameRuleValue("doTileDrops", "false")
-            meta.world.setGameRuleValue("doDaylightCycle", "true")
+            meta.world.setGameRuleValue("doDaylightCycle", "false")
             meta.world.setGameRuleValue("naturalRegeneration", "true")
+            meta.world.time = 21000
             meta
         } catch (exception: Exception) {
             when (exception) {
