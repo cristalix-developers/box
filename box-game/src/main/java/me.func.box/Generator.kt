@@ -1,11 +1,20 @@
 package me.func.box
 
+import clepto.bukkit.B
+import com.sun.org.apache.xpath.internal.operations.Bool
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.block.BlockFace
+
 
 object Generator {
 
-    fun generateCube(start: Location, xSize: Int, ySize: Int, zSize: Int, roomSize: Int, wholeSize: Int) {
+    fun generateContentOfCube(
+        start: Location,
+        xSize: Int,
+        ySize: Int,
+        zSize: Int,
+    ) {
         val originalX = start.blockX
         val originalY = start.blockY
         val originalZ = start.blockZ
@@ -13,23 +22,44 @@ object Generator {
             for (y in 1..ySize) {
                 for (z in 1..zSize) {
                     start.set((originalX + x).toDouble(), (originalY + y).toDouble(), (originalZ + z).toDouble())
-                    if (Math.random() > 0.02)
+                    if (Math.random() > 0.025)
                         start.block.type = Material.STONE
                     else
                         start.block.type = Material.EMERALD_ORE
                 }
             }
         }
+    }
+
+    fun generateCube(
+        start: Location,
+        xSize: Int,
+        ySize: Int,
+        zSize: Int,
+    ) {
+        val originalX = start.blockX
+        val originalY = start.blockY
+        val originalZ = start.blockZ
         start.set(originalX.toDouble(), originalY.toDouble(), originalZ.toDouble())
-        makeBox(start, Material.BEDROCK, xSize, ySize, zSize)
+        makeBox(start, Material.BEDROCK, xSize, ySize, zSize, false)
+    }
+
+    fun generateRooms(start: Location,
+                       xSize: Int,
+                       ySize: Int,
+                       zSize: Int,
+                       roomSize: Int,
+                       wholeSize: Int): List<Location> {
+        val locations = arrayListOf<Location>()
         start.set(0.0, ySize * Math.random() / 2 + ySize / 4, zSize * Math.random() / 2 + zSize / 4)
-        generateRoom(start, -1, 0, 0, roomSize, wholeSize)
+        locations.add(generateRoom(start, -1, 0, 0, roomSize, wholeSize))
         start.set(
             xSize.toDouble() - roomSize,
             ySize * Math.random() / 2 + ySize / 4,
             zSize * Math.random() / 2 + zSize / 4
         )
-        generateRoom(start, 1, 0, 0, roomSize, wholeSize)
+        locations.add(generateRoom(start, 1, 0, 0, roomSize, wholeSize))
+        return locations
     }
 
     private fun iterate(location: Location, type: Material, vararg triple: Triple<Int, Int, Int>) {
@@ -46,56 +76,74 @@ object Generator {
         }
     }
 
-    private fun generateRoom(start: Location, x: Int, y: Int, z: Int, size: Int, wholeSize: Int) {
+    private fun generateRoom(start: Location, x: Int, y: Int, z: Int, size: Int, wholeSize: Int): Location {
         val originalX = start.x
         val originalY = start.y
         val originalZ = start.z
         start.set(originalX + x * size.toDouble(), originalY + y * size.toDouble(), originalZ + z * size.toDouble())
-        makeBox(start, Material.BEDROCK, size, size, size)
-        start.set(originalX, originalY, originalZ)
-        if (x != 0) {
-            for (currentZ in 1..wholeSize) {
-                for (currentY in 1..wholeSize) {
-                    start.set(originalX, originalY, originalZ + (size - wholeSize) / 2)
-                    iterate(
-                        start,
-                        Material.AIR,
-                        Triple(if (x < 0) 0 else x * size, currentY, currentZ),
-                    )
+        makeBox(start, Material.BEDROCK, size, size, size, true)
+        B.postpone(100) {
+            start.set(originalX, originalY, originalZ)
+            if (x != 0) {
+                for (currentZ in 1..wholeSize) {
+                    for (currentY in 1..wholeSize) {
+                        start.set(originalX, originalY, originalZ + (size - wholeSize) / 2)
+                        iterate(
+                            start,
+                            Material.AIR,
+                            Triple(if (x < 0) 0 else x * size, currentY, currentZ),
+                        )
+                    }
+                }
+            } else if (z != 0) {
+                for (currentX in 1..wholeSize) {
+                    for (currentY in 1..wholeSize) {
+                        start.set(originalX + (size - wholeSize) / 2 * z, originalY, originalZ)
+                        iterate(
+                            start,
+                            Material.AIR,
+                            Triple(currentX, currentY, if (z < 0) 0 else z * size),
+                        )
+                    }
                 }
             }
         }
-        if (z != 0) {
-            for (currentX in 1..wholeSize) {
-                for (currentY in 1..wholeSize) {
-                    start.set(originalX + (size - wholeSize) / 2 * z, originalY, originalZ)
-                    iterate(
-                        start,
-                        Material.AIR,
-                        Triple(currentX, currentY, if (z < 0) 0 else z * size),
-                    )
-                }
-            }
-        }
+        val location = Location(
+            app.getWorld(),
+            originalX + x * size.toDouble() + size / 2,
+            originalY + y * size.toDouble() + 1,
+            originalZ + z * size.toDouble() + size / 2
+        )
+        val bedFoot = location.block.getRelative(BlockFace.SOUTH).state
+        val bedHead = bedFoot.block.getRelative(BlockFace.SOUTH).state
+        bedFoot.type = Material.BED_BLOCK
+        bedHead.type = Material.BED_BLOCK
+        bedFoot.rawData = 0x0.toByte()
+        bedHead.rawData = 0x8.toByte()
+        bedFoot.update(true, false)
+        bedHead.update(true, true)
+        return location
     }
 
-    private fun makeBox(start: Location, type: Material, xSize: Int, ySize: Int, zSize: Int) {
+    private fun makeBox(start: Location, type: Material, xSize: Int, ySize: Int, zSize: Int, moment: Boolean) {
         val originalX = start.blockX
         val originalY = start.blockY
         val originalZ = start.blockZ
-        for (x in 1..xSize) {
-            for (z in 1..zSize) {
-                start.set(originalX.toDouble(), originalY.toDouble(), originalZ.toDouble())
-                iterate(
-                    start,
-                    type,
-                    Triple(x, 0, z),
-                    Triple(0, x, z),
-                    Triple(x, z, 0),
-                    Triple(x, ySize, z),
-                    Triple(xSize, x, z),
-                    Triple(x, z, zSize),
-                )
+        for (x in 0..xSize) {
+            B.postpone(if (moment) 0 else x * 3) {
+                for (z in 0..zSize) {
+                    start.set(originalX.toDouble(), originalY.toDouble(), originalZ.toDouble())
+                    iterate(
+                        start,
+                        type,
+                        Triple(x, 0, z),
+                        Triple(0, x, z),
+                        Triple(x, z, 0),
+                        Triple(x, ySize, z),
+                        Triple(xSize, x, z),
+                        Triple(x, z, zSize),
+                    )
+                }
             }
         }
     }

@@ -2,12 +2,16 @@ package me.func.box
 
 import clepto.bukkit.B
 import clepto.cristalix.WorldMeta
+import me.func.box.bar.WaitingPlayers
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.core.CoreApi
+import ru.cristalix.core.formatting.Color
 import ru.cristalix.core.inventory.IInventoryService
 import ru.cristalix.core.inventory.InventoryService
 import ru.cristalix.core.realm.IRealmService
@@ -18,7 +22,6 @@ import ru.cristalix.core.stats.UserManager
 import ru.cristalix.core.stats.impl.StatService
 import ru.cristalix.core.stats.impl.network.StatServiceConnectionData
 
-
 lateinit var app: Box
 
 class Box : JavaPlugin() {
@@ -26,9 +29,17 @@ class Box : JavaPlugin() {
     private val statScope = PlayerScope("box", Stat::class.java)
 
     private lateinit var worldMeta: WorldMeta
-    lateinit var userManager: UserManager<User>
-    private var status = Status.STARTING
-    private var slots = 2
+    lateinit var spawn: Location
+    lateinit var zero: Location
+    private lateinit var userManager: UserManager<User>
+    var status = Status.STARTING
+    var slots = 2
+    val waitingBar = WaitingPlayers()
+    val woodPickaxe = ItemStack(Material.WOOD_PICKAXE)
+    val teams = arrayListOf(
+        Team(mutableListOf(), true, Color.RED, null),
+        Team(mutableListOf(), true, Color.BLUE, null)
+    )
 
     override fun onEnable() {
         B.plugin = this
@@ -36,6 +47,9 @@ class Box : JavaPlugin() {
 
         // Загрузка карты
         worldMeta = MapLoader().load("prod")!!
+        spawn = worldMeta.getLabel("spawn").add(0.0, 2.0, 0.0).toCenterLocation()
+        zero = Location(worldMeta.world, 0.0, 20.0, 0.0)
+        Generator.generateContentOfCube(Location(worldMeta.world, 0.0, 20.0, 0.0), 100, 100, 100)
 
         // Конфигурация реалма
         val info = IRealmService.get().currentRealmInfo
@@ -64,27 +78,56 @@ class Box : JavaPlugin() {
             }
         )
 
-        B.events(BlockListener())
-
-        Generator.generateCube(Location(worldMeta.world, 0.0, 0.0, 0.0), 40, 40, 40, 10, 5)
+        B.events(BlockListener(), ConnectionListener())
 
         var time = 0
-
         Bukkit.getScheduler().runTaskTimer(this, {
             time++
 
-            status = Status.values().find { it.lastSecond == time } ?: status
+            B.bc(status.title + " " + time.toString())
 
             when (status) {
                 Status.STARTING -> {
-                    if (time == 29 && Bukkit.getOnlinePlayers().size < slots) {
-                        time = 9
+                    if (time == Status.STARTING.lastSecond) {
+                        status = Status.GAME
+                        waitingBar.stop()
+                        // Генерация комнат
+                        Generator.generateRooms(zero, 100, 100, 100, 10, 5)
+                            .forEachIndexed { index, location ->
+                                teams[index].location = location
+                            }
+                        // Заполение команд
+                        Bukkit.getOnlinePlayers().forEach { player ->
+                            if (teams.any { it.players.contains(player.uniqueId) })
+                                return@forEach
+                            teams.sortedBy { it.players.size }[0].players.add(player.uniqueId)
+                            player.inventory.clear()
+                            player.inventory.addItem(woodPickaxe)
+                        }
+                        // Отпрака игроков по домам
+                        teams.forEach { team ->
+                            team.players.forEach { Bukkit.getPlayer(it).teleport(team.location) }
+                        }
+                    }
+                    waitingBar.updateMessage()
+                    if (Bukkit.getOnlinePlayers().size == slots) {
+                        time = Status.STARTING.lastSecond - 10
+                    } else if (time == Status.STARTING.lastSecond - 10 && Bukkit.getOnlinePlayers().size + 1 < slots) {
+                        time = 0
                         return@runTaskTimer
                     }
-                    // Игра начинается
-                    time = 31
+                    if (time == Status.STARTING.lastSecond - 10 && Bukkit.getOnlinePlayers().size + 1 >= slots) {
+                        Generator.generateCube(zero, 100, 100, 100)
+                        return@runTaskTimer
+                    }
+                    if (Bukkit.getOnlinePlayers().size + 1 < slots) {
+                        time = 0
+                        return@runTaskTimer
+                    }
                 }
                 Status.GAME -> {
+                    if (time == Status.GAME.lastSecond)
+                        status = Status.END
                     // Идет игра
                 }
                 Status.END -> {
