@@ -1,20 +1,20 @@
 package me.func.box
 
-import clepto.bukkit.B
-import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.player.PlayerJoinEvent
-import ru.cristalix.core.item.Items
 
 class BlockListener : Listener {
 
     @EventHandler
     fun BlockBreakEvent.handle() {
+        if (app.status == Status.STARTING || (block.type != Material.EMERALD_ORE && block.type != Material.STONE && block.type != Material.COBBLESTONE)) {
+            cancel = true
+            return
+        }
         if (player.itemInHand.hasItemMeta()) {
             val item = CraftItemStack.asNMSCopy(player.itemInHand)
 

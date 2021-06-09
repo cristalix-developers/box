@@ -12,8 +12,6 @@ class MapLoader {
             .orElseThrow { RuntimeException("Map Forest wasn't found in the MapService") }
         return try {
             val meta = WorldMeta(Cristalix.mapService().loadMap(mapInfo.latest, BukkitWorldLoader.INSTANCE).get())
-            meta.world.setGameRuleValue("mobGriefing", "false")
-            meta.world.setGameRuleValue("doTileDrops", "false")
             meta.world.setGameRuleValue("doDaylightCycle", "false")
             meta.world.setGameRuleValue("naturalRegeneration", "true")
             meta.world.time = 21000

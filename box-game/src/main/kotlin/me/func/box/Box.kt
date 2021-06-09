@@ -10,10 +10,13 @@ import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scoreboard.NameTagVisibility
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.formatting.Color
 import ru.cristalix.core.inventory.IInventoryService
 import ru.cristalix.core.inventory.InventoryService
+import ru.cristalix.core.network.ISocketClient
+import ru.cristalix.core.network.packages.RealmUpdatePackage
 import ru.cristalix.core.realm.IRealmService
 import ru.cristalix.core.realm.RealmStatus
 import ru.cristalix.core.stats.IStatService
@@ -21,6 +24,7 @@ import ru.cristalix.core.stats.PlayerScope
 import ru.cristalix.core.stats.UserManager
 import ru.cristalix.core.stats.impl.StatService
 import ru.cristalix.core.stats.impl.network.StatServiceConnectionData
+
 
 lateinit var app: Box
 
@@ -37,8 +41,8 @@ class Box : JavaPlugin() {
     val waitingBar = WaitingPlayers()
     val woodPickaxe = ItemStack(Material.WOOD_PICKAXE)
     val teams = arrayListOf(
-        Team(mutableListOf(), true, Color.RED, null),
-        Team(mutableListOf(), true, Color.BLUE, null)
+        BoxTeam(mutableListOf(), true, Color.RED, null, null),
+        BoxTeam(mutableListOf(), true, Color.BLUE, null, null)
     )
 
     override fun onEnable() {
@@ -78,8 +82,20 @@ class Box : JavaPlugin() {
             }
         )
 
-        B.events(BlockListener(), ConnectionListener())
+        // Регистрация обработчиков
+        B.events(BlockListener(), DefaultListener())
 
+        // Скорборд команды
+        val manager = Bukkit.getScoreboardManager()
+        val board = manager.newScoreboard
+        teams.forEach {
+            it.team = board.registerNewTeam(it.color.teamName)
+            it.team!!.nameTagVisibility = NameTagVisibility.HIDE_FOR_OTHER_TEAMS
+            it.team!!.color = org.bukkit.ChatColor.valueOf(it.color.name)
+            it.team!!.setAllowFriendlyFire(false)
+        }
+
+        // Таймер
         var time = 0
         Bukkit.getScheduler().runTaskTimer(this, {
             time++
@@ -89,6 +105,11 @@ class Box : JavaPlugin() {
             when (status) {
                 Status.STARTING -> {
                     if (time == Status.STARTING.lastSecond) {
+                        // Обновление статуса реалма
+                        val realm = IRealmService.get().currentRealmInfo
+                        realm.status = RealmStatus.GAME_STARTED_RESTRICTED
+                        ISocketClient.get().write(RealmUpdatePackage(RealmUpdatePackage.UpdateType.UPDATE, realm))
+                        // Смена статуса игры и остановка счетчика игроков
                         status = Status.GAME
                         waitingBar.stop()
                         // Генерация комнат
@@ -98,19 +119,25 @@ class Box : JavaPlugin() {
                             }
                         // Заполение команд
                         Bukkit.getOnlinePlayers().forEach { player ->
+                            player.inventory.clear()
+                            player.inventory.addItem(woodPickaxe)
+
                             if (teams.any { it.players.contains(player.uniqueId) })
                                 return@forEach
                             teams.sortedBy { it.players.size }[0].players.add(player.uniqueId)
-                            player.inventory.clear()
-                            player.inventory.addItem(woodPickaxe)
                         }
                         // Отпрака игроков по домам
                         teams.forEach { team ->
-                            team.players.forEach { Bukkit.getPlayer(it).teleport(team.location) }
+                            team.players.forEach {
+                                val player = Bukkit.getPlayer(it)
+                                player.teleport(team.location)
+                                team.team!!.addPlayer(player)
+                                player.scoreboard = board
+                            }
                         }
                     }
                     waitingBar.updateMessage()
-                    if (Bukkit.getOnlinePlayers().size == slots) {
+                    if (Bukkit.getOnlinePlayers().size == slots && time < Status.STARTING.lastSecond - 10) {
                         time = Status.STARTING.lastSecond - 10
                     } else if (time == Status.STARTING.lastSecond - 10 && Bukkit.getOnlinePlayers().size + 1 < slots) {
                         time = 0
