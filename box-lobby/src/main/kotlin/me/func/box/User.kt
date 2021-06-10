@@ -1,6 +1,5 @@
 package me.func.box
 
-import net.minecraft.server.v1_12_R1.PlayerConnection
 import ru.cristalix.core.stats.player.PlayerWrapper
 import java.util.*
 

@@ -145,8 +145,10 @@ class DefaultListener : Listener {
         val list = app.teams.filter { it.players.size > 0 }
         if (list.size == 1) {
             B.bc(Formatting.fine("" + list[0].color.chatColor + list[0].color.teamName + " победили!"))
-            list[0].players.forEach { app.getUser(it)!!.stat!!.wins++ }
             app.status = Status.END
+            list[0].players.forEach {
+                app.getUser(it)!!.stat!!.wins++
+            }
         }
     }
 }

@@ -60,6 +60,9 @@ dependencies {
     implementation 'dev.implario.bukkit:bukkit-tools:4.0.0'
     implementation 'dev.implario.bukkit:kotlin-api:1.0.0'
     implementation 'dev.implario.bukkit:dark-paper:1.0.0'
+
+    implementation 'ru.cristalix:boards-bukkit-api:3.0.2'
+    implementation 'ru.cristalix:npcs-bukkit-api:3.0.5'
 }
 
 remotes {
@@ -80,8 +83,8 @@ task upload() {
     doLast {
         ssh.run {
             session(remotes.webServer) {
-                put from: jar.getArchiveFile().get().getAsFile(), into: "/home/func/forest/resources-bin/test"
-                execute 'netstat -tulpn | grep :10118 | grep --perl-regexp -o \"\\d+(?=/java)\" | xargs kill -TERM'
+                put from: jar.getArchiveFile().get().getAsFile(), into: "/home/func/forest/resources-bin/prod"
+                execute 'netstat -tulpn | grep :10116 | grep --perl-regexp -o \"\\d+(?=/java)\" | xargs kill -TERM'
             }
         }
     }

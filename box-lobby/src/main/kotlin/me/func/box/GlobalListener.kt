@@ -20,7 +20,7 @@ class GlobalListener : Listener {
 
     @EventHandler
     fun disable(event: FoodLevelChangeEvent) {
-        event.foodLevel = 20.0
+        event.foodLevel = 20
     }
 
     @EventHandler

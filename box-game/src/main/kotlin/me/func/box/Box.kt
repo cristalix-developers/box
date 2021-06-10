@@ -45,8 +45,8 @@ class Box : JavaPlugin() {
     private lateinit var userManager: UserManager<User>
     lateinit var zero: Location
     var status = Status.STARTING
-    var slots = 40
-    var size = 100
+    var slots = 8
+    var size = 70
     var waitingBar = WaitingPlayers()
     val woodPickaxe = ItemStack(Material.WOOD_PICKAXE)
     val teams = arrayListOf(
@@ -65,10 +65,10 @@ class Box : JavaPlugin() {
         // Конфигурация реалма
         val info = IRealmService.get().currentRealmInfo
         info.status = RealmStatus.WAITING_FOR_PLAYERS
-        info.extraSlots = 50
+        info.extraSlots = 2
         info.maxPlayers = slots
-        info.readableName = "Бедроковая коробка"
-        info.groupName = "Бедроковая коробка"
+        info.readableName = "Бедроковая коробка 8x8"
+        info.groupName = "Бедроковая коробка 8x8"
 
         // Регистрация сервисов
         val core = CoreApi.get()
@@ -160,7 +160,7 @@ class Box : JavaPlugin() {
                                 }
                             teams.forEach { team ->
                                 team.players.forEach {
-                                    val player = Bukkit.getPlayer(it)
+                                    val player = Bukkit.getPlayer(it) ?: return@forEach
                                     player.itemOnCursor = null
                                     player.teleport(team.location)
                                     team.team!!.addPlayer(player)
@@ -203,7 +203,7 @@ class Box : JavaPlugin() {
                             it.bed = true
                         }
                         Bukkit.getOnlinePlayers().forEach {
-                            Cristalix.transfer(listOf(it.uniqueId), RealmId.of("HUB-20"))
+                            Cristalix.transfer(listOf(it.uniqueId), RealmId.of("TEST-55"))
                         }
                         loadMap()
                         time = 0
