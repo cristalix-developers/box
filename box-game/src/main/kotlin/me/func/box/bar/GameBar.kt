@@ -8,7 +8,7 @@ import java.util.*
 
 abstract class GameBar {
     private val viewers: MutableCollection<UUID> = HashSet()
-    private var currentMessage: ProgressMessage? = null
+    private lateinit var currentMessage: ProgressMessage
 
     fun updateMessage() {
         currentMessage = message
@@ -18,11 +18,11 @@ abstract class GameBar {
     fun stop() {
         IDisplayService.get().sendProgress(
             viewers,
-            ProgressMessage.builder().position(currentMessage!!.position).updateType(EnumUpdateType.REMOVE).build()
+            ProgressMessage.builder().position(currentMessage.position).updateType(EnumUpdateType.REMOVE).build()
         )
     }
 
-    abstract val message: ProgressMessage?
+    abstract val message: ProgressMessage
 
     fun addViewer(viewerUniqueId: UUID) {
         viewers.add(viewerUniqueId)
@@ -30,11 +30,11 @@ abstract class GameBar {
             viewerUniqueId,
             ProgressMessage.builder()
                 .updateType(EnumUpdateType.ADD)
-                .position(currentMessage!!.position)
-                .color(currentMessage!!.color)
-                .name(currentMessage!!.name)
-                .start(currentMessage!!.start)
-                .percent(currentMessage!!.percent)
+                .position(currentMessage.position)
+                .color(currentMessage.color)
+                .name(currentMessage.name)
+                .start(currentMessage.start)
+                .percent(currentMessage.percent)
                 .build()
         )
     }
@@ -45,7 +45,7 @@ abstract class GameBar {
             viewerUniqueId,
             ProgressMessage.builder()
                 .updateType(EnumUpdateType.REMOVE)
-                .position(currentMessage!!.position)
+                .position(currentMessage.position)
                 .build()
         )
     }

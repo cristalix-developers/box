@@ -74,7 +74,7 @@ class BlockListener : Listener {
 
     private fun breakBlock(location: Location, x: Int, y: Int, z: Int) {
         val clone = location.clone().add(x.toDouble(), y.toDouble(), z.toDouble())
-        if (clone.block.type == Material.BEDROCK)
+        if (clone.block.type == Material.BEDROCK || clone.block.type == Material.WOOD || clone.block.type == Material.BED)
             return
         clone.block.breakNaturally()
     }

@@ -59,7 +59,7 @@ object Generator {
         locations.add(generateRoom(start, -1, 0, 0, roomSize, wholeSize))
         start.set(
             xSize.toDouble() - roomSize,
-            ySize * Math.random() / 2 + ySize / 4,
+            ySize * Math.random() / 3 + ySize / 4 + roomSize,
             zSize * Math.random() / 2 + zSize / 4
         )
         locations.add(generateRoom(start, 1, 0, 0, roomSize, wholeSize))
@@ -147,7 +147,7 @@ object Generator {
         bedHead.rawData = 0x8.toByte()
         bedFoot.update(true, false)
         bedHead.update(true, true)
-        return location
+        return location.clone().add(0.0, 1.5, 0.0)
     }
 
     private fun makeBox(start: Location, type: Material, xSize: Int, ySize: Int, zSize: Int, moment: Boolean) {
