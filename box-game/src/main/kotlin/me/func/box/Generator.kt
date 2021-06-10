@@ -3,7 +3,10 @@ package me.func.box
 import clepto.bukkit.B
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.attribute.Attribute
 import org.bukkit.block.BlockFace
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftVillager
+import org.bukkit.entity.EntityType
 
 
 object Generator {
@@ -21,7 +24,7 @@ object Generator {
             for (y in 1..ySize) {
                 for (z in 1..zSize) {
                     start.set((originalX + x).toDouble(), (originalY + y).toDouble(), (originalZ + z).toDouble())
-                    if (Math.random() > 0.025)
+                    if (Math.random() > 0.05)
                         start.block.type = Material.STONE
                     else
                         start.block.type = Material.EMERALD_ORE
@@ -126,6 +129,16 @@ object Generator {
             originalY + 2,
             originalZ + z * size * (if (z > 0) 2 else 1) + (if (z < 0) 3 else 2)
         )
+        val center = Location(
+            app.getWorld(),
+            originalX + x * size.toDouble() + size / 2,
+            originalY + y * size.toDouble() + 2,
+            originalZ + z * size.toDouble() + size / 2
+        )
+        val trader = location.world.spawnEntity(center, EntityType.VILLAGER) as CraftVillager
+        center.clone().add(0.0, 0.0, 2.0).block.type = Material.WORKBENCH
+        trader.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).baseValue = 0.0
+
         val bedFoot = location.block.getRelative(BlockFace.WEST).state
         val bedHead = bedFoot.block.getRelative(BlockFace.SOUTH).state
         bedFoot.type = Material.BED_BLOCK

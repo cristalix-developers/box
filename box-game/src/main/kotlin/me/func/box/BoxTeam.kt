@@ -7,7 +7,7 @@ import java.util.*
 
 data class BoxTeam(
     val players: MutableList<UUID>,
-    val bed: Boolean,
+    var bed: Boolean,
     val color: Color,
     var location: Location?,
     var team: Team?

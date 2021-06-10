@@ -11,6 +11,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scoreboard.NameTagVisibility
+import org.bukkit.scoreboard.Team
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.formatting.Color
 import ru.cristalix.core.inventory.IInventoryService
@@ -24,6 +25,10 @@ import ru.cristalix.core.stats.PlayerScope
 import ru.cristalix.core.stats.UserManager
 import ru.cristalix.core.stats.impl.StatService
 import ru.cristalix.core.stats.impl.network.StatServiceConnectionData
+import dev.implario.bukkit.platform.Platforms
+import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
+import ru.cristalix.core.realm.RealmId
+import ru.cristalix.core.transfer.ITransferService
 
 
 lateinit var app: Box
@@ -37,8 +42,9 @@ class Box : JavaPlugin() {
     lateinit var zero: Location
     private lateinit var userManager: UserManager<User>
     var status = Status.STARTING
-    var slots = 2
-    val waitingBar = WaitingPlayers()
+    var slots = 100
+    var size = 100
+    var waitingBar = WaitingPlayers()
     val woodPickaxe = ItemStack(Material.WOOD_PICKAXE)
     val teams = arrayListOf(
         BoxTeam(mutableListOf(), true, Color.RED, null, null),
@@ -48,12 +54,13 @@ class Box : JavaPlugin() {
     override fun onEnable() {
         B.plugin = this
         app = this
+        Platforms.set(PlatformDarkPaper())
 
         // Загрузка карты
         worldMeta = MapLoader().load("prod")!!
         spawn = worldMeta.getLabel("spawn").add(0.0, 2.0, 0.0).toCenterLocation()
         zero = Location(worldMeta.world, 0.0, 20.0, 0.0)
-        Generator.generateContentOfCube(Location(worldMeta.world, 0.0, 20.0, 0.0), 100, 100, 100)
+        Generator.generateContentOfCube(Location(worldMeta.world, 0.0, 20.0, 0.0), size, size, size)
 
         // Конфигурация реалма
         val info = IRealmService.get().currentRealmInfo
@@ -83,7 +90,7 @@ class Box : JavaPlugin() {
         )
 
         // Регистрация обработчиков
-        B.events(BlockListener(), DefaultListener())
+        B.events(BlockListener(), DefaultListener(), TradeMenu())
 
         // Скорборд команды
         val manager = Bukkit.getScoreboardManager()
@@ -93,14 +100,13 @@ class Box : JavaPlugin() {
             it.team!!.nameTagVisibility = NameTagVisibility.HIDE_FOR_OTHER_TEAMS
             it.team!!.color = org.bukkit.ChatColor.valueOf(it.color.name)
             it.team!!.setAllowFriendlyFire(false)
+            it.team!!.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER)
         }
 
         // Таймер
         var time = 0
         Bukkit.getScheduler().runTaskTimer(this, {
             time++
-
-            B.bc(status.title + " " + time.toString())
 
             when (status) {
                 Status.STARTING -> {
@@ -113,7 +119,7 @@ class Box : JavaPlugin() {
                         status = Status.GAME
                         waitingBar.stop()
                         // Генерация комнат
-                        Generator.generateRooms(zero, 100, 100, 100, 10, 5)
+                        Generator.generateRooms(zero, size, size, size, 10, 5)
                             .forEachIndexed { index, location ->
                                 teams[index].location = location
                             }
@@ -144,7 +150,7 @@ class Box : JavaPlugin() {
                         return@runTaskTimer
                     }
                     if (time == Status.STARTING.lastSecond - 10 && Bukkit.getOnlinePlayers().size + 1 >= slots) {
-                        Generator.generateCube(zero, 100, 100, 100)
+                        Generator.generateCube(zero, size, size, size)
                         return@runTaskTimer
                     }
                     if (Bukkit.getOnlinePlayers().size + 1 < slots) {
@@ -159,10 +165,22 @@ class Box : JavaPlugin() {
                 }
                 Status.END -> {
                     // Рестарт игры
+                    teams.forEach {
+                        it.players.forEach { player -> it.team!!.removePlayer(Bukkit.getPlayer(player)) }
+                        it.players.clear()
+                        it.location = null
+                        it.bed = true
+                    }
+                    val service = ITransferService.get()
+                    Bukkit.getOnlinePlayers().forEach {
+                        service.transfer(it.uniqueId, RealmId.of("BOXL", 1))
+                    }
+                    waitingBar = WaitingPlayers()
+                    status = Status.STARTING
+                    Generator.generateContentOfCube(Location(worldMeta.world, 0.0, 20.0, 0.0), size, size, size)
                     time = 0
                 }
             }
-
         }, 5, 20)
     }
 
