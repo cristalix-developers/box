@@ -45,8 +45,9 @@ class Box : JavaPlugin() {
     private lateinit var userManager: UserManager<User>
     lateinit var zero: Location
     var status = Status.STARTING
-    var slots = 8
-    var size = 70
+    var slots = 16
+    var size = 100
+    val hub = "TEST-55"
     var waitingBar = WaitingPlayers()
     val woodPickaxe = ItemStack(Material.WOOD_PICKAXE)
     val teams = arrayListOf(
@@ -62,16 +63,19 @@ class Box : JavaPlugin() {
         // Загрузка карты
         loadMap()
 
-        // Конфигурация реалма
-        val info = IRealmService.get().currentRealmInfo
-        info.status = RealmStatus.WAITING_FOR_PLAYERS
-        info.extraSlots = 2
-        info.maxPlayers = slots
-        info.readableName = "Бедроковая коробка 8x8"
-        info.groupName = "Бедроковая коробка 8x8"
-
         // Регистрация сервисов
         val core = CoreApi.get()
+
+        val realmService = IRealmService.get()
+
+        // Конфигурация реалма
+        val info = IRealmService.get().currentRealmInfo
+        val id = realmService.currentRealmInfo.realmId.id
+        info.status = RealmStatus.WAITING_FOR_PLAYERS
+        info.extraSlots = 1
+        info.maxPlayers = slots
+        info.readableName = "БКоробка ${slots/2}x${slots/2} #$id"
+        info.groupName = "БКоробка ${slots/2}x${slots/2} #$id"
 
         core.registerService(IInventoryService::class.java, InventoryService())
         val statService = StatService(core.platformServer, StatServiceConnectionData.fromEnvironment())
@@ -134,7 +138,7 @@ class Box : JavaPlugin() {
                                 val address = UUID.randomUUID().toString()
                                 val objective =
                                     Cristalix.scoreboardService().getPlayerObjective(player.uniqueId, address)
-                                objective.displayName = "Бедрок. коробка"
+                                objective.displayName = "Бедроковая коробка"
                                 objective.startGroup("Игра")
                                     .record("Врагов") {
                                         "§c" + teams.filter { !it.players.contains(player.uniqueId) }
@@ -147,7 +151,11 @@ class Box : JavaPlugin() {
                                         "§7Авторестарт " + String.format("%02d:%02d", pTime / 60, pTime % 60)
                                     }
                                 objective.startGroup("Сервер")
-                                    .record("Онлайн") { IRealmService.get().getOnlineOnRealms("BOX").toString() }
+                                    .record("Онлайн") {
+                                        (realmService.getOnlineOnRealms("BOX4") +
+                                                realmService.getOnlineOnRealms("BOX8") +
+                                                realmService.getOnlineOnRealms("BOX50")).toString()
+                                    }
                                 Cristalix.scoreboardService().setCurrentObjective(player.uniqueId, address)
                             }
                         }
@@ -197,13 +205,17 @@ class Box : JavaPlugin() {
                     waitingBar.updateMessage()
                     B.postpone(100) {
                         teams.forEach {
-                            it.players.forEach { player -> it.team!!.removePlayer(Bukkit.getPlayer(player)) }
+                            it.players.forEach { player ->
+                                val find = Bukkit.getPlayer(player)
+                                if (find != null)
+                                    it.team!!.removePlayer(find)
+                            }
                             it.players.clear()
                             it.location = null
                             it.bed = true
                         }
                         Bukkit.getOnlinePlayers().forEach {
-                            Cristalix.transfer(listOf(it.uniqueId), RealmId.of("TEST-55"))
+                            Cristalix.transfer(listOf(it.uniqueId), RealmId.of(hub))
                         }
                         loadMap()
                         time = 0

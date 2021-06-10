@@ -1,6 +1,8 @@
 package me.func.box
 
 import clepto.bukkit.B
+import clepto.cristalix.Cristalix
+import dev.implario.bukkit.item.item
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
@@ -20,10 +22,16 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.item.Items
+import ru.cristalix.core.realm.RealmId
 
 class DefaultListener : Listener {
 
     private val effect = PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 1, true)
+    private val back = item {
+        type = Material.CLAY_BALL
+        nbt("other", "cancel")
+        text("§cВернуться")
+    }.build()
 
     @EventHandler
     fun PlayerJoinEvent.handle() {
@@ -33,6 +41,7 @@ class DefaultListener : Listener {
         player.addPotionEffect(effect, true)
 
         if (app.status == Status.STARTING) {
+            player.inventory.setItem(8, back)
             app.teams.forEach {
                 player.inventory.addItem(
                     Items.builder()
@@ -89,6 +98,8 @@ class DefaultListener : Listener {
 
     @EventHandler
     fun PlayerInteractEvent.handle() {
+        if (app.status == Status.STARTING && material == Material.CLAY_BALL)
+            Cristalix.transfer(listOf(player.uniqueId), RealmId.of(app.hub))
         if (app.status == Status.STARTING && material == Material.WOOL) {
             app.teams.filter {
                 !it.players.contains(player.uniqueId) && it.color.woolData.toByte() == player.itemInHand.getData().data

@@ -87,7 +87,7 @@ class App : JavaPlugin() {
                 .skinDigest("307264a1-2c6911e8b5ea1cb72caa35fd")
                 .type(EntityType.PLAYER)
                 .onClick { player ->
-                    val navigator = ClickServer("BOX", 16)
+                    val navigator = ClickServer("BOX8", 16)
                     navigator.accept(player)
                 }.build()
         )
@@ -100,7 +100,7 @@ class App : JavaPlugin() {
                 .skinDigest("6f3f4a2e-7f8411e983741cb72caa35fd")
                 .type(EntityType.PLAYER)
                 .onClick { player ->
-                    val navigator = ClickServer("BOX", 8)
+                    val navigator = ClickServer("BOX4", 8)
                     navigator.accept(player)
                 }.build()
         )
@@ -113,7 +113,7 @@ class App : JavaPlugin() {
                 .skinDigest("30392bb3-2c6911e8b5ea1cb72caa35fd")
                 .type(EntityType.PLAYER)
                 .onClick { player ->
-                    val navigator = ClickServer("BOX", 100)
+                    val navigator = ClickServer("BOX5", 100)
                     navigator.accept(player)
                 }.build()
         )
