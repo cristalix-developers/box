@@ -30,7 +30,7 @@ class TradeMenu : Listener {
                     "XAXDXPXOX",
                     "XAXDXPXOX",
                     "XAXDXPXOX",
-                    "XXXXLXXXX"
+                    "GSXXLXXJX"
                 )
                 contents.add('A', slot(player, ItemStack(Material.IRON_HELMET), Pair(Material.COBBLESTONE, 32)))
                 contents.add('A', slot(player, ItemStack(Material.IRON_CHESTPLATE), Pair(Material.COBBLESTONE, 32)))
@@ -66,8 +66,10 @@ class TradeMenu : Listener {
                     nbt("extra", "hammer")
                 }.build(), Pair(Material.EMERALD, 128)))
                 contents.add('O', slot(player, ItemStack(Material.CHEST), Pair(Material.EMERALD, 33)))
-
                 contents.add('L', slot(player, ItemStack(Material.GOLD_INGOT), Pair(Material.COBBLESTONE, 48)))
+                contents.add('J', slot(player, ItemStack(Material.COMPASS), Pair(Material.EMERALD, 148)))
+                contents.add('S', slot(player, ItemStack(Material.BED), Pair(Material.EMERALD, 192)))
+                contents.add('G', slot(player, ItemStack(Material.ENCHANTMENT_TABLE), Pair(Material.EMERALD, 256)))
 
                 contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
             }
@@ -97,7 +99,6 @@ class TradeMenu : Listener {
             }
             player.updateInventory()
             player.inventory.addItem(if (itemStack.type0 == Material.GOLD_INGOT) ItemStack(Material.GOLD_INGOT) else itemStack)
-            player.closeInventory()
         }
     }
 

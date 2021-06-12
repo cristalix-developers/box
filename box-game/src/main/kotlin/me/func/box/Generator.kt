@@ -1,6 +1,7 @@
 package me.func.box
 
 import clepto.bukkit.B
+import net.minecraft.server.v1_12_R1.MinecraftServer
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.attribute.Attribute
@@ -70,13 +71,15 @@ object Generator {
         val originalX = location.blockX
         val originalY = location.blockY
         val originalZ = location.blockZ
-        for (node in triple) {
-            location.set(
-                (originalX + node.first).toDouble(),
-                (originalY + node.second).toDouble(),
-                (originalZ + node.third).toDouble()
-            )
-            location.block.type = type
+        MinecraftServer.SERVER.postToMainThread {
+            for (node in triple) {
+                location.set(
+                    (originalX + node.first).toDouble(),
+                    (originalY + node.second).toDouble(),
+                    (originalZ + node.third).toDouble()
+                )
+                location.block.type = type
+            }
         }
     }
 

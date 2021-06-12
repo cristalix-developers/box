@@ -3,6 +3,7 @@ package me.func.box
 import clepto.bukkit.B
 import clepto.cristalix.Cristalix
 import dev.implario.bukkit.item.item
+import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
@@ -10,8 +11,9 @@ import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.block.*
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerDropItemEvent
@@ -26,7 +28,8 @@ import ru.cristalix.core.realm.RealmId
 
 class DefaultListener : Listener {
 
-    private val effect = PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 1, true)
+    private val visible = PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 1, true)
+    private val regen = PotionEffect(PotionEffectType.REGENERATION, 100000, 0, true)
     private val back = item {
         type = Material.CLAY_BALL
         nbt("other", "cancel")
@@ -35,10 +38,13 @@ class DefaultListener : Listener {
 
     @EventHandler
     fun PlayerJoinEvent.handle() {
+        player.sendMessage("Привет! Игра на стадии теста, если вы нашли ошибку пишите сюда https://vk.com/funcid, и номер сервера снизу справа")
+
         app.waitingBar.addViewer(player.uniqueId)
 
         B.postpone(1) { player.teleport(app.spawn) }
-        player.addPotionEffect(effect, true)
+        player.addPotionEffect(visible, true)
+        player.addPotionEffect(regen, true)
 
         if (app.status == Status.STARTING) {
             player.inventory.setItem(8, back)
@@ -61,6 +67,7 @@ class DefaultListener : Listener {
             return
         }
         if (player.gameMode == GameMode.SURVIVAL) {
+            player.sendMessage(Formatting.error("Очень жаль! Надеемся ваша команда сильная без вас..."))
             player.inventory.forEach {
                 if (it != null)
                     player.world.dropItemNaturally(player.location, it)
@@ -68,13 +75,23 @@ class DefaultListener : Listener {
         }
         app.teams.filter { it.players.contains(player.uniqueId) }
             .forEach { it.players.remove(player.uniqueId) }
-        tryGetWinner()
+        Winner.tryGetWinner()
     }
 
     @EventHandler
     fun BlockPlaceEvent.handle() {
         if (app.status == Status.STARTING)
             cancel = true
+        if (blockPlaced.type == Material.BED_BLOCK) {
+            player.sendMessage(Formatting.fine("Вы установили личную кровать!"))
+            app.getUser(player)!!.bed = blockPlaced.location
+        }
+    }
+
+    @EventHandler
+    fun BlockGrowEvent.handle() {
+        if (app.status == Status.STARTING)
+            cancelled = true
     }
 
     @EventHandler
@@ -92,6 +109,12 @@ class DefaultListener : Listener {
     fun EntityDamageByEntityEvent.handle() {
         if (entityType == EntityType.VILLAGER)
             cancelled = true
+        if (app.status == Status.STARTING)
+            cancelled = true
+    }
+
+    @EventHandler
+    fun EntityDamageEvent.handle() {
         if (app.status == Status.STARTING)
             cancelled = true
     }
@@ -134,16 +157,23 @@ class DefaultListener : Listener {
                 if (it != null)
                     player.world.dropItemNaturally(player.location, it)
             }
+            if (player.openInventory != null && player.openInventory.topInventory != null)
+                player.openInventory.topInventory.clear()
             player.inventory.clear()
             app.teams.filter { it.players.contains(entity.uniqueId) }
                 .forEach { team ->
+                    if (app.getUser(player)!!.bed != null) {
+                        player.teleport(app.getUser(player)!!.bed)
+                        player.inventory.addItem(app.woodPickaxe)
+                        return@postpone
+                    }
                     if (team.bed) {
                         player.bedSpawnLocation = team.location
                         entity.teleport(team.location)
                         player.inventory.addItem(app.woodPickaxe)
                     } else {
                         team.players.remove(player.uniqueId)
-                        tryGetWinner()
+                        Winner.tryGetWinner()
                         player.gameMode = GameMode.SPECTATOR
                         player.sendMessage(Formatting.error("Вы проиграли."))
                     }
@@ -151,14 +181,30 @@ class DefaultListener : Listener {
                 }
         }
     }
+}
 
-    private fun tryGetWinner() {
+object Winner {
+    fun tryGetWinner() {
+        if (Bukkit.getOnlinePlayers().isEmpty()) {
+            app.status = Status.END
+            return
+        } else {
+            app.teams.forEach { it.players.removeIf { player -> Bukkit.getPlayer(player) == null } }
+        }
+
         val list = app.teams.filter { it.players.size > 0 }
         if (list.size == 1) {
-            B.bc(Formatting.fine("" + list[0].color.chatColor + list[0].color.teamName + " победили!"))
+            B.bc(" ")
+            B.bc(" ")
+            B.bc("" + list[0].color.chatColor + list[0].color.teamName + " §f победили!")
+            B.bc(" ")
+            B.bc(" ")
             app.status = Status.END
             list[0].players.forEach {
-                app.getUser(it)!!.stat!!.wins++
+                val user = app.getUser(it)
+                if (user?.stat != null) {
+                    user.stat!!.wins++
+                }
             }
         }
     }

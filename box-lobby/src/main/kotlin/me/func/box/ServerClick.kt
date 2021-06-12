@@ -1,5 +1,6 @@
 package me.func.box
 
+import clepto.bukkit.B
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.entity.Player
@@ -94,13 +95,20 @@ class ClickServer(private val server: String, private val maxPlayers: Int) : Con
         return if (maxRealm != null) Optional.of(maxRealm.realmId) else Optional.empty()
     }
 
-    override fun accept(pl: Player) {
-        try {
-            sendToServer(pl)
-        } catch (e: ExecutionException) {
-            e.printStackTrace()
-        } catch (e: InterruptedException) {
-            e.printStackTrace()
+    override fun accept(player: Player) {
+        val user = app.getUser(player)!!
+        if (user.looked)
+            return
+        user.looked = true
+        B.postpone(1) { user.looked = false }
+        B.postpone(2) {
+            try {
+                sendToServer(player)
+            } catch (e: ExecutionException) {
+                e.printStackTrace()
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
         }
     }
 }

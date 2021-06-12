@@ -10,6 +10,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
@@ -45,9 +46,9 @@ class Box : JavaPlugin() {
     private lateinit var userManager: UserManager<User>
     lateinit var zero: Location
     var status = Status.STARTING
-    var slots = 16
-    var size = 100
-    val hub = "TEST-55"
+    var slots = 8
+    var size = 72
+    val hub = "BOXL-1"
     var waitingBar = WaitingPlayers()
     val woodPickaxe = ItemStack(Material.WOOD_PICKAXE)
     val teams = arrayListOf(
@@ -74,8 +75,8 @@ class Box : JavaPlugin() {
         info.status = RealmStatus.WAITING_FOR_PLAYERS
         info.extraSlots = 1
         info.maxPlayers = slots
-        info.readableName = "БКоробка ${slots/2}x${slots/2} #$id"
-        info.groupName = "БКоробка ${slots/2}x${slots/2} #$id"
+        info.readableName = "БКоробка ${slots / 2}x${slots / 2} #$id"
+        info.groupName = "БКоробка ${slots / 2}x${slots / 2} #$id"
 
         core.registerService(IInventoryService::class.java, InventoryService())
         val statService = StatService(core.platformServer, StatServiceConnectionData.fromEnvironment())
@@ -112,7 +113,6 @@ class Box : JavaPlugin() {
         var time = 0
         Bukkit.getScheduler().runTaskTimer(this, {
             time++
-
             when (status) {
                 Status.STARTING -> {
                     if (time == Status.STARTING.lastSecond) {
@@ -126,6 +126,7 @@ class Box : JavaPlugin() {
                         Bukkit.getOnlinePlayers().forEach { player ->
                             player.inventory.clear()
                             player.inventory.addItem(woodPickaxe)
+                            player.sendTitle("§eПоехали!", "Враги без ника")
                             app.getUser(player)!!.stat!!.games++
                             waitingBar.removeViewer(player.uniqueId)
 
@@ -134,7 +135,7 @@ class Box : JavaPlugin() {
                             teams.sortedBy { it.players.size }[0].players.add(player.uniqueId)
 
                             // Скорборды
-                            B.postpone(1) {
+                            B.postpone(20) {
                                 val address = UUID.randomUUID().toString()
                                 val objective =
                                     Cristalix.scoreboardService().getPlayerObjective(player.uniqueId, address)
@@ -154,13 +155,13 @@ class Box : JavaPlugin() {
                                     .record("Онлайн") {
                                         (realmService.getOnlineOnRealms("BOX4") +
                                                 realmService.getOnlineOnRealms("BOX8") +
-                                                realmService.getOnlineOnRealms("BOX50")).toString()
+                                                realmService.getOnlineOnRealms("BOX5")).toString()
                                     }
                                 Cristalix.scoreboardService().setCurrentObjective(player.uniqueId, address)
                             }
                         }
                         // Отпрака игроков по домам
-                        B.postpone(1) {
+                        B.postpone(2) {
                             // Генерация комнат
                             Generator.generateRooms(zero, size, size, size, 10, 5)
                                 .forEachIndexed { index, location ->
@@ -194,33 +195,60 @@ class Box : JavaPlugin() {
                     }
                 }
                 Status.GAME -> {
+                    //Обновление компасов
+                    Bukkit.getOnlinePlayers().forEach { player ->
+                        if (player.inventory.contains(Material.COMPASS)) {
+                            try {
+                                val nearestPlayer =
+                                    Bukkit.getPlayer(teams.filter { !it.players.contains(player.uniqueId) }
+                                        .map {
+                                            it.players.minByOrNull { current ->
+                                                Bukkit.getPlayer(current).location.distanceSquared(
+                                                    player.location
+                                                )
+                                            }
+                                        }
+                                        .minByOrNull { current ->
+                                            Bukkit.getPlayer(current).location.distanceSquared(
+                                                player.location
+                                            )
+                                        })
+                                player.compassTarget = nearestPlayer.location
+                            } catch (exception: Exception) {}
+                        }
+                    }
+
                     if (time == Status.GAME.lastSecond)
                         status = Status.END
+                    Winner.tryGetWinner()
                     // Идет игра
                 }
                 Status.END -> {
-                    status = Status.GAME
+                    status = Status.CLOSE
                     // Рестарт игры
                     B.bc(Formatting.error("Перезагрузка..."))
                     waitingBar.updateMessage()
                     B.postpone(100) {
                         teams.forEach {
                             it.players.forEach { player ->
-                                val find = Bukkit.getPlayer(player)
-                                if (find != null)
-                                    it.team!!.removePlayer(find)
+                                try {
+                                    val find = Bukkit.getPlayer(player)
+                                    if (find != null)
+                                        it.team!!.removePlayer(find)
+                                } catch (ignored: Exception) {
+                                }
                             }
                             it.players.clear()
                             it.location = null
                             it.bed = true
                         }
-                        Bukkit.getOnlinePlayers().forEach {
-                            Cristalix.transfer(listOf(it.uniqueId), RealmId.of(hub))
+                        Bukkit.getOnlinePlayers().forEachIndexed { index, it ->
+                            B.postpone(index) { Cristalix.transfer(listOf(it.uniqueId), RealmId.of(hub)) }
                         }
                         loadMap()
                         time = 0
                         status = Status.STARTING
-                        B.postpone(60) {
+                        B.postpone(120) {
                             val realm = IRealmService.get().currentRealmInfo
                             realm.status = RealmStatus.WAITING_FOR_PLAYERS
                             ISocketClient.get().write(RealmUpdatePackage(RealmUpdatePackage.UpdateType.UPDATE, realm))
