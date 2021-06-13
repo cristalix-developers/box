@@ -47,9 +47,15 @@ class TradeMenu : Listener {
                     type = Material.IRON_PICKAXE
                     enchant(Enchantment.DIG_SPEED, 2)
                 }.build(), Pair(Material.COBBLESTONE, 40)))
-                contents.add('P', slot(player, ItemStack(Material.DIAMOND_PICKAXE), Pair(Material.COBBLESTONE, 80)))
+                contents.add('P', slot(player, item {
+                    type = Material.DIAMOND_PICKAXE
+                    enchant(Enchantment.DIG_SPEED, 2)
+                }.build(), Pair(Material.GOLD_INGOT, 2)))
                 contents.add('P', slot(player, item {
                     type = Material.GOLD_PICKAXE
+                    text("§eЗолотая кирка §l3x3")
+                    text("")
+                    text("§fЛомает сразу 9 блоков")
                     enchant(Enchantment.DIG_SPEED, 2)
                     nbt("Unbreakable", 1)
                     nbt("simulators", "donate_pickaxe")
@@ -65,7 +71,7 @@ class TradeMenu : Listener {
                     nbt("weapons", "bronze_warhammer")
                     nbt("extra", "hammer")
                 }.build(), Pair(Material.EMERALD, 128)))
-                contents.add('O', slot(player, ItemStack(Material.CHEST), Pair(Material.EMERALD, 33)))
+                contents.add('O', slot(player, ItemStack(Material.CHEST), Pair(Material.EMERALD, 10)))
                 contents.add('L', slot(player, ItemStack(Material.GOLD_INGOT), Pair(Material.COBBLESTONE, 48)))
                 contents.add('J', slot(player, ItemStack(Material.COMPASS), Pair(Material.EMERALD, 148)))
                 contents.add('S', slot(player, ItemStack(Material.BED), Pair(Material.EMERALD, 192)))

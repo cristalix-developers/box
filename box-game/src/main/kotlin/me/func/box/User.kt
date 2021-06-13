@@ -7,6 +7,7 @@ import java.util.*
 class User(uuid: UUID, name: String, var stat: Stat?) : PlayerWrapper(uuid, name) {
 
     var bed: Location? = null
+    var tempKills = 0
 
     init {
         if (stat == null) {

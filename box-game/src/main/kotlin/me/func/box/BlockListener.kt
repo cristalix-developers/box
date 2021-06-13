@@ -5,6 +5,8 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.ExperienceOrb
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -30,7 +32,7 @@ class BlockListener : Listener {
                     return
                 }
             val bed = Bukkit.getOnlinePlayers().filter {
-                app.getUser(it)!!.bed != null && app.getUser(it)!!.bed!!.distanceSquared(it.location) < 10
+                app.getUser(it)!!.bed != null && app.getUser(it)!!.bed!!.distanceSquared(it.location) < 16
             }
             if (bed.isNotEmpty()) {
                 app.getUser(bed[0])!!.bed = null
@@ -92,6 +94,10 @@ class BlockListener : Listener {
         val clone = location.clone().add(x.toDouble(), y.toDouble(), z.toDouble())
         if (clone.block.type == Material.BEDROCK || clone.block.type == Material.WOOD || clone.block.type == Material.BED_BLOCK)
             return
+        if (clone.block.type == Material.EMERALD_ORE) {
+            val exp = clone.world.spawnEntity(clone, EntityType.EXPERIENCE_ORB) as ExperienceOrb
+            exp.experience = 5
+        }
         clone.block.drops.forEach { player.inventory.addItem(it) }
         clone.block.type = Material.AIR
     }

@@ -64,6 +64,18 @@ object Generator {
             zSize * Math.random() / 2 + zSize / 4
         )
         locations.add(generateRoom(start, 1, 0, 0, roomSize, wholeSize))
+        start.set(
+            xSize * Math.random() / 2 + xSize / 4,
+            ySize * Math.random() / 3 + ySize / 4 + roomSize,
+            zSize.toDouble() - roomSize
+        )
+        locations.add(generateRoom(start, 0, 0, 1, roomSize, wholeSize))
+        start.set(
+            xSize * Math.random() / 2 + xSize / 4,
+            ySize * Math.random() / 3 + ySize / 4 + roomSize,
+            0.0
+        )
+        locations.add(generateRoom(start, 0, 0, -1, roomSize, wholeSize))
         return locations
     }
 
@@ -116,7 +128,7 @@ object Generator {
             } else if (z != 0) {
                 for (currentX in 1..wholeSize) {
                     for (currentY in 1..wholeSize) {
-                        start.set(originalX + (size - wholeSize) / 2 * z, originalY + 1, originalZ)
+                        start.set(originalX + (size - wholeSize) / 2, originalY + 1, originalZ)
                         iterate(
                             start,
                             Material.AIR,
@@ -128,9 +140,9 @@ object Generator {
         }
         val location = Location(
             app.getWorld(),
-            originalX + x * size * (if (x > 0) 2 else 1) + (if (x < 0) 3 else -1),
+            originalX + x * size * (if (x > 0) 2 else 1) + (if (x < 0) 3 else -1) + (if (x == 0) 4 else 0),
             originalY + 2,
-            originalZ + z * size * (if (z > 0) 2 else 1) + (if (z < 0) 3 else 2)
+            originalZ + z * size * (if (z > 0) 2 else 1) + (if (z > 0) -3 else 2)
         )
         val center = Location(
             app.getWorld(),

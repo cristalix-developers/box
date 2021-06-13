@@ -1,6 +1,7 @@
 package me.func.box
 
 import clepto.bukkit.B
+import clepto.cristalix.Cristalix
 import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
@@ -30,6 +31,7 @@ import ru.cristalix.npcs.data.NpcBehaviour
 import ru.cristalix.npcs.server.Npc
 import ru.cristalix.npcs.server.Npcs
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 lateinit var app: App
@@ -83,14 +85,18 @@ class App : JavaPlugin() {
         )
         B.events(FamousListener(), GlobalListener())
 
-        createTop(Location(worldMeta.world, -258.0, 115.5, 19.5), "Убийств", "Топ убийств", "kills")
-        createTop(Location(worldMeta.world, -266.5, 115.5, 28.0, -90f, 0f), "Побед", "Топ побед", "wins")
+        createTop(Location(worldMeta.world, -258.0, 115.6, 19.5), "Убийств", "Топ убийств", "kills") {
+            it.kills
+        }
+        createTop(Location(worldMeta.world, -266.5, 115.6, 28.0, -90f, 0f), "Побед", "Топ побед", "wins") {
+            it.wins
+        }
 
         Npcs.init(this)
         Npcs.spawn(
             Npc.builder()
-                .location(Location(worldMeta.world, -253.0, 112.0, 33.0))
-                .name("§c§l8 §fx §c§l8")
+                .location(Location(worldMeta.world, -253.0, 112.0, 33.0, 95f, 0f))
+                .name("§c§l8 §fx §c§l2")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/30719b68-2c69-11e8-b5ea-1cb72caa35fd")
                 .skinDigest("307264a1-2c6911e8b5ea1cb72caa35fd")
@@ -102,8 +108,8 @@ class App : JavaPlugin() {
         )
         Npcs.spawn(
             Npc.builder()
-                .location(Location(worldMeta.world, -252.0, 112.0, 29.0))
-                .name("§c§l4 §fx §c§l4")
+                .location(Location(worldMeta.world, -252.0, 112.0, 29.0, 145f, 0f))
+                .name("§c§l4 §fx §c§l2")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/6f3f4a2e-7f84-11e9-8374-1cb72caa35fd")
                 .skinDigest("6f3f4a2e-7f8411e983741cb72caa35fd")
@@ -115,8 +121,8 @@ class App : JavaPlugin() {
         )
         Npcs.spawn(
             Npc.builder()
-                .location(Location(worldMeta.world, -257.0, 112.0, 34.0))
-                .name("§c§l50 §fx §c§l50")
+                .location(Location(worldMeta.world, -257.0, 112.0, 34.0, 165f, 0f))
+                .name("§c§l50 §fx §c§l2")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/30392bb3-2c69-11e8-b5ea-1cb72caa35fd")
                 .skinDigest("30392bb3-2c6911e8b5ea1cb72caa35fd")
@@ -126,30 +132,46 @@ class App : JavaPlugin() {
                     navigator.accept(player)
                 }.build()
         )
+        Npcs.spawn(
+            Npc.builder()
+                .location(Location(worldMeta.world, -264.0, 112.0, 36.0, -180f, 0f))
+                .name("§c§l4 §fx §c§l4")
+                .behaviour(NpcBehaviour.STARE_AT_PLAYER)
+                .skinUrl("https://webdata.c7x.dev/textures/skin/7f3fea26-be9f-11e9-80c4-1cb72caa35fd")
+                .skinDigest("7f3fea26-be9f11e980c41cb72caa35fd")
+                .type(EntityType.PLAYER)
+                .onClick { player ->
+                    val navigator = ClickServer("BOXS", 16)
+                    navigator.accept(player)
+                }.build()
+        )
     }
 
-    private fun createTop(location: Location, string: String, title: String, key: String) {
+    private fun createTop(location: Location, string: String, title: String, key: String, function: (Stat) -> Any) {
         val blocks = Boards.newBoard()
         blocks.addColumn("#", 10.0)
-        blocks.addColumn("Игрок", 80.0)
+        blocks.addColumn("Игрок", 95.0)
         blocks.addColumn(string, 55.0)
         blocks.title = title
         blocks.location = location
         Boards.addBoard(blocks)
 
-        Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, {
             statService.getLeaderboard(statScope, key, 10).thenAccept { top ->
                     blocks.clearContent()
                     for (i in 0 until top.size) {
+                        if (top[i].lastSeenName == null)
+                            top[i].lastSeenName = IAccountService.get().getNameByUuid(top[i].id).get(3, TimeUnit.SECONDS)
+
                         blocks.addContent(
                             UUID.randomUUID(), "§e" + (i + 1),
-                            IAccountService.get().getNameByUuid(top[i].uuid).join(),
-                            "" + top[i].kills
+                            top[i].lastSeenName,
+                            "" + function(top[i])
                         )
                     }
                     blocks.updateContent()
                 }
-            }, 20, 10 * 20
+            }, 20, 30 * 20
         )
     }
 

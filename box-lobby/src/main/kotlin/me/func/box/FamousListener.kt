@@ -21,7 +21,9 @@ class FamousListener : Listener {
             player.allowFlight = true
             player.teleport(app.spawn)
 
-            val stat = app.getUser(player)!!.stat!!
+            val user = app.getUser(player)!!
+            val stat = user.stat!!
+            stat.lastSeenName = Cristalix.getDisplayName(player)
             val address = UUID.randomUUID().toString()
             val objective =
                 Cristalix.scoreboardService().getPlayerObjective(player.uniqueId, address)

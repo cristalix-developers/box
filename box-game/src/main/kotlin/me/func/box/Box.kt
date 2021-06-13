@@ -3,11 +3,15 @@ package me.func.box
 import clepto.bukkit.B
 import clepto.cristalix.Cristalix
 import clepto.cristalix.WorldMeta
+import dev.implario.bukkit.item.item
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.bar.WaitingPlayers
 import net.md_5.bungee.api.chat.ComponentBuilder
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
@@ -18,6 +22,7 @@ import ru.cristalix.core.formatting.Color
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.inventory.IInventoryService
 import ru.cristalix.core.inventory.InventoryService
+import ru.cristalix.core.item.Items
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.network.packages.RealmUpdatePackage
 import ru.cristalix.core.realm.IRealmService
@@ -33,9 +38,9 @@ import ru.cristalix.core.tab.TabTextComponent
 import ru.cristalix.core.text.TextFormat
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import kotlin.collections.ArrayList
 import kotlin.math.max
 import kotlin.math.min
-
 
 lateinit var app: Box
 
@@ -49,19 +54,27 @@ class Box : JavaPlugin() {
     lateinit var zero: Location
     var status = Status.STARTING
     var slots = System.getenv("SLOT").toInt()
-    var size = System.getenv("SIZE").toInt()
+    private var size = System.getenv("SIZE").toInt()
+    var teamSize = System.getenv("TEAM").toInt()
     val hub = "BOXL-1"
     var waitingBar = WaitingPlayers()
-    val woodPickaxe = ItemStack(Material.WOOD_PICKAXE)
-    val teams = arrayListOf(
+    var woodPickaxe = ItemStack(Material.WOOD_PICKAXE)
+    var teams = listOf(
         BoxTeam(mutableListOf(), true, Color.RED, null, null),
-        BoxTeam(mutableListOf(), true, Color.BLUE, null, null)
+        BoxTeam(mutableListOf(), true, Color.BLUE, null, null),
+        BoxTeam(mutableListOf(), true, Color.GREEN, null, null),
+        BoxTeam(mutableListOf(), true, Color.YELLOW, null, null)
     )
 
     override fun onEnable() {
         B.plugin = this
         app = this
+        teams = teams.dropLast(teams.size - teamSize)
         Platforms.set(PlatformDarkPaper())
+        woodPickaxe = item {
+            type = Material.WOOD_PICKAXE
+            nbt("Unbreakable", 1)
+        }.build()
 
         // Загрузка карты
         loadMap()
@@ -97,7 +110,7 @@ class Box : JavaPlugin() {
         )
 
         // Регистрация обработчиков
-        B.events(BlockListener(), DefaultListener(), TradeMenu())
+        B.events(BlockListener(), DefaultListener(), TradeMenu(), EnchantTable())
 
         // Скорборд команды
         val manager = Bukkit.getScoreboardManager()
@@ -185,10 +198,18 @@ class Box : JavaPlugin() {
                                         "Наблюдатель"
                                     else
                                         "" + team[0].color.chatColor + team[0].color.teamName
-                                    CompletableFuture.completedFuture(ComponentBuilder(
-                                        text
-                                    ).create())
-                                }
+                                    CompletableFuture.completedFuture(
+                                        ComponentBuilder(
+                                            text
+                                        ).create()
+                                    )
+                                }, { player ->
+                                    CompletableFuture.completedFuture(
+                                        teams.indexOfFirst { it.players.contains(
+                                            player
+                                        ) }
+                                    )
+                                },
                             ))
                             val tab = ITabService.get()
                             tab.enable()
@@ -234,8 +255,7 @@ class Box : JavaPlugin() {
                                                     player.location
                                                 )
                                             }
-                                        }
-                                        .minByOrNull { current ->
+                                        }.minByOrNull { current ->
                                             Bukkit.getPlayer(current).location.distanceSquared(
                                                 player.location
                                             )
@@ -270,13 +290,12 @@ class Box : JavaPlugin() {
                             it.location = null
                             it.bed = true
                         }
-                        Bukkit.getOnlinePlayers().forEachIndexed { index, it ->
-                            B.postpone(index) { Cristalix.transfer(listOf(it.uniqueId), RealmId.of(hub)) }
-                        }
+                        Cristalix.transfer(Bukkit.getOnlinePlayers().map { it.uniqueId }, RealmId.of(hub))
                         loadMap()
                         time = 0
                         status = Status.STARTING
-                        B.postpone(120) {
+                        B.postpone(20) {
+                            Cristalix.transfer(Bukkit.getOnlinePlayers().map { it.uniqueId }, RealmId.of(hub))
                             val realm = IRealmService.get().currentRealmInfo
                             realm.status = RealmStatus.WAITING_FOR_PLAYERS
                             ISocketClient.get().write(RealmUpdatePackage(RealmUpdatePackage.UpdateType.UPDATE, realm))
