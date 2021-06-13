@@ -16,15 +16,15 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
-import org.bukkit.event.player.PlayerDropItemEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.*
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.item.Items
+import ru.cristalix.core.realm.IRealmService
 import ru.cristalix.core.realm.RealmId
+import ru.cristalix.core.realm.RealmStatus
+
 
 class DefaultListener : Listener {
 
@@ -38,8 +38,6 @@ class DefaultListener : Listener {
 
     @EventHandler
     fun PlayerJoinEvent.handle() {
-        player.sendMessage("Привет! Игра на стадии теста, если вы нашли ошибку пишите сюда https://vk.com/funcid, и номер сервера снизу справа")
-
         app.waitingBar.addViewer(player.uniqueId)
 
         B.postpone(1) { player.teleport(app.spawn) }
@@ -179,6 +177,18 @@ class DefaultListener : Listener {
                     }
                     return@postpone
                 }
+        }
+    }
+
+    @EventHandler
+    fun AsyncPlayerPreLoginEvent.handle() {
+        playerProfile.properties.forEach { profileProperty ->
+            if (profileProperty.value == "PARTY_WARP") {
+                if (IRealmService.get().currentRealmInfo.status != RealmStatus.WAITING_FOR_PLAYERS) {
+                    disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "Сейчас нельзя зайти на этот сервер")
+                    loginResult = AsyncPlayerPreLoginEvent.Result.KICK_OTHER
+                }
+            }
         }
     }
 }

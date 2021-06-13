@@ -6,11 +6,8 @@ import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.bar.WaitingPlayers
-import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.World
-import org.bukkit.entity.EntityType
+import net.md_5.bungee.api.chat.ComponentBuilder
+import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
@@ -31,9 +28,14 @@ import ru.cristalix.core.stats.PlayerScope
 import ru.cristalix.core.stats.UserManager
 import ru.cristalix.core.stats.impl.StatService
 import ru.cristalix.core.stats.impl.network.StatServiceConnectionData
+import ru.cristalix.core.tab.ITabService
+import ru.cristalix.core.tab.TabTextComponent
+import ru.cristalix.core.text.TextFormat
 import java.util.*
+import java.util.concurrent.CompletableFuture
 import kotlin.math.max
 import kotlin.math.min
+
 
 lateinit var app: Box
 
@@ -46,8 +48,8 @@ class Box : JavaPlugin() {
     private lateinit var userManager: UserManager<User>
     lateinit var zero: Location
     var status = Status.STARTING
-    var slots = 8
-    var size = 72
+    var slots = System.getenv("SLOT").toInt()
+    var size = System.getenv("SIZE").toInt()
     val hub = "BOXL-1"
     var waitingBar = WaitingPlayers()
     val woodPickaxe = ItemStack(Material.WOOD_PICKAXE)
@@ -135,7 +137,7 @@ class Box : JavaPlugin() {
                             teams.sortedBy { it.players.size }[0].players.add(player.uniqueId)
 
                             // Скорборды
-                            B.postpone(20) {
+                            B.postpone(30) {
                                 val address = UUID.randomUUID().toString()
                                 val objective =
                                     Cristalix.scoreboardService().getPlayerObjective(player.uniqueId, address)
@@ -167,6 +169,29 @@ class Box : JavaPlugin() {
                                 .forEachIndexed { index, location ->
                                     teams[index].location = location
                                 }
+                            // Таб
+                            val tabView = ITabService.get().createConstantTabView()
+                            tabView.addPrefix(TabTextComponent(
+                                1,
+                                TextFormat.RBRACKETS,
+                                { player -> teams.any { it.players.contains(player) } },
+                                { player ->
+                                    val team = teams.filter {
+                                        it.players.contains(
+                                            player
+                                        )
+                                    }
+                                    val text = if (team.isEmpty())
+                                        "Наблюдатель"
+                                    else
+                                        "" + team[0].color.chatColor + team[0].color.teamName
+                                    CompletableFuture.completedFuture(ComponentBuilder(
+                                        text
+                                    ).create())
+                                }
+                            ))
+                            val tab = ITabService.get()
+                            tab.enable()
                             teams.forEach { team ->
                                 team.players.forEach {
                                     val player = Bukkit.getPlayer(it) ?: return@forEach
@@ -174,6 +199,8 @@ class Box : JavaPlugin() {
                                     player.teleport(team.location)
                                     team.team!!.addPlayer(player)
                                     player.scoreboard = board
+                                    tab.setTabView(player.uniqueId, tabView)
+                                    tab.update(player)
                                 }
                             }
                         }
@@ -214,7 +241,8 @@ class Box : JavaPlugin() {
                                             )
                                         })
                                 player.compassTarget = nearestPlayer.location
-                            } catch (exception: Exception) {}
+                            } catch (exception: Exception) {
+                            }
                         }
                     }
 

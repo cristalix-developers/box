@@ -43,7 +43,8 @@ class BlockListener : Listener {
         }
 
         block.drops.forEach { player.inventory.addItem(it) }
-        block.type = Material.AIR
+        block.drops.clear()
+        dropItems = false
 
         if (player.itemInHand.hasItemMeta()) {
             val item = CraftItemStack.asNMSCopy(player.itemInHand)
