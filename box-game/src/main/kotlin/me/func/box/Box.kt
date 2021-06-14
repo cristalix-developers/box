@@ -8,13 +8,12 @@ import dev.implario.bukkit.platform.Platforms
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.bar.WaitingPlayers
 import net.md_5.bungee.api.chat.ComponentBuilder
-import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.World
+import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import org.bukkit.scoreboard.NameTagVisibility
 import org.bukkit.scoreboard.Team
 import ru.cristalix.core.CoreApi
@@ -22,7 +21,6 @@ import ru.cristalix.core.formatting.Color
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.inventory.IInventoryService
 import ru.cristalix.core.inventory.InventoryService
-import ru.cristalix.core.item.Items
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.network.packages.RealmUpdatePackage
 import ru.cristalix.core.realm.IRealmService
@@ -38,7 +36,6 @@ import ru.cristalix.core.tab.TabTextComponent
 import ru.cristalix.core.text.TextFormat
 import java.util.*
 import java.util.concurrent.CompletableFuture
-import kotlin.collections.ArrayList
 import kotlin.math.max
 import kotlin.math.min
 
@@ -128,6 +125,8 @@ class Box : JavaPlugin() {
         var time = 0
         Bukkit.getScheduler().runTaskTimer(this, {
             time++
+            app.teams.forEach { it.players.removeIf { player -> Bukkit.getPlayer(player) == null } }
+
             when (status) {
                 Status.STARTING -> {
                     if (time == Status.STARTING.lastSecond) {
@@ -142,12 +141,13 @@ class Box : JavaPlugin() {
                             player.inventory.clear()
                             player.inventory.addItem(woodPickaxe)
                             player.sendTitle("§eПоехали!", "Враги без ника")
-                            app.getUser(player)!!.stat!!.games++
+                            val user = app.getUser(player)!!
+                            user.stat!!.games++
                             waitingBar.removeViewer(player.uniqueId)
 
                             if (teams.any { it.players.contains(player.uniqueId) })
                                 return@forEach
-                            teams.sortedBy { it.players.size }[0].players.add(player.uniqueId)
+                            teams.minByOrNull { it.players.size }!!.players.add(player.uniqueId)
 
                             // Скорборды
                             B.postpone(30) {
@@ -155,22 +155,18 @@ class Box : JavaPlugin() {
                                 val objective =
                                     Cristalix.scoreboardService().getPlayerObjective(player.uniqueId, address)
                                 objective.displayName = "Бедроковая коробка"
-                                objective.startGroup("Игра")
-                                    .record("Врагов") {
-                                        "§c" + teams.filter { !it.players.contains(player.uniqueId) }
-                                            .sumOf { it.players.size }
-                                    }.record("Своих") {
-                                        "§b" + teams.filter { it.players.contains(player.uniqueId) }
-                                            .sumOf { it.players.size }
-                                    }.record {
+                                val group = objective.startGroup("Игра")
+                                teams.forEach {
+                                    group.record { "" + it.color.chatColor + "■ §f" + it.color.teamName + (if (it.bed) " §a✔" else " §c" + it.players.size) }
+                                }
+                                group
+                                    .record { "" }
+                                    .record { "Убийств: §c" + user.tempKills }
+                                    .record { "Финальных: §6" + user.finalKills }
+                                    .record { "Кровать " + if (user.bed != null) "§a✔" else "§c䂄" }
+                                    .record {
                                         val pTime = Status.END.lastSecond - time
                                         "§7Авторестарт " + String.format("%02d:%02d", pTime / 60, pTime % 60)
-                                    }
-                                objective.startGroup("Сервер")
-                                    .record("Онлайн") {
-                                        (realmService.getOnlineOnRealms("BOX4") +
-                                                realmService.getOnlineOnRealms("BOX8") +
-                                                realmService.getOnlineOnRealms("BOX5")).toString()
                                     }
                                 Cristalix.scoreboardService().setCurrentObjective(player.uniqueId, address)
                             }
@@ -184,33 +180,38 @@ class Box : JavaPlugin() {
                                 }
                             // Таб
                             val tabView = ITabService.get().createConstantTabView()
-                            tabView.addPrefix(TabTextComponent(
-                                1,
-                                TextFormat.RBRACKETS,
-                                { player -> teams.any { it.players.contains(player) } },
-                                { player ->
-                                    val team = teams.filter {
-                                        it.players.contains(
-                                            player
+                            tabView.addPrefix(
+                                TabTextComponent(
+                                    1,
+                                    TextFormat.RBRACKETS,
+                                    { player -> teams.any { it.players.contains(player) } },
+                                    { player ->
+                                        val team = teams.filter {
+                                            it.players.contains(
+                                                player
+                                            )
+                                        }
+                                        val text = if (team.isEmpty())
+                                            "Наблюдатель"
+                                        else
+                                            "" + team[0].color.chatColor + team[0].color.teamName
+                                        CompletableFuture.completedFuture(
+                                            ComponentBuilder(
+                                                text
+                                            ).create()
                                         )
-                                    }
-                                    val text = if (team.isEmpty())
-                                        "Наблюдатель"
-                                    else
-                                        "" + team[0].color.chatColor + team[0].color.teamName
-                                    CompletableFuture.completedFuture(
-                                        ComponentBuilder(
-                                            text
-                                        ).create()
-                                    )
-                                }, { player ->
-                                    CompletableFuture.completedFuture(
-                                        teams.indexOfFirst { it.players.contains(
-                                            player
-                                        ) }
-                                    )
-                                },
-                            ))
+                                    },
+                                    { player ->
+                                        CompletableFuture.completedFuture(
+                                            teams.indexOfFirst {
+                                                it.players.contains(
+                                                    player
+                                                )
+                                            }
+                                        )
+                                    },
+                                )
+                            )
                             val tab = ITabService.get()
                             tab.enable()
                             teams.forEach { team ->
@@ -218,7 +219,7 @@ class Box : JavaPlugin() {
                                     val player = Bukkit.getPlayer(it) ?: return@forEach
                                     player.itemOnCursor = null
                                     player.teleport(team.location)
-                                    team.team!!.addPlayer(player)
+                                    team.team!!.addEntry(player.name)
                                     player.scoreboard = board
                                     tab.setTabView(player.uniqueId, tabView)
                                     tab.update(player)
@@ -243,11 +244,21 @@ class Box : JavaPlugin() {
                     }
                 }
                 Status.GAME -> {
+                    // Если игра длиться дольше 20 минут включить ники
+                    if (time == 20 * 60) {
+                        app.teams.forEach { it.team!!.nameTagVisibility = NameTagVisibility.ALWAYS }
+                    }
+                    if (time == 27 * 60) {
+                        Bukkit.getOnlinePlayers().forEach { player ->
+                            if (player.gameMode == GameMode.SURVIVAL)
+                                player.isGlowing = true
+                        }
+                    }
                     //Обновление компасов
                     Bukkit.getOnlinePlayers().forEach { player ->
                         if (player.inventory.contains(Material.COMPASS)) {
                             try {
-                                val nearestPlayer =
+                                player.compassTarget = if (app.getUser(player)!!.compassToPlayer) {
                                     Bukkit.getPlayer(teams.filter { !it.players.contains(player.uniqueId) }
                                         .map {
                                             it.players.minByOrNull { current ->
@@ -259,8 +270,22 @@ class Box : JavaPlugin() {
                                             Bukkit.getPlayer(current).location.distanceSquared(
                                                 player.location
                                             )
-                                        })
-                                player.compassTarget = nearestPlayer.location
+                                        }).location
+                                } else {
+                                    Bukkit.getPlayer(teams.filter { !it.players.contains(player.uniqueId) }
+                                        .map {
+                                            it.players.minByOrNull { current ->
+                                                val enemyBed =
+                                                    app.getUser(current)!!.bed ?: Bukkit.getPlayer(current).location
+                                                enemyBed.distanceSquared(player.location)
+                                            }
+                                        }.minByOrNull { current ->
+                                            val enemyBed = current?.let { app.getUser(it) }!!.bed ?: Bukkit.getPlayer(
+                                                current
+                                            ).location
+                                            enemyBed.distanceSquared(player.location)
+                                        }).location
+                                }
                             } catch (exception: Exception) {
                             }
                         }
@@ -286,6 +311,7 @@ class Box : JavaPlugin() {
                                 } catch (ignored: Exception) {
                                 }
                             }
+                            it.team!!.nameTagVisibility = NameTagVisibility.HIDE_FOR_OTHER_TEAMS
                             it.players.clear()
                             it.location = null
                             it.bed = true

@@ -56,26 +56,34 @@ object Generator {
         wholeSize: Int
     ): List<Location> {
         val locations = arrayListOf<Location>()
-        start.set(0.0, ySize * Math.random() / 2 + ySize / 4, zSize * Math.random() / 2 + zSize / 4)
-        locations.add(generateRoom(start, -1, 0, 0, roomSize, wholeSize))
-        start.set(
-            xSize.toDouble() - roomSize,
-            ySize * Math.random() / 3 + ySize / 4 + roomSize,
-            zSize * Math.random() / 2 + zSize / 4
-        )
-        locations.add(generateRoom(start, 1, 0, 0, roomSize, wholeSize))
-        start.set(
-            xSize * Math.random() / 2 + xSize / 4,
-            ySize * Math.random() / 3 + ySize / 4 + roomSize,
-            zSize.toDouble() - roomSize
-        )
-        locations.add(generateRoom(start, 0, 0, 1, roomSize, wholeSize))
-        start.set(
-            xSize * Math.random() / 2 + xSize / 4,
-            ySize * Math.random() / 3 + ySize / 4 + roomSize,
-            0.0
-        )
-        locations.add(generateRoom(start, 0, 0, -1, roomSize, wholeSize))
+        if (app.teams.isNotEmpty()) {
+            start.set(0.0, ySize * Math.random() / 2 + ySize / 4, zSize * Math.random() / 2 + zSize / 4)
+            locations.add(generateRoom(start, -1, 0, 0, roomSize, wholeSize))
+        }
+        if (app.teams.size > 1) {
+            start.set(
+                xSize.toDouble() - roomSize,
+                ySize * Math.random() / 3 + ySize / 4 + roomSize,
+                zSize * Math.random() / 2 + zSize / 4
+            )
+            locations.add(generateRoom(start, 1, 0, 0, roomSize, wholeSize))
+        }
+        if (app.teams.size > 2) {
+            start.set(
+                xSize * Math.random() / 2 + xSize / 4,
+                ySize * Math.random() / 3 + ySize / 4 + roomSize,
+                zSize.toDouble() - roomSize
+            )
+            locations.add(generateRoom(start, 0, 0, 1, roomSize, wholeSize))
+        }
+        if (app.teams.size > 3) {
+            start.set(
+                xSize * Math.random() / 2 + xSize / 4,
+                ySize * Math.random() / 3 + ySize / 4 + roomSize,
+                0.0
+            )
+            locations.add(generateRoom(start, 0, 0, -1, roomSize, wholeSize))
+        }
         return locations
     }
 

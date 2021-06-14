@@ -61,7 +61,7 @@ class App : JavaPlugin() {
         info.readableName = "Бедроковая коробка Лобби"
         info.groupName = "Бедроковая коробка Лобби"
         info.isLobbyServer = true
-        info.servicedServers = arrayOf("BOX4", "BOX8", "BOX5", "BOXE")
+        info.servicedServers = arrayOf("BOX4", "BOX8", "BOX5", "BOXE", "BOXS", "BOXN")
 
         // Регистрация сервисов
         val core = CoreApi.get()
@@ -96,7 +96,7 @@ class App : JavaPlugin() {
         Npcs.spawn(
             Npc.builder()
                 .location(Location(worldMeta.world, -253.0, 112.0, 33.0, 95f, 0f))
-                .name("§c§l8 §fx §c§l2")
+                .name("§c§l8 §fx §c§l2 §eПВП 1.8")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/30719b68-2c69-11e8-b5ea-1cb72caa35fd")
                 .skinDigest("307264a1-2c6911e8b5ea1cb72caa35fd")
@@ -109,7 +109,7 @@ class App : JavaPlugin() {
         Npcs.spawn(
             Npc.builder()
                 .location(Location(worldMeta.world, -252.0, 112.0, 29.0, 145f, 0f))
-                .name("§c§l4 §fx §c§l2")
+                .name("§c§l4 §fx §c§l2 §eПВП 1.8")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/6f3f4a2e-7f84-11e9-8374-1cb72caa35fd")
                 .skinDigest("6f3f4a2e-7f8411e983741cb72caa35fd")
@@ -122,7 +122,7 @@ class App : JavaPlugin() {
         Npcs.spawn(
             Npc.builder()
                 .location(Location(worldMeta.world, -257.0, 112.0, 34.0, 165f, 0f))
-                .name("§c§l50 §fx §c§l2")
+                .name("§c§l50 §fx §c§l2 §eПВП 1.8")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/30392bb3-2c69-11e8-b5ea-1cb72caa35fd")
                 .skinDigest("30392bb3-2c6911e8b5ea1cb72caa35fd")
@@ -135,13 +135,26 @@ class App : JavaPlugin() {
         Npcs.spawn(
             Npc.builder()
                 .location(Location(worldMeta.world, -264.0, 112.0, 36.0, -180f, 0f))
-                .name("§c§l4 §fx §c§l4")
+                .name("§c§l4 §fx §c§l4 §eПВП 1.8")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/7f3fea26-be9f-11e9-80c4-1cb72caa35fd")
                 .skinDigest("7f3fea26-be9f11e980c41cb72caa35fd")
                 .type(EntityType.PLAYER)
                 .onClick { player ->
                     val navigator = ClickServer("BOXS", 16)
+                    navigator.accept(player)
+                }.build()
+        )
+        Npcs.spawn(
+            Npc.builder()
+                .location(Location(worldMeta.world, -249.0, 112.0, 20.0, 45f, 0f))
+                .name("§c§l4 §fx §c§l4 §eПВП 1.9")
+                .behaviour(NpcBehaviour.STARE_AT_PLAYER)
+                .skinUrl("https://webdata.c7x.dev/textures/skin/e7c13d3d-ac38-11e8-8374-1cb72caa35fd")
+                .skinDigest("e7c13d3d-ac3811e883741cb72caa35fd")
+                .type(EntityType.PLAYER)
+                .onClick { player ->
+                    val navigator = ClickServer("BOXN", 16)
                     navigator.accept(player)
                 }.build()
         )

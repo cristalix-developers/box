@@ -37,7 +37,8 @@ class FamousListener : Listener {
                 .record("Онлайн") {
                     (realmService.getOnlineOnRealms("BOX4") +
                             realmService.getOnlineOnRealms("BOX8") +
-                            realmService.getOnlineOnRealms("BOX50")).toString()
+                            realmService.getOnlineOnRealms("BOX50") +
+                            realmService.getOnlineOnRealms("BOXS")).toString()
                 }
             Cristalix.scoreboardService().setCurrentObjective(player.uniqueId, address)
         }
@@ -46,7 +47,7 @@ class FamousListener : Listener {
 
     @EventHandler
     fun PlayerMoveEvent.handle() {
-        if (app.spawn.distanceSquared(to) > 40 * 40)
+        if (app.spawn.distanceSquared(to) > 70 * 70)
             player.teleport(app.spawn)
     }
 

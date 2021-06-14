@@ -4,6 +4,8 @@ import clepto.bukkit.B
 import clepto.cristalix.Cristalix
 import dev.implario.bukkit.item.item
 import io.netty.buffer.Unpooled
+import net.md_5.bungee.api.ChatMessageType
+import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.PacketDataSerializer
 import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload
 import org.bukkit.*
@@ -22,6 +24,7 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import ru.cristalix.core.chat.IChatService
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.item.Items
 import ru.cristalix.core.realm.IRealmService
@@ -53,7 +56,7 @@ class DefaultListener : Listener {
         (player as CraftPlayer).handle.playerConnection.sendPacket(
             PacketPlayOutCustomPayload(
                 "xdark:pvp", PacketDataSerializer(
-                    Unpooled.wrappedBuffer("{\"renderSwordAsShield\": false}".toByteArray(StandardCharsets.UTF_8))
+                    Unpooled.wrappedBuffer("{\"renderSwordAsShield\": true}".toByteArray(StandardCharsets.UTF_8))
                 )
             )
         )
@@ -95,8 +98,16 @@ class DefaultListener : Listener {
         if (app.status == Status.STARTING)
             cancel = true
         if (blockPlaced.type == Material.BED_BLOCK) {
+            if (blockPlaced.location.add(0.0, 1.0, 0.0).block.type != Material.AIR) {
+                player.sendMessage(Formatting.error("Над кроватью должна быть пустота."))
+                cancel = true
+                return
+            }
+            val user = app.getUser(player)!!
+            if (user.bed != null)
+                return
             player.sendMessage(Formatting.fine("Вы установили личную кровать!"))
-            app.getUser(player)!!.bed = blockPlaced.location
+            user.bed = blockPlaced.location
         }
     }
 
@@ -104,6 +115,11 @@ class DefaultListener : Listener {
     fun PlayerBedEnterEvent.handle() {
         if (app.status == Status.STARTING)
             cancel = true
+        if (app.teams.filter { team -> team.players.contains(player.uniqueId) }[0]
+            .location!!.distanceSquared(bed.location) < 15) {
+            player.sendMessage(Formatting.fine("Вы уже привязаны к этой кровати"))
+            return
+        }
         player.sendMessage(Formatting.fine("Точка возраждения установлена!"))
         app.getUser(player)!!.bed = bed.location
     }
@@ -143,11 +159,20 @@ class DefaultListener : Listener {
     fun PlayerInteractEvent.handle() {
         if (app.status == Status.STARTING && material == Material.CLAY_BALL)
             Cristalix.transfer(listOf(player.uniqueId), RealmId.of(app.hub))
+        if (material == Material.COMPASS) {
+            val user = app.getUser(player)!!
+            user.compassToPlayer = !user.compassToPlayer
+
+            player.spigot().sendMessage(
+                ChatMessageType.ACTION_BAR,
+                TextComponent(if (user.compassToPlayer) "§aКомпас нацелен на врагов" else "Компас указывает на кровать врага")
+            )
+        }
         if (app.status == Status.STARTING && material == Material.WOOL) {
             app.teams.filter {
                 !it.players.contains(player.uniqueId) && it.color.woolData.toByte() == player.itemInHand.getData().data
             }.forEach { team ->
-                if (team.players.size == app.slots / app.teams.size) {
+                if (team.players.size > app.slots / app.teams.size) {
                     player.sendMessage(Formatting.error("Ошибка! Команда заполена."))
                     return@forEach
                 }
@@ -183,6 +208,7 @@ class DefaultListener : Listener {
             if (player.openInventory != null && player.openInventory.topInventory != null)
                 player.openInventory.topInventory.clear()
             player.inventory.clear()
+            player.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 255, false, false))
             app.teams.filter { it.players.contains(entity.uniqueId) }
                 .forEach { team ->
                     var message = "" + team.color.chatColor + player.name + " §fубит"
@@ -205,6 +231,9 @@ class DefaultListener : Listener {
                         player.gameMode = GameMode.SPECTATOR
                         player.sendTitle("Вы проиграли!", "Наблюдение...")
                         message = "§e§lФИНАЛЬНОЕ УБИЙСТВО! $message"
+                        if (player.killer != null) {
+                            app.getUser(player.killer)!!.finalKills++
+                        }
                     }
                     B.bc(Formatting.fine(message))
                     return@postpone
@@ -234,13 +263,17 @@ class DefaultListener : Listener {
             cancel = true
             return
         }
-        if (message.startsWith("!")) {
-            val team = app.teams.filter { boxTeam -> boxTeam.players.contains(player.uniqueId) }
-            if (team.isNotEmpty()) {
+        val team = app.teams.filter { boxTeam -> boxTeam.players.contains(player.uniqueId) }
+        if (team.isNotEmpty()) {
+            cancel = true
+            if (!message.startsWith("!")) {
                 team[0].players.mapNotNull { Bukkit.getPlayer(it) }.forEach {
-                    it.sendMessage("" + team[0].color.chatColor + "${player.name} > ${message.drop(1)}")
+                    it.sendMessage("" + team[0].color.chatColor + "${player.name} >§7 $message")
                 }
-                cancel = true
+            } else {
+                Bukkit.getOnlinePlayers().forEach {
+                    it.sendMessage("§f[" + team[0].color.chatColor + team[0].color.teamName.substring(0, 1) + "§f] ${player.name} > " + message.drop(1))
+                }
             }
         }
     }
@@ -248,13 +281,6 @@ class DefaultListener : Listener {
 
 object Winner {
     fun tryGetWinner() {
-        if (Bukkit.getOnlinePlayers().isEmpty()) {
-            app.status = Status.END
-            return
-        } else {
-            app.teams.forEach { it.players.removeIf { player -> Bukkit.getPlayer(player) == null } }
-        }
-
         val list = app.teams.filter { it.players.size > 0 }
         if (list.size == 1) {
             B.bc(" ")
@@ -268,7 +294,6 @@ object Winner {
                 }
             B.bc(" ")
             B.bc(" ")
-            app.status = Status.END
             list[0].players.forEach {
                 val user = app.getUser(it)
                 if (user?.stat != null) {
@@ -298,6 +323,11 @@ object Winner {
                     return@forEach
                 it.sendTitle("§cПОРАЖЕНИЕ", "§cвы проиграли")
             }
+            app.status = Status.END
+        }
+        if (Bukkit.getOnlinePlayers().isEmpty()) {
+            app.status = Status.END
+            return
         }
     }
 }

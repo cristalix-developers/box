@@ -23,23 +23,29 @@ class BlockListener : Listener {
         }
         if (block.type == Material.BED_BLOCK) {
             cancel = true
-            app.teams.filter { it.location!!.distanceSquared(block.location) < 16 && !it.players.contains(player.uniqueId) }
+            app.teams.filter { it.location!!.distanceSquared(block.location) < 25 && !it.players.contains(player.uniqueId) }
                 .forEach {
                     it.bed = false
                     cancel = false
                     dropItems = false
                     B.bc(Formatting.fine(player.name + " сломал кровать команды " + it.color.chatColor + it.color.teamName))
+                    it.players.forEach { uid ->
+                        Bukkit.getPlayer(uid)?.playSound(player.location, "entity.enderdragon.ambient", 1f, 1f)
+                    }
                     return
                 }
             val bed = Bukkit.getOnlinePlayers().filter {
-                app.getUser(it)!!.bed != null && app.getUser(it)!!.bed!!.distanceSquared(it.location) < 16
+                app.getUser(it)!!.bed != null && app.getUser(it)!!.bed!!.distanceSquared(it.location) < 25
             }
             if (bed.isNotEmpty()) {
+                if (block.drops.isNotEmpty())
+                    player.inventory.addItem(block.drops.first())
                 app.getUser(bed[0])!!.bed = null
                 cancel = false
-                player.sendMessage(Formatting.fine("Вы сломали кровать врага!"))
+                dropItems = false
+                block.drops.clear()
+                player.sendMessage(Formatting.fine("Вы сломали кровать!"))
                 bed[0].sendMessage(Formatting.error("Ваша кровать сломана!"))
-                return
             }
             return
         }
