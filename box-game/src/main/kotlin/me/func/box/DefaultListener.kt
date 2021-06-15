@@ -77,6 +77,8 @@ class DefaultListener : Listener {
 
     @EventHandler
     fun PlayerQuitEvent.handle() {
+        app.teams.filter { it.players.contains(player.uniqueId) }
+            .forEach { it.players.remove(player.uniqueId) }
         if (app.status == Status.STARTING) {
             app.waitingBar.removeViewer(player.uniqueId)
             return
@@ -88,8 +90,6 @@ class DefaultListener : Listener {
                     player.world.dropItemNaturally(player.location, it)
             }
         }
-        app.teams.filter { it.players.contains(player.uniqueId) }
-            .forEach { it.players.remove(player.uniqueId) }
         Winner.tryGetWinner()
     }
 

@@ -12,8 +12,6 @@ import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionEffectType
 import org.bukkit.scoreboard.NameTagVisibility
 import org.bukkit.scoreboard.Team
 import ru.cristalix.core.CoreApi
@@ -125,7 +123,12 @@ class Box : JavaPlugin() {
         var time = 0
         Bukkit.getScheduler().runTaskTimer(this, {
             time++
-            app.teams.forEach { it.players.removeIf { player -> Bukkit.getPlayer(player) == null } }
+            app.teams.forEach {
+                it.players.removeIf { player ->
+                    val craftPlayer = Bukkit.getPlayer(player)
+                    craftPlayer == null || !craftPlayer.isOnline
+                }
+            }
 
             when (status) {
                 Status.STARTING -> {
@@ -145,34 +148,31 @@ class Box : JavaPlugin() {
                             user.stat!!.games++
                             waitingBar.removeViewer(player.uniqueId)
 
-                            if (teams.any { it.players.contains(player.uniqueId) })
-                                return@forEach
-                            teams.minByOrNull { it.players.size }!!.players.add(player.uniqueId)
+                            if (!teams.any { it.players.contains(player.uniqueId) })
+                                teams.minByOrNull { it.players.size }!!.players.add(player.uniqueId)
 
                             // Скорборды
-                            B.postpone(30) {
-                                val address = UUID.randomUUID().toString()
-                                val objective =
-                                    Cristalix.scoreboardService().getPlayerObjective(player.uniqueId, address)
-                                objective.displayName = "Бедроковая коробка"
-                                val group = objective.startGroup("Игра")
-                                teams.forEach {
-                                    group.record { "" + it.color.chatColor + "■ §f" + it.color.teamName + (if (it.bed) " §a✔" else " §c" + it.players.size) }
-                                }
-                                group
-                                    .record { "" }
-                                    .record { "Убийств: §c" + user.tempKills }
-                                    .record { "Финальных: §6" + user.finalKills }
-                                    .record { "Кровать " + if (user.bed != null) "§a✔" else "§c䂄" }
-                                    .record {
-                                        val pTime = Status.END.lastSecond - time
-                                        "§7Авторестарт " + String.format("%02d:%02d", pTime / 60, pTime % 60)
-                                    }
-                                Cristalix.scoreboardService().setCurrentObjective(player.uniqueId, address)
+                            val address = UUID.randomUUID().toString()
+                            val objective =
+                                Cristalix.scoreboardService().getPlayerObjective(player.uniqueId, address)
+                            objective.displayName = "Бедроковая коробка"
+                            val group = objective.startGroup("Игра")
+                            teams.forEach {
+                                group.record { "" + it.color.chatColor + "■ §f" + it.color.teamName + (if (it.bed) " §a✔" else " §c" + it.players.size) }
                             }
+                            group
+                                .record { "" }
+                                .record { "Убийств: §c" + user.tempKills }
+                                .record { "Финальных: §6" + user.finalKills }
+                                .record { "Кровать " + if (user.bed != null) "§a✔" else "§c䂄" }
+                                .record {
+                                    val pTime = Status.END.lastSecond - time
+                                    "§7Авторестарт " + String.format("%02d:%02d", pTime / 60, pTime % 60)
+                                }
+                            Cristalix.scoreboardService().setCurrentObjective(player.uniqueId, address)
                         }
                         // Отпрака игроков по домам
-                        B.postpone(2) {
+                        B.postpone(1) {
                             // Генерация комнат
                             Generator.generateRooms(zero, size, size, size, 10, 5)
                                 .forEachIndexed { index, location ->

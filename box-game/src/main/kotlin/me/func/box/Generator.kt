@@ -98,7 +98,7 @@ object Generator {
                     (originalY + node.second).toDouble(),
                     (originalZ + node.third).toDouble()
                 )
-                location.block.type = type
+                location.block.setTypeAndDataFast(type.id, 0)
             }
         }
     }
