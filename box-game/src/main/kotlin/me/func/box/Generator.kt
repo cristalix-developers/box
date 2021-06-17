@@ -26,9 +26,9 @@ object Generator {
                 for (z in 1..zSize) {
                     start.set((originalX + x).toDouble(), (originalY + y).toDouble(), (originalZ + z).toDouble())
                     if (Math.random() > 0.05)
-                        start.block.type = Material.STONE
+                        start.block.setTypeAndDataFast(1, 0)
                     else
-                        start.block.type = Material.EMERALD_ORE
+                        start.block.setTypeAndDataFast(Material.EMERALD_ORE.id, 0)
                 }
             }
         }

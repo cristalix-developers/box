@@ -22,7 +22,7 @@ class FamousListener : Listener {
             player.teleport(app.spawn)
 
             val user = app.getUser(player)!!
-            val stat = user.stat!!
+            val stat = user.stat
             stat.lastSeenName = Cristalix.getDisplayName(player)
             val address = UUID.randomUUID().toString()
             val objective =
@@ -37,7 +37,9 @@ class FamousListener : Listener {
                 .record("Онлайн") {
                     (realmService.getOnlineOnRealms("BOX4") +
                             realmService.getOnlineOnRealms("BOX8") +
-                            realmService.getOnlineOnRealms("BOX50") +
+                            realmService.getOnlineOnRealms("BOX5") +
+                            realmService.getOnlineOnRealms("BOXL") +
+                            realmService.getOnlineOnRealms("BOXE") +
                             realmService.getOnlineOnRealms("BOXS")).toString()
                 }
             Cristalix.scoreboardService().setCurrentObjective(player.uniqueId, address)

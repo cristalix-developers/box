@@ -172,7 +172,7 @@ class DefaultListener : Listener {
             app.teams.filter {
                 !it.players.contains(player.uniqueId) && it.color.woolData.toByte() == player.itemInHand.getData().data
             }.forEach { team ->
-                if (team.players.size > app.slots / app.teams.size) {
+                if (team.players.size >= app.slots / app.teams.size) {
                     player.sendMessage(Formatting.error("Ошибка! Команда заполена."))
                     return@forEach
                 }
@@ -195,10 +195,10 @@ class DefaultListener : Listener {
 
         if (player.killer != null) {
             val user = app.getUser(player.killer)!!
-            user.stat!!.kills++
+            user.stat.kills++
             user.tempKills++
         }
-        app.getUser(player)!!.stat!!.deaths++
+        app.getUser(player)!!.stat.deaths++
 
         B.postpone(1) {
             player.inventory.forEach {
@@ -290,16 +290,16 @@ object Winner {
             B.bc("§e§lТОП УБИЙСТВ")
             Bukkit.getOnlinePlayers().map { app.getUser(it) }.sortedBy { -it!!.tempKills }.subList(0, 3)
                 .forEachIndexed { index, user ->
-                    B.bc(" §l${index + 1}. §e" + user!!.player.name + " §с" + user.tempKills + " убийств")
+                    B.bc(" §l${index + 1}. §e" + user!!.player?.name + " §с" + user.tempKills + " убийств")
                 }
             B.bc(" ")
             B.bc(" ")
             list[0].players.forEach {
                 val user = app.getUser(it)
                 if (user?.stat != null) {
-                    user.stat!!.wins++
-                    user.player.sendTitle("§aПОБЕДА", "§aвы выиграли!")
-                    val firework = user.player.world.spawn(user.player.location, Firework::class.java)
+                    user.stat.wins++
+                    user.player?.sendTitle("§aПОБЕДА", "§aвы выиграли!")
+                    val firework = user.player?.world!!.spawn(user.player!!.location, Firework::class.java)
                     val meta = firework.fireworkMeta
                     meta.addEffect(
                         FireworkEffect.builder()

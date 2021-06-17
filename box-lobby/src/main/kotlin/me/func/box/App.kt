@@ -4,6 +4,11 @@ import clepto.bukkit.B
 import clepto.cristalix.Cristalix
 import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.platform.Platforms
+import dev.implario.kensuke.Kensuke
+import dev.implario.kensuke.Scope
+import dev.implario.kensuke.Session
+import dev.implario.kensuke.impl.bukkit.BukkitKensuke
+import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -20,30 +25,28 @@ import ru.cristalix.core.party.IPartyService
 import ru.cristalix.core.party.PartyService
 import ru.cristalix.core.realm.IRealmService
 import ru.cristalix.core.realm.RealmStatus
-import ru.cristalix.core.stats.IStatService
-import ru.cristalix.core.stats.PlayerScope
-import ru.cristalix.core.stats.UserManager
-import ru.cristalix.core.stats.impl.StatService
-import ru.cristalix.core.stats.impl.network.StatServiceConnectionData
 import ru.cristalix.core.transfer.ITransferService
 import ru.cristalix.core.transfer.TransferService
 import ru.cristalix.npcs.data.NpcBehaviour
 import ru.cristalix.npcs.server.Npc
 import ru.cristalix.npcs.server.Npcs
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 lateinit var app: App
 
 class App : JavaPlugin() {
 
-    private val statScope = PlayerScope("box", Stat::class.java)
-    private lateinit var statService: IStatService
+    private val statScope = Scope("box", Stat::class.java)
 
     private lateinit var worldMeta: WorldMeta
+    private lateinit var kensuke: Kensuke
     lateinit var spawn: Location
-    private lateinit var userManager: UserManager<User>
+    private var userManager = BukkitUserManager(
+        listOf(statScope),
+        { session, context -> User(session, context.getData(statScope)) },
+        { user, context -> context.store(statScope, user.stat) }
+    )
 
     override fun onEnable() {
         B.plugin = this
@@ -69,27 +72,18 @@ class App : JavaPlugin() {
         core.registerService(IPartyService::class.java, PartyService(ISocketClient.get()))
         core.registerService(ITransferService::class.java, TransferService(ISocketClient.get()))
         core.registerService(IInventoryService::class.java, InventoryService())
-        statService = StatService(core.platformServer, StatServiceConnectionData.fromEnvironment())
-        core.registerService(IStatService::class.java, statService)
 
-        statService.useScopes(statScope)
+        kensuke = BukkitKensuke.setup(this)
+        kensuke.addGlobalUserManager(userManager)
+        kensuke.globalRealm = info.realmId.realmName
 
-        userManager = statService.registerUserManager(
-            {
-                val user = User(it.uuid, it.name, it.getData(statScope))
-                user
-            },
-            { user: User, context ->
-                context.store(statScope, user.stat)
-            }
-        )
         B.events(FamousListener(), GlobalListener())
 
         createTop(Location(worldMeta.world, -258.0, 115.6, 19.5), "Убийств", "Топ убийств", "kills") {
-            it.kills
+            "" + it.kills
         }
         createTop(Location(worldMeta.world, -266.5, 115.6, 28.0, -90f, 0f), "Побед", "Топ побед", "wins") {
-            it.wins
+            "" + it.wins
         }
 
         Npcs.init(this)
@@ -160,7 +154,7 @@ class App : JavaPlugin() {
         )
     }
 
-    private fun createTop(location: Location, string: String, title: String, key: String, function: (Stat) -> Any) {
+    private fun createTop(location: Location, string: String, title: String, key: String, function: (Stat) -> String) {
         val blocks = Boards.newBoard()
         blocks.addColumn("#", 10.0)
         blocks.addColumn("Игрок", 95.0)
@@ -169,22 +163,22 @@ class App : JavaPlugin() {
         blocks.location = location
         Boards.addBoard(blocks)
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, {
-            statService.getLeaderboard(statScope, key, 10).thenAccept { top ->
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(
+            this, {
+                kensuke.getLeaderboard(userManager, statScope, key, 10).thenAccept {
                     blocks.clearContent()
-                    for (i in 0 until top.size) {
-                        if (top[i].lastSeenName == null)
-                            top[i].lastSeenName = IAccountService.get().getNameByUuid(top[i].id).get(3, TimeUnit.SECONDS)
 
+                    for (entry in it) {
+                        if (entry.data.stat.lastSeenName == null)
+                            entry.data.stat.lastSeenName = IAccountService.get().getNameByUuid(UUID.fromString(entry.data.id)).get()
                         blocks.addContent(
-                            UUID.randomUUID(), "§e" + (i + 1),
-                            top[i].lastSeenName,
-                            "" + function(top[i])
+                            UUID.fromString(entry.data.id), "" + entry.position, entry.data.stat.lastSeenName, "§d" + function(entry.data.stat)
                         )
                     }
+
                     blocks.updateContent()
                 }
-            }, 20, 30 * 20
+            }, 20, 10 * 20
         )
     }
 

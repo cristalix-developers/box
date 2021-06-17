@@ -5,6 +5,10 @@ import clepto.cristalix.Cristalix
 import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.item.item
 import dev.implario.bukkit.platform.Platforms
+import dev.implario.kensuke.Scope
+import dev.implario.kensuke.Session
+import dev.implario.kensuke.impl.bukkit.BukkitKensuke
+import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.bar.WaitingPlayers
 import net.md_5.bungee.api.chat.ComponentBuilder
@@ -21,17 +25,16 @@ import ru.cristalix.core.inventory.IInventoryService
 import ru.cristalix.core.inventory.InventoryService
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.network.packages.RealmUpdatePackage
+import ru.cristalix.core.party.IPartyService
+import ru.cristalix.core.party.PartyService
 import ru.cristalix.core.realm.IRealmService
 import ru.cristalix.core.realm.RealmId
 import ru.cristalix.core.realm.RealmStatus
-import ru.cristalix.core.stats.IStatService
-import ru.cristalix.core.stats.PlayerScope
-import ru.cristalix.core.stats.UserManager
-import ru.cristalix.core.stats.impl.StatService
-import ru.cristalix.core.stats.impl.network.StatServiceConnectionData
 import ru.cristalix.core.tab.ITabService
 import ru.cristalix.core.tab.TabTextComponent
 import ru.cristalix.core.text.TextFormat
+import ru.cristalix.core.transfer.ITransferService
+import ru.cristalix.core.transfer.TransferService
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import kotlin.math.max
@@ -41,11 +44,15 @@ lateinit var app: Box
 
 class Box : JavaPlugin() {
 
-    private val statScope = PlayerScope("box", Stat::class.java)
+    private val statScope = Scope("box", Stat::class.java)
 
     private lateinit var worldMeta: WorldMeta
     lateinit var spawn: Location
-    private lateinit var userManager: UserManager<User>
+    private var userManager = BukkitUserManager(
+        listOf(statScope),
+        { session: Session, context -> User(session, context.getData(statScope)) },
+        { user, context -> context.store(statScope, user.stat) }
+    )
     lateinit var zero: Location
     var status = Status.STARTING
     var slots = System.getenv("SLOT").toInt()
@@ -76,6 +83,9 @@ class Box : JavaPlugin() {
 
         // Регистрация сервисов
         val core = CoreApi.get()
+        core.registerService(IPartyService::class.java, PartyService(ISocketClient.get()))
+        core.registerService(ITransferService::class.java, TransferService(ISocketClient.get()))
+        core.registerService(IInventoryService::class.java, InventoryService())
 
         val realmService = IRealmService.get()
 
@@ -88,21 +98,10 @@ class Box : JavaPlugin() {
         info.readableName = "БКоробка ${slots / 2}x${slots / 2} #$id"
         info.groupName = "БКоробка ${slots / 2}x${slots / 2} #$id"
 
-        core.registerService(IInventoryService::class.java, InventoryService())
-        val statService = StatService(core.platformServer, StatServiceConnectionData.fromEnvironment())
-        core.registerService(IStatService::class.java, statService)
-
-        statService.useScopes(statScope)
-
-        userManager = statService.registerUserManager(
-            {
-                val user = User(it.uuid, it.name, it.getData(statScope))
-                user
-            },
-            { user: User, context ->
-                context.store(statScope, user.stat)
-            }
-        )
+        val kensuke = BukkitKensuke.setup(this)
+        kensuke.addGlobalUserManager(userManager)
+        kensuke.globalRealm = info.realmId.realmName
+        userManager.isOptional = true
 
         // Регистрация обработчиков
         B.events(BlockListener(), DefaultListener(), TradeMenu(), EnchantTable())
@@ -257,36 +256,33 @@ class Box : JavaPlugin() {
                     //Обновление компасов
                     Bukkit.getOnlinePlayers().forEach { player ->
                         if (player.inventory.contains(Material.COMPASS)) {
-                            try {
-                                player.compassTarget = if (app.getUser(player)!!.compassToPlayer) {
-                                    Bukkit.getPlayer(teams.filter { !it.players.contains(player.uniqueId) }
-                                        .map {
-                                            it.players.minByOrNull { current ->
-                                                Bukkit.getPlayer(current).location.distanceSquared(
-                                                    player.location
-                                                )
-                                            }
-                                        }.minByOrNull { current ->
+                            player.compassTarget = if (app.getUser(player)!!.compassToPlayer) {
+                                Bukkit.getPlayer(teams.filter { !it.players.contains(player.uniqueId) }
+                                    .map {
+                                        it.players.minByOrNull { current ->
                                             Bukkit.getPlayer(current).location.distanceSquared(
                                                 player.location
                                             )
-                                        }).location
-                                } else {
-                                    Bukkit.getPlayer(teams.filter { !it.players.contains(player.uniqueId) }
-                                        .map {
-                                            it.players.minByOrNull { current ->
-                                                val enemyBed =
-                                                    app.getUser(current)!!.bed ?: Bukkit.getPlayer(current).location
-                                                enemyBed.distanceSquared(player.location)
-                                            }
-                                        }.minByOrNull { current ->
-                                            val enemyBed = current?.let { app.getUser(it) }!!.bed ?: Bukkit.getPlayer(
-                                                current
-                                            ).location
+                                        }
+                                    }.minByOrNull { current ->
+                                        Bukkit.getPlayer(current).location.distanceSquared(
+                                            player.location
+                                        )
+                                    }).location
+                            } else {
+                                Bukkit.getPlayer(teams.filter { !it.players.contains(player.uniqueId) }
+                                    .map {
+                                        it.players.minByOrNull { current ->
+                                            val enemyBed =
+                                                app.getUser(current)!!.bed ?: return@minByOrNull 999999.0
                                             enemyBed.distanceSquared(player.location)
-                                        }).location
-                                }
-                            } catch (exception: Exception) {
+                                        }
+                                    }.minByOrNull { current ->
+                                        if (current == null)
+                                            return@minByOrNull 99999.0
+                                        val enemyBed = app.getUser(current)!!.bed ?: return@minByOrNull 999999.0
+                                        enemyBed.distanceSquared(player.location)
+                                    }).location
                             }
                         }
                     }
@@ -316,42 +312,47 @@ class Box : JavaPlugin() {
                             it.location = null
                             it.bed = true
                         }
-                        Cristalix.transfer(Bukkit.getOnlinePlayers().map { it.uniqueId }, RealmId.of(hub))
                         loadMap()
                         time = 0
                         status = Status.STARTING
                         B.postpone(20) {
-                            Cristalix.transfer(Bukkit.getOnlinePlayers().map { it.uniqueId }, RealmId.of(hub))
                             val realm = IRealmService.get().currentRealmInfo
                             realm.status = RealmStatus.WAITING_FOR_PLAYERS
                             ISocketClient.get().write(RealmUpdatePackage(RealmUpdatePackage.UpdateType.UPDATE, realm))
+                            Cristalix.transfer(Bukkit.getOnlinePlayers().map { it.uniqueId }, RealmId.of(hub))
                         }
                     }
                 }
             }
         }, 5, 20)
 
-        B.regCommand({ player, strings ->
-            if (player.isOp) {
-                slots = strings[0].toInt()
-            }
-            "Усновлено $slots слотов"
-        }, "slot")
+        B.regCommand(
+            { player, strings ->
+                if (player.isOp) {
+                    slots = strings[0].toInt()
+                }
+                "Усновлено $slots слотов"
+            }, "slot"
+        )
 
-        B.regCommand({ player, strings ->
-            if (player.isOp) {
-                val arg = strings[0].toInt()
-                size = max(50, min(arg, 130))
-            }
-            "Усновлен размер $size"
-        }, "size")
+        B.regCommand(
+            { player, strings ->
+                if (player.isOp) {
+                    val arg = strings[0].toInt()
+                    size = max(50, min(arg, 130))
+                }
+                "Усновлен размер $size"
+            }, "size"
+        )
 
-        B.regCommand({ player, _ ->
-            if (player.isOp) {
-                status = Status.END
-            }
-            "Игра будет прекращена"
-        }, "end")
+        B.regCommand(
+            { player, _ ->
+                if (player.isOp) {
+                    status = Status.END
+                }
+                "Игра будет прекращена"
+            }, "end"
+        )
     }
 
     fun getUser(player: Player): User? {
