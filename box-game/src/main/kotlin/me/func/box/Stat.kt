@@ -11,5 +11,9 @@ data class Stat (
     var emerald: Int,
     var stone: Int,
     var beds: Int,
-    val currentSkin: String
+    val currentSkin: String,
+    var money: Int,
+    var skins: MutableList<String>?,
+    var currentStarter: Starter?,
+    var starters: MutableList<Starter>?
 )

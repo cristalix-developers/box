@@ -211,8 +211,11 @@ class DefaultListener : Listener {
             app.teams.filter { it.players.contains(entity.uniqueId) }
                 .forEach { team ->
                     var message = "" + team.color.chatColor + player.name + " §fубит"
-                    if (player.killer != null)
+                    if (player.killer != null) {
+                        app.getUser(player.killer)!!.stat.money += app.killMoney
                         message += " игроком " + player.killer.name
+                        player.killer!!.sendMessage(Formatting.fine("Вы заработали " + app.killMoney + " монет."))
+                    }
                     val user = app.getUser(player)!!
                     if (user.bed != null && user.bed!!.block.type == Material.BED_BLOCK) {
                         player.teleport(app.getUser(player)!!.bed)
@@ -232,6 +235,8 @@ class DefaultListener : Listener {
                         message = "§e§lФИНАЛЬНОЕ УБИЙСТВО! $message"
                         if (player.killer != null) {
                             user.finalKills++
+                            user.stat.money += app.finalMoney
+                            player.killer!!.sendMessage(Formatting.fine("Вы заработали " + app.finalMoney + " монет."))
                             user.stat.kills++
                         }
                     }
@@ -300,6 +305,8 @@ object Winner {
                 val user = app.getUser(it)
                 if (user?.stat != null) {
                     user.stat.wins++
+                    user.stat.money += app.winMoney
+                    user.player!!.sendMessage(Formatting.fine("Вы заработали " + app.finalMoney + " монет."))
                     user.player?.sendTitle("§aПОБЕДА", "§aвы выиграли!")
                     val firework = user.player?.world!!.spawn(user.player!!.location, Firework::class.java)
                     val meta = firework.fireworkMeta

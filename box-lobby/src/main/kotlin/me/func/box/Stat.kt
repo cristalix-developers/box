@@ -14,4 +14,7 @@ data class Stat (
     var stone: Int,
     var beds: Int,
     var lastSeenName: String? = null,
+    var money: Int,
+    var currentStarter: Starter?,
+    var starters: MutableList<Starter>?
 )

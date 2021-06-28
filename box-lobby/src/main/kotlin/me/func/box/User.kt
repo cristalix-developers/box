@@ -27,8 +27,12 @@ class User(session: Session, stat: Stat?) : IBukkitKensukeUser {
 
     init {
         if (stat == null) {
-            this.stat = Stat(UUID.fromString(session.userId), arrayListOf("hi"), "", 0, 0, 0, 0, 0, 0, 0)
+            this.stat = Stat(UUID.fromString(session.userId), arrayListOf("hi"), "", 0, 0, 0, 0, 0, 0, 0, null, 500, Starter.NONE, mutableListOf(Starter.NONE))
         } else {
+            if(stat.currentStarter == null)
+                stat.currentStarter = Starter.NONE
+            if(stat.starters == null || stat.starters!!.isEmpty())
+                stat.starters = mutableListOf(Starter.NONE)
             this.stat = stat
         }
         if (this.stat.skins == null)

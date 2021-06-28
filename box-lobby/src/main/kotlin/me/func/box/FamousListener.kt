@@ -29,10 +29,11 @@ class FamousListener : Listener {
                 Cristalix.scoreboardService().getPlayerObjective(player.uniqueId, address)
             objective.displayName = "Бедроковая коробка"
             objective.startGroup("Статистика")
+                .record("Монет") { "§e" + stat.money }
                 .record("Убийств") { "§c" + stat.kills }
                 .record("Смертей") { "" + stat.deaths }
                 .record("Побед") { "§b" + stat.wins }
-                .record("Игр") { "§e" + stat.games }
+                .record("Игр") { "§d" + stat.games }
             objective.startGroup("Сервер")
                 .record("Онлайн") {
                     (realmService.getOnlineOnRealms("BOX4") +

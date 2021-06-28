@@ -66,16 +66,6 @@ dependencies {
     implementation 'ru.cristalix:npcs-bukkit-api:3.0.5'
 }
 
-remotes {
-    webServer {
-        port = project.properties["DEPLOY_PORT"] as int
-        host = project.properties["DEPLOY_HOST"]
-        user = project.properties["DEPLOY_USER"]
-        identity = file(project.properties["DEPLOY_KEY_ROOT"])
-        passphrase = project.properties["DEPLOY_PASSPHRASE"]
-    }
-}
-
 ssh.settings {
      knownHosts = allowAnyHosts
 }

@@ -58,6 +58,9 @@ class Box : JavaPlugin() {
     lateinit var zero: Location
     var status = Status.STARTING
     var slots = System.getenv("SLOT").toInt()
+    val winMoney = System.getenv("WIN_REWARD").toInt()
+    val finalMoney = System.getenv("FINAL_REWARD").toInt()
+    val killMoney = System.getenv("KILL_REWARD").toInt()
     private var size = System.getenv("SIZE").toInt()
     var teamSize = System.getenv("TEAM").toInt()
     val hub = "BOXL-1"
@@ -146,7 +149,8 @@ class Box : JavaPlugin() {
                             player.inventory.addItem(woodPickaxe)
                             player.sendTitle("§eПоехали!", "Враги без ника")
                             val user = app.getUser(player)!!
-                            user.stat!!.games++
+                            user.stat.currentStarter?.let { it.consumer(user) }
+                            user.stat.games++
                             waitingBar.removeViewer(player.uniqueId)
 
                             if (!teams.any { it.players.contains(player.uniqueId) })
