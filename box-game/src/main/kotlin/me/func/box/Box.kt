@@ -25,6 +25,8 @@ import ru.cristalix.core.inventory.IInventoryService
 import ru.cristalix.core.inventory.InventoryService
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.network.packages.RealmUpdatePackage
+import ru.cristalix.core.p13n.BukkitP13nService
+import ru.cristalix.core.p13n.P13nService
 import ru.cristalix.core.party.IPartyService
 import ru.cristalix.core.party.PartyService
 import ru.cristalix.core.realm.IRealmService
@@ -44,7 +46,7 @@ lateinit var app: Box
 
 class Box : JavaPlugin() {
 
-    private val statScope = Scope("box", Stat::class.java)
+    private val statScope = Scope("boxl", Stat::class.java)
 
     private lateinit var worldMeta: WorldMeta
     lateinit var spawn: Location

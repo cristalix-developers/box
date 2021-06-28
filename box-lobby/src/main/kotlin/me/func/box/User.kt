@@ -27,10 +27,12 @@ class User(session: Session, stat: Stat?) : IBukkitKensukeUser {
 
     init {
         if (stat == null) {
-            this.stat = Stat(UUID.fromString(session.userId), 0, 0, 0, 0, name)
+            this.stat = Stat(UUID.fromString(session.userId), arrayListOf("hi"), "", 0, 0, 0, 0, 0, 0, 0)
         } else {
             this.stat = stat
         }
+        if (this.stat.skins == null)
+            this.stat.skins = arrayListOf("hi")
         this.session = session
     }
 

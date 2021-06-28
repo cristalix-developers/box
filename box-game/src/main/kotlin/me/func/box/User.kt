@@ -32,7 +32,7 @@ class User(session: Session, stat: Stat?) : IBukkitKensukeUser {
 
     init {
         if (stat == null) {
-            this.stat = Stat(UUID.fromString(session.userId), 0, 0, 0, 0)
+            this.stat = Stat(UUID.fromString(session.userId), 0, 0, 0, 0, 0, 0, 0, "")
         } else {
             this.stat = stat
         }

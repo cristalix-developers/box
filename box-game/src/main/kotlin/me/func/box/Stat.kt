@@ -8,4 +8,8 @@ data class Stat (
     var deaths: Int,
     var wins: Int,
     var games: Int,
+    var emerald: Int,
+    var stone: Int,
+    var beds: Int,
+    val currentSkin: String
 )

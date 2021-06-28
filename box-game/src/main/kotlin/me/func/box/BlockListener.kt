@@ -31,6 +31,7 @@ class BlockListener : Listener {
                     B.bc(Formatting.fine(player.name + " сломал кровать команды " + it.color.chatColor + it.color.teamName))
                     it.players.forEach { uid ->
                         Bukkit.getPlayer(uid)?.playSound(player.location, "entity.enderdragon.ambient", 1f, 1f)
+                        Bukkit.getPlayer(uid)?.sendTitle("§cКровать уничтожена!", "§eВы больше не оживете")
                     }
                     return
                 }

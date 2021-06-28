@@ -40,6 +40,7 @@ class FamousListener : Listener {
                             realmService.getOnlineOnRealms("BOX5") +
                             realmService.getOnlineOnRealms("BOXL") +
                             realmService.getOnlineOnRealms("BOXE") +
+                            realmService.getOnlineOnRealms("BOXN") +
                             realmService.getOnlineOnRealms("BOXS")).toString()
                 }
             Cristalix.scoreboardService().setCurrentObjective(player.uniqueId, address)

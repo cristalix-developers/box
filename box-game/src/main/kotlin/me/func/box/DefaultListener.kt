@@ -195,7 +195,6 @@ class DefaultListener : Listener {
 
         if (player.killer != null) {
             val user = app.getUser(player.killer)!!
-            user.stat.kills++
             user.tempKills++
         }
         app.getUser(player)!!.stat.deaths++
@@ -232,7 +231,8 @@ class DefaultListener : Listener {
                         player.sendTitle("Вы проиграли!", "Наблюдение...")
                         message = "§e§lФИНАЛЬНОЕ УБИЙСТВО! $message"
                         if (player.killer != null) {
-                            app.getUser(player.killer)!!.finalKills++
+                            user.finalKills++
+                            user.stat.kills++
                         }
                     }
                     B.bc(Formatting.fine(message))
@@ -282,6 +282,8 @@ class DefaultListener : Listener {
 object Winner {
     fun tryGetWinner() {
         val list = app.teams.filter { it.players.size > 0 }
+        if (app.status != Status.GAME)
+            return
         if (list.size == 1) {
             B.bc(" ")
             B.bc(" ")

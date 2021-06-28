@@ -32,15 +32,41 @@ class TradeMenu : Listener {
                     "XAXDXPXOX",
                     "GSXXLXXJX"
                 )
+
+                val skin = app.getUser(player)!!.stat.currentSkin
+                var helmet = ItemStack(Material.DIAMOND_HELMET)
+                var chestplate = ItemStack(Material.DIAMOND_CHESTPLATE)
+                var leggins = ItemStack(Material.DIAMOND_LEGGINGS)
+                var boots = ItemStack(Material.DIAMOND_BOOTS)
+
+                if (skin != null && skin.isNotEmpty()) {
+                    helmet = item {
+                        type = Material.DIAMOND_HELMET
+                        nbt("armors", skin)
+                    }.build()
+                    chestplate = item {
+                        type = Material.DIAMOND_CHESTPLATE
+                        nbt("armors", skin)
+                    }.build()
+                    leggins = item {
+                        type = Material.DIAMOND_LEGGINGS
+                        nbt("armors", skin)
+                    }.build()
+                    boots = item {
+                        type = Material.DIAMOND_BOOTS
+                        nbt("armors", skin)
+                    }.build()
+                }
+
                 contents.add('A', slot(player, ItemStack(Material.IRON_HELMET), Pair(Material.COBBLESTONE, 32)))
                 contents.add('A', slot(player, ItemStack(Material.IRON_CHESTPLATE), Pair(Material.COBBLESTONE, 32)))
                 contents.add('A', slot(player, ItemStack(Material.IRON_LEGGINGS), Pair(Material.COBBLESTONE, 32)))
                 contents.add('A', slot(player, ItemStack(Material.IRON_BOOTS), Pair(Material.COBBLESTONE, 32)))
 
-                contents.add('D', slot(player, ItemStack(Material.DIAMOND_HELMET), Pair(Material.GOLD_INGOT, 4)))
-                contents.add('D', slot(player, ItemStack(Material.DIAMOND_CHESTPLATE), Pair(Material.GOLD_INGOT, 4)))
-                contents.add('D', slot(player, ItemStack(Material.DIAMOND_LEGGINGS), Pair(Material.GOLD_INGOT, 4)))
-                contents.add('D', slot(player, ItemStack(Material.DIAMOND_BOOTS), Pair(Material.GOLD_INGOT, 4)))
+                contents.add('D', slot(player, helmet, Pair(Material.GOLD_INGOT, 4)))
+                contents.add('D', slot(player, chestplate, Pair(Material.GOLD_INGOT, 4)))
+                contents.add('D', slot(player, leggins, Pair(Material.GOLD_INGOT, 4)))
+                contents.add('D', slot(player, boots, Pair(Material.GOLD_INGOT, 4)))
 
                 contents.add('P', slot(player, ItemStack(Material.STONE_PICKAXE), Pair(Material.COBBLESTONE, 16)))
                 contents.add('P', slot(player, item {
