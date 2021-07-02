@@ -11,6 +11,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityExplodeEvent
 import ru.cristalix.core.formatting.Formatting
 
 class BlockListener : Listener {
@@ -18,6 +21,14 @@ class BlockListener : Listener {
     @EventHandler
     fun BlockBreakEvent.handle() {
         if (app.status == Status.STARTING || block.type == Material.WOOD || block.type == Material.WORKBENCH) {
+            cancel = true
+            return
+        }
+        val user = app.getUser(player)!!
+        if (block.type == Material.GOLD_BLOCK) {
+            block.type = Material.AIR
+            user.stat.money += 100
+            player.sendMessage(Formatting.fine("Вы добыли §e100 монет§f!"))
             cancel = true
             return
         }
@@ -97,11 +108,64 @@ class BlockListener : Listener {
         }
     }
 
+    @EventHandler
+    fun BlockPlaceEvent.handle() {
+        if (app.status == Status.STARTING)
+            cancel = true
+        if (blockPlaced.location.subtract(0.0, 1.0, 0.0).block.type == Material.BED_BLOCK) {
+            player.sendMessage(Formatting.error("Над кроватью нельзя ставить блоки!"))
+            cancel = true
+        }
+        if (blockPlaced.type == Material.GOLD_BLOCK) {
+            player.sendMessage(Formatting.fine("Рукотворный?! Пойдет, заберу за §e5 монет"))
+            app.getUser(player)!!.stat.money += 5
+            blockPlaced.type = Material.AIR
+            return
+        }
+        if (blockPlaced.type == Material.BED_BLOCK) {
+            if (blockPlaced.location.clone().add(0.0, 1.0, 0.0).block.type != Material.AIR ||
+                blockPlaced.location.clone().add(0.0, 2.0, 0.0).block.type != Material.AIR
+            ) {
+                player.sendMessage(Formatting.error("Над кроватью должна быть пустота."))
+                cancel = true
+                return
+            }
+            val user = app.getUser(player)!!
+            if (user.bed != null)
+                return
+            player.sendMessage(Formatting.fine("Вы установили личную кровать!"))
+            user.bed = blockPlaced.location
+        }
+    }
+
+    @EventHandler
+    fun EntityExplodeEvent.handle() {
+        if (entityType == EntityType.PRIMED_TNT) {
+            blockList().removeIf {
+                it.type == Material.WOOD ||
+                        it.type == Material.BED_BLOCK ||
+                        it.type == Material.GOLD_BLOCK ||
+                        it.type == Material.CHEST ||
+                        it.type == Material.WORKBENCH
+            }
+        }
+    }
+
+    @EventHandler
+    fun EntityDamageEvent.handle() {
+        if (cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION ||
+            cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION
+        ) {
+            damage = 0.0
+        }
+    }
+
     private fun breakBlock(player: Player, location: Location, x: Int, y: Int, z: Int) {
         val clone = location.clone().add(x.toDouble(), y.toDouble(), z.toDouble())
-        if (clone.block.type == Material.BEDROCK || clone.block.type == Material.WOOD || clone.block.type == Material.BED_BLOCK)
+        val type = clone.block.type
+        if (type == Material.BEDROCK || type == Material.WOOD || type == Material.BED_BLOCK || type == Material.GOLD_BLOCK)
             return
-        if (clone.block.type == Material.EMERALD_ORE) {
+        if (type == Material.EMERALD_ORE) {
             val exp = clone.world.spawnEntity(clone, EntityType.EXPERIENCE_ORB) as ExperienceOrb
             exp.experience = 5
         }

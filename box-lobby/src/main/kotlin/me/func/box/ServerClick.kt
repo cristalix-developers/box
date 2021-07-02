@@ -58,7 +58,6 @@ class ClickServer(private val server: String, private val maxPlayers: Int) : Con
         } else {
             val realmId = getRealm(server, 1)
             if (realmId.isPresent) {
-                val realmInfo = IRealmService.get().getRealmById(realmId.get())
                 ITransferService.get().transfer(p.uniqueId, realmId.get())
             } else {
                 p.spigot().sendMessage(

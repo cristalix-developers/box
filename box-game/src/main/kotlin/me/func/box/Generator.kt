@@ -25,10 +25,12 @@ object Generator {
             for (y in 1..ySize) {
                 for (z in 1..zSize) {
                     start.set((originalX + x).toDouble(), (originalY + y).toDouble(), (originalZ + z).toDouble())
-                    if (Math.random() > 0.05)
-                        start.block.setTypeAndDataFast(1, 0)
-                    else
-                        start.block.setTypeAndDataFast(Material.EMERALD_ORE.id, 0)
+                    val random = Math.random()
+                    when {
+                        random > 0.05 -> start.block.setTypeAndDataFast(1, 0)
+                        random > 0.0002 -> start.block.setTypeAndDataFast(Material.EMERALD_ORE.id, 0)
+                        else -> start.block.setTypeAndDataFast(Material.GOLD_BLOCK.id, 0)
+                    }
                 }
             }
         }

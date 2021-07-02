@@ -43,6 +43,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 lateinit var app: Box
+const val MAX_GAME_STREAK_COUNT = 5
 
 class Box : JavaPlugin() {
 
@@ -72,6 +73,7 @@ class Box : JavaPlugin() {
         BoxTeam(mutableListOf(), true, Color.GREEN, null, null),
         BoxTeam(mutableListOf(), true, Color.YELLOW, null, null)
     )
+    var gameCounter = 0
 
     override fun onEnable() {
         B.plugin = this
@@ -143,6 +145,7 @@ class Box : JavaPlugin() {
                         ISocketClient.get().write(RealmUpdatePackage(RealmUpdatePackage.UpdateType.UPDATE, realm))
                         // Смена статуса игры и остановка счетчика игроков
                         status = Status.GAME
+                        gameCounter++
                         // Заполение команд
                         Bukkit.getOnlinePlayers().forEach { player ->
                             player.inventory.clear()
@@ -326,6 +329,9 @@ class Box : JavaPlugin() {
                             realm.status = RealmStatus.WAITING_FOR_PLAYERS
                             ISocketClient.get().write(RealmUpdatePackage(RealmUpdatePackage.UpdateType.UPDATE, realm))
                             Cristalix.transfer(Bukkit.getOnlinePlayers().map { it.uniqueId }, RealmId.of(hub))
+
+                            if (gameCounter == MAX_GAME_STREAK_COUNT)
+                                Bukkit.shutdown()
                         }
                     }
                 }

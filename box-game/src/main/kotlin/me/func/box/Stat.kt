@@ -3,7 +3,9 @@ package me.func.box
 import java.util.*
 
 data class Stat (
-    var id: UUID,
+    val id: UUID,
+    var skins: MutableList<String>?,
+    var currentSkin: String,
     var kills: Int,
     var deaths: Int,
     var wins: Int,
@@ -11,9 +13,10 @@ data class Stat (
     var emerald: Int,
     var stone: Int,
     var beds: Int,
-    val currentSkin: String,
+    var lastSeenName: String? = null,
     var money: Int,
-    var skins: MutableList<String>?,
+    var starters: MutableList<Starter>?,
     var currentStarter: Starter?,
-    var starters: MutableList<Starter>?
+    var swords: MutableList<Sword>?,
+    var currentSword: Sword?
 )

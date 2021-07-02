@@ -1,5 +1,7 @@
 package me.func.box
 
+import me.func.box.donate.Starter
+import me.func.box.donate.Sword
 import java.util.*
 
 data class Stat (
@@ -15,6 +17,8 @@ data class Stat (
     var beds: Int,
     var lastSeenName: String? = null,
     var money: Int,
+    var starters: MutableList<Starter>?,
     var currentStarter: Starter?,
-    var starters: MutableList<Starter>?
+    var swords: MutableList<Sword>?,
+    var currentSword: Sword?
 )

@@ -13,24 +13,29 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Firework
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.TNTPrimed
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockGrowEvent
-import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import ru.cristalix.core.chat.IChatService
+import ru.cristalix.core.display.DisplayChannels
+import ru.cristalix.core.display.messages.Mod
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.item.Items
 import ru.cristalix.core.realm.IRealmService
 import ru.cristalix.core.realm.RealmId
 import ru.cristalix.core.realm.RealmStatus
+import java.io.File
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 
 
 class DefaultListener : Listener {
@@ -43,11 +48,33 @@ class DefaultListener : Listener {
         text("§cВернуться")
     }.build()
 
+    private var modList = try {
+        File("./mods/").listFiles()!!
+            .filter { it.name.contains("bundle") }
+            .map {
+                val buffer = Unpooled.buffer()
+                buffer.writeBytes(Mod.serialize(Mod(Files.readAllBytes(it.toPath()))))
+                buffer
+            }.toList()
+    } catch (exception: Exception) {
+        throw RuntimeException(exception)
+    }
+
     @EventHandler
     fun PlayerJoinEvent.handle() {
         app.waitingBar.addViewer(player.uniqueId)
 
-        B.postpone(1) { player.teleport(app.spawn) }
+        B.postpone(1) {
+            player.teleport(app.spawn)
+            modList.forEach {
+                app.getUser(player)!!.sendPacket(
+                    PacketPlayOutCustomPayload(
+                        DisplayChannels.MOD_CHANNEL,
+                        PacketDataSerializer(it.retainedSlice())
+                    )
+                )
+            }
+        }
         player.addPotionEffect(visible, true)
         player.addPotionEffect(regen, true)
 
@@ -91,24 +118,6 @@ class DefaultListener : Listener {
             }
         }
         Winner.tryGetWinner()
-    }
-
-    @EventHandler
-    fun BlockPlaceEvent.handle() {
-        if (app.status == Status.STARTING)
-            cancel = true
-        if (blockPlaced.type == Material.BED_BLOCK) {
-            if (blockPlaced.location.add(0.0, 1.0, 0.0).block.type != Material.AIR) {
-                player.sendMessage(Formatting.error("Над кроватью должна быть пустота."))
-                cancel = true
-                return
-            }
-            val user = app.getUser(player)!!
-            if (user.bed != null)
-                return
-            player.sendMessage(Formatting.fine("Вы установили личную кровать!"))
-            user.bed = blockPlaced.location
-        }
     }
 
     @EventHandler
@@ -157,6 +166,13 @@ class DefaultListener : Listener {
 
     @EventHandler
     fun PlayerInteractEvent.handle() {
+        if (item != null && item.getType() == Material.TNT && action == Action.LEFT_CLICK_AIR) {
+            val cloned = item.clone()
+            cloned.setAmount(1)
+            player.inventory.removeItem(cloned)
+            val tnt = player.world.spawnEntity(player.location, EntityType.PRIMED_TNT) as TNTPrimed
+            tnt.velocity = player.location.direction.normalize().multiply(2)
+        }
         if (app.status == Status.STARTING && material == Material.CLAY_BALL)
             Cristalix.transfer(listOf(player.uniqueId), RealmId.of(app.hub))
         if (material == Material.COMPASS) {
@@ -234,10 +250,11 @@ class DefaultListener : Listener {
                         player.sendTitle("Вы проиграли!", "Наблюдение...")
                         message = "§e§lФИНАЛЬНОЕ УБИЙСТВО! $message"
                         if (player.killer != null) {
-                            user.finalKills++
-                            user.stat.money += app.finalMoney
+                            val killer = app.getUser(player.killer)!!
+                            killer.finalKills++
+                            killer.stat.money += app.finalMoney
                             player.killer!!.sendMessage(Formatting.fine("Вы заработали " + app.finalMoney + " монет."))
-                            user.stat.kills++
+                            killer.stat.kills++
                         }
                     }
                     B.bc(Formatting.fine(message))

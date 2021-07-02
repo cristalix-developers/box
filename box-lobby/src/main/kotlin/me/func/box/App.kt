@@ -2,30 +2,23 @@ package me.func.box
 
 import clepto.bukkit.B
 import clepto.cristalix.WorldMeta
-import dev.implario.bukkit.item.item
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.kensuke.Kensuke
 import dev.implario.kensuke.Scope
 import dev.implario.kensuke.impl.bukkit.BukkitKensuke
 import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
-import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.enchantments.Enchantment
+import me.func.box.donate.DonateViewer
+import me.func.box.donate.Lootbox
+import org.bukkit.*
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.boards.bukkitapi.Boards
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.account.IAccountService
-import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.inventory.*
-import ru.cristalix.core.network.CorePackage
 import ru.cristalix.core.network.ISocketClient
-import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage
-import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage
 import ru.cristalix.core.party.IPartyService
 import ru.cristalix.core.party.PartyService
 import ru.cristalix.core.realm.IRealmService
@@ -36,6 +29,8 @@ import ru.cristalix.npcs.data.NpcBehaviour
 import ru.cristalix.npcs.server.Npc
 import ru.cristalix.npcs.server.Npcs
 import java.util.*
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 lateinit var app: App
@@ -44,7 +39,7 @@ class App : JavaPlugin() {
 
     private val statScope = Scope("boxl", Stat::class.java)
 
-    private lateinit var worldMeta: WorldMeta
+    lateinit var worldMeta: WorldMeta
     private lateinit var kensuke: Kensuke
     lateinit var spawn: Location
     private var userManager = BukkitUserManager(
@@ -83,7 +78,7 @@ class App : JavaPlugin() {
         kensuke.globalRealm = info.realmId.realmName
         userManager.isOptional = true
 
-        B.events(FamousListener(), GlobalListener())
+        B.events(FamousListener(), GlobalListener(), Lootbox())
 
         createTop(Location(worldMeta.world, -258.0, 115.6, 19.5), "Убийств", "Топ убийств", "kills") {
             "" + it.kills
@@ -92,10 +87,38 @@ class App : JavaPlugin() {
             "" + it.wins
         }
 
+        val location = Location(worldMeta.world, -258.0, 116.0, 28.5)
+        val chest = Location(worldMeta.world, -249.5, 111.5, 26.6)
+        var counter = 0
+        Bukkit.getScheduler().runTaskTimer(this, {
+            counter += 15
+            worldMeta.world.spawnParticle(
+                Particle.REDSTONE, location.clone().add(
+                    sin(-Math.toRadians(counter % 360.0)) * 2,
+                    0.0,
+                    cos(-Math.toRadians(counter % 360.0)) * 2,
+                ), 1
+            )
+            worldMeta.world.spawnParticle(
+                Particle.REDSTONE, location.clone().add(
+                    sin(Math.toRadians(counter % 360.0)) * 7,
+                    -2.0,
+                    cos(Math.toRadians(counter % 360.0)) * 7,
+                ), 1
+            )
+            worldMeta.world.spawnParticle(
+                Particle.FIREWORKS_SPARK, chest.clone().add(
+                    0.0,
+                    sin(Math.toRadians(counter * 2 % 360.0)) * (1.1 + (counter % 100) / 300.0),
+                    cos(Math.toRadians(counter * 2 % 360.0)) * (1.1 + (counter % 100) / 300.0)
+                ), 1, 0.0, 0.0, 0.0, 0.05
+            )
+        }, 1, 1)
+
         Npcs.init(this)
         Npcs.spawn(
             Npc.builder()
-                .location(Location(worldMeta.world, -253.0, 112.0, 33.0, 95f, 0f))
+                .location(Location(worldMeta.world, -262.0, 112.0, 36.0, -152f, 0f))
                 .name("§c§l8 §fx §c§l2 §eПВП 1.8")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/30719b68-2c69-11e8-b5ea-1cb72caa35fd")
@@ -108,7 +131,7 @@ class App : JavaPlugin() {
         )
         Npcs.spawn(
             Npc.builder()
-                .location(Location(worldMeta.world, -252.0, 112.0, 29.0, 145f, 0f))
+                .location(Location(worldMeta.world, -255.0, 112.0, 36.0, 162f, 0f))
                 .name("§c§l4 §fx §c§l2 §eПВП 1.8")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/6f3f4a2e-7f84-11e9-8374-1cb72caa35fd")
@@ -121,7 +144,7 @@ class App : JavaPlugin() {
         )
         Npcs.spawn(
             Npc.builder()
-                .location(Location(worldMeta.world, -257.0, 112.0, 34.0, 165f, 0f))
+                .location(Location(worldMeta.world, -265.0, 112.0, 34.0, -125f, 0f))
                 .name("§c§l50 §fx §c§l2 §eПВП 1.8")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/30392bb3-2c69-11e8-b5ea-1cb72caa35fd")
@@ -134,7 +157,7 @@ class App : JavaPlugin() {
         )
         Npcs.spawn(
             Npc.builder()
-                .location(Location(worldMeta.world, -264.0, 112.0, 36.0, -180f, 0f))
+                .location(Location(worldMeta.world, -258.5, 112.0, 36.0, -174f, 0f))
                 .name("§c§l4 §fx §c§l4 §eПВП 1.8")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/7f3fea26-be9f-11e9-80c4-1cb72caa35fd")
@@ -147,7 +170,7 @@ class App : JavaPlugin() {
         )
         Npcs.spawn(
             Npc.builder()
-                .location(Location(worldMeta.world, -249.0, 112.0, 20.0, 45f, 0f))
+                .location(Location(worldMeta.world, -252.0, 112.0, 34.0, 137f, 0f))
                 .name("§c§l4 §fx §c§l4 §eПВП 1.9")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/e7c13d3d-ac38-11e8-8374-1cb72caa35fd")
@@ -159,151 +182,16 @@ class App : JavaPlugin() {
                 }.build()
         )
 
-        Npcs.spawn(
-            Npc.builder()
-                .location(Location(worldMeta.world, -262.0, 110.0, 21.0, -30f, 0f))
-                .name("§e§lПомощник")
-                .behaviour(NpcBehaviour.STARE_AT_PLAYER)
-                .skinUrl("https://webdata.c7x.dev/textures/skin/479cb4df-7024-11ea-acca-1cb72caa35fd")
-                .skinDigest("479cb4df-702411eaacca1cb72caa35fd")
-                .type(EntityType.PLAYER)
-                .onClick { player -> menu.open(player) }.build()
-        )
+        DonateViewer()
+
+        B.regCommand({ player, strings ->
+            if (player.isOp) {
+                app.getUser(Bukkit.getPlayer(strings[0]))!!.stat.money = strings[1].toInt()
+                "Деньги выданы"
+            } else
+                null
+        }, "money")
     }
-
-    private val costume = ControlledInventory.builder()
-        .title("Костюмы")
-        .rows(2)
-        .columns(9)
-        .provider(object : InventoryProvider {
-            override fun init(player: Player, contents: InventoryContents) {
-                contents.setLayout(
-                    "XOOOOOOOX",
-                    "XXOOOOOXX",
-                )
-
-                val armors = "wolf wither spider0 shadow_walker renegade " +
-                        "hungry_horror ghost_kindler frost quantum nano golem chicken"
-                val cost = 49
-
-                armors.split(" ").forEach { tag ->
-                    val user = app.getUser(player)!!
-                    val has = user.stat.skins!!.contains(tag)
-                    val current = user.stat.currentSkin == tag
-                    contents.add('O',  ClickableItem.of(item {
-                        text(if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть")
-                        nbt("armors", tag)
-                        if (current)
-                            enchant(Enchantment.LUCK, 1)
-                        type = Material.DIAMOND_HELMET
-                    }.build()) {
-                        if (current)
-                            return@of
-                        if (has) {
-                            user.stat.currentSkin = tag
-                            player.closeInventory()
-                            return@of
-                        }
-                        ControlledInventory.builder()
-                            .title("Новый сет")
-                            .rows(1)
-                            .columns(9)
-                            .provider(object : InventoryProvider {
-                                override fun init(player: Player, contents: InventoryContents) {
-                                    contents.setLayout(
-                                        "XXKKKKXOP",
-                                    )
-                                    contents.add('K', ClickableItem.empty(item {
-                                        text("§bШлем")
-                                        nbt("armors", tag)
-                                        type = Material.DIAMOND_HELMET
-                                    }.build()))
-                                    contents.add('K', ClickableItem.empty(item {
-                                        text("§bНагрудник")
-                                        nbt("armors", tag)
-                                        type = Material.DIAMOND_CHESTPLATE
-                                    }.build()))
-                                    contents.add('K', ClickableItem.empty(item {
-                                        text("§bПоножи")
-                                        nbt("armors", tag)
-                                        type = Material.DIAMOND_LEGGINGS
-                                    }.build()))
-                                    contents.add('K', ClickableItem.empty(item {
-                                        text("§bБотинки")
-                                        nbt("armors", tag)
-                                        type = Material.DIAMOND_BOOTS
-                                    }.build()))
-                                    contents.add('P', ClickableItem.of(item {
-                                        text("§cВыйти")
-                                        nbt("other", "cancel")
-                                        type = Material.CLAY_BALL
-                                    }.build()) {
-                                        player.closeInventory()
-                                    })
-                                    contents.add('O', ClickableItem.of(item {
-                                        text("§aКупить сет за $cost кристаликов")
-                                        nbt("other", "access")
-                                        enchant(Enchantment.LUCK, 1)
-                                        type = Material.CLAY_BALL
-                                    }.build()) { _ ->
-                                        ISocketClient.get().writeAndAwaitResponse<MoneyTransactionResponsePackage>(
-                                            MoneyTransactionRequestPackage(
-                                                player.uniqueId,
-                                                cost,
-                                                true,
-                                                "Покупка сета $tag"
-                                            )
-                                        ).thenAccept {
-                                            if (it.errorMessage != null) {
-                                                player.sendMessage(Formatting.error(it.errorMessage))
-                                                return@thenAccept
-                                            }
-                                            if (user.stat.skins == null)
-                                                user.stat.skins = arrayListOf(tag)
-                                            else
-                                                user.stat.skins!!.add(tag)
-                                            user.stat.currentSkin = tag
-
-                                            player.closeInventory()
-                                            player.sendMessage(Formatting.fine("Спасибо за поддержку разработчиков!"))
-                                        }
-                                    })
-                                    contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
-                                }
-                            }).build().open(player)
-                    })
-                }
-                contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
-            }
-        }).build()
-
-    private val menu = ControlledInventory.builder()
-        .title("Помощник")
-        .rows(1)
-        .columns(9)
-        .provider(object : InventoryProvider {
-            override fun init(player: Player, contents: InventoryContents) {
-                contents.setLayout(
-                    "XXNXXXPXX",
-                )
-
-                contents.add('N',  ClickableItem.of(item {
-                    text("§eКостюмы")
-                    nbt("armors", "chicken")
-                    type = Material.DIAMOND_HELMET
-                }.build()) {
-                    costume.open(player)
-                })
-                contents.add('P',  ClickableItem.of(item {
-                    text("§eДостижения §cСКОРО")
-
-                }.build(), {
-
-                }))
-
-                contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
-            }
-        }).build()
 
     private fun createTop(location: Location, string: String, title: String, key: String, function: (Stat) -> String) {
         val blocks = Boards.newBoard()
@@ -321,9 +209,13 @@ class App : JavaPlugin() {
 
                     for (entry in it) {
                         if (entry.data.stat.lastSeenName == null)
-                            entry.data.stat.lastSeenName = IAccountService.get().getNameByUuid(UUID.fromString(entry.data.id)).get()
+                            entry.data.stat.lastSeenName =
+                                IAccountService.get().getNameByUuid(UUID.fromString(entry.data.id)).get()
                         blocks.addContent(
-                            UUID.fromString(entry.data.id), "" + entry.position, entry.data.stat.lastSeenName, "§d" + function(entry.data.stat)
+                            UUID.fromString(entry.data.id),
+                            "" + entry.position,
+                            entry.data.stat.lastSeenName,
+                            "§d" + function(entry.data.stat)
                         )
                     }
 

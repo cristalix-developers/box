@@ -33,7 +33,9 @@ class TradeMenu : Listener {
                     "GSXXLXXJX"
                 )
 
-                val skin = app.getUser(player)!!.stat.currentSkin
+                val stat = app.getUser(player)!!.stat
+                val skin = stat.currentSkin
+                val sword = stat.currentSword
                 var helmet = ItemStack(Material.DIAMOND_HELMET)
                 var chestplate = ItemStack(Material.DIAMOND_CHESTPLATE)
                 var leggins = ItemStack(Material.DIAMOND_LEGGINGS)
@@ -89,7 +91,14 @@ class TradeMenu : Listener {
                 }.build(), Pair(Material.EMERALD, 64), Pair(Material.GOLD_INGOT, 5)))
 
                 contents.add('O', slot(player, ItemStack(Material.IRON_SWORD), Pair(Material.COBBLESTONE, 64)))
-                contents.add('O', slot(player, ItemStack(Material.DIAMOND_SWORD), Pair(Material.COBBLESTONE, 128)))
+
+                if (sword == null || sword == Sword.NONE)
+                    contents.add('O', slot(player, ItemStack(Material.DIAMOND_SWORD), Pair(Material.COBBLESTONE, 128)))
+                else
+                    contents.add('O', slot(player, item {
+                        type = Material.DIAMOND_SWORD
+                        nbt("weapons_other", sword.code.toString())
+                    }.build(), Pair(Material.COBBLESTONE, 128)))
                 contents.add('O', slot(player, item {
                     type = Material.IRON_SWORD
                     enchant(Enchantment.DAMAGE_ALL, 3)
