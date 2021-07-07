@@ -11,6 +11,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.InventoryDragEvent
+import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
@@ -113,4 +114,8 @@ class GlobalListener : Listener {
         event.isCancelled = true
     }
 
+    @EventHandler
+    fun disable(event: InventoryMoveItemEvent) {
+        event.isCancelled = true
+    }
 }

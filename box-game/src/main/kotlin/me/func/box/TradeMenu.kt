@@ -30,7 +30,7 @@ class TradeMenu : Listener {
                     "XAXDXPXOX",
                     "XAXDXPXOX",
                     "XAXDXPXOX",
-                    "GSXXLXXJX"
+                    "GSXXLXXJK"
                 )
 
                 val stat = app.getUser(player)!!.stat
@@ -108,9 +108,10 @@ class TradeMenu : Listener {
                 }.build(), Pair(Material.EMERALD, 128)))
                 contents.add('O', slot(player, ItemStack(Material.CHEST), Pair(Material.EMERALD, 10)))
                 contents.add('L', slot(player, ItemStack(Material.GOLD_INGOT), Pair(Material.COBBLESTONE, 48)))
-                contents.add('J', slot(player, ItemStack(Material.COMPASS), Pair(Material.EMERALD, 148)))
+                contents.add('J', slot(player, ItemStack(Material.COMPASS), Pair(Material.EMERALD, 128)))
                 contents.add('S', slot(player, ItemStack(Material.BED), Pair(Material.EMERALD, 192)))
-                contents.add('G', slot(player, ItemStack(Material.ENCHANTMENT_TABLE), Pair(Material.EMERALD, 256)))
+                contents.add('G', slot(player, ItemStack(Material.ENCHANTMENT_TABLE), Pair(Material.EMERALD, 128)))
+                contents.add('K', slot(player, ItemStack(Material.TNT), Pair(Material.EMERALD, 12)))
 
                 contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
             }

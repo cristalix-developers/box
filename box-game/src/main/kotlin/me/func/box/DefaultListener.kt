@@ -24,6 +24,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import ru.cristalix.core.display.DisplayChannels
@@ -36,6 +37,7 @@ import ru.cristalix.core.realm.RealmStatus
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import kotlin.math.min
 
 
 class DefaultListener : Listener {
@@ -124,9 +126,8 @@ class DefaultListener : Listener {
     fun PlayerBedEnterEvent.handle() {
         if (app.status == Status.STARTING)
             cancel = true
-        if (app.teams.filter { team -> team.players.contains(player.uniqueId) }[0]
-            .location!!.distanceSquared(bed.location) < 15) {
-            player.sendMessage(Formatting.fine("Вы уже привязаны к этой кровати"))
+        if (app.teams.any { it.location != null && it.location!!.distanceSquared(bed.location) < 10 }) {
+            player.sendMessage(Formatting.fine("Вы уже привязаны к этой кровати или это кровать врага."))
             return
         }
         player.sendMessage(Formatting.fine("Точка возраждения установлена!"))
@@ -171,6 +172,7 @@ class DefaultListener : Listener {
             cloned.setAmount(1)
             player.inventory.removeItem(cloned)
             val tnt = player.world.spawnEntity(player.location, EntityType.PRIMED_TNT) as TNTPrimed
+            tnt.setMetadata("shooter", FixedMetadataValue(app, player.uniqueId.toString()))
             tnt.velocity = player.location.direction.normalize().multiply(2)
         }
         if (app.status == Status.STARTING && material == Material.CLAY_BALL)
@@ -307,12 +309,13 @@ object Winner {
         if (app.status != Status.GAME)
             return
         if (list.size == 1) {
+
             B.bc(" ")
             B.bc(" ")
             B.bc("" + list[0].color.chatColor + list[0].color.teamName + " §f победили!")
             B.bc(" ")
             B.bc("§e§lТОП УБИЙСТВ")
-            Bukkit.getOnlinePlayers().map { app.getUser(it) }.sortedBy { -it!!.tempKills }.subList(0, 3)
+            Bukkit.getOnlinePlayers().map { app.getUser(it) }.sortedBy { -it!!.tempKills }.subList(0, min(3, Bukkit.getOnlinePlayers().size))
                 .forEachIndexed { index, user ->
                     B.bc(" §l${index + 1}. §e" + user!!.player?.name + " §с" + user.tempKills + " убийств")
                 }

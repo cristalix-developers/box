@@ -78,8 +78,6 @@ class App : JavaPlugin() {
         kensuke.globalRealm = info.realmId.realmName
         userManager.isOptional = true
 
-        B.events(FamousListener(), GlobalListener(), Lootbox())
-
         createTop(Location(worldMeta.world, -258.0, 115.6, 19.5), "Убийств", "Топ убийств", "kills") {
             "" + it.kills
         }
@@ -145,7 +143,7 @@ class App : JavaPlugin() {
         Npcs.spawn(
             Npc.builder()
                 .location(Location(worldMeta.world, -265.0, 112.0, 34.0, -125f, 0f))
-                .name("§c§l50 §fx §c§l2 §eПВП 1.8")
+                .name("§c§l25 §fx §c§l4 §eПВП 1.8")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/30392bb3-2c69-11e8-b5ea-1cb72caa35fd")
                 .skinDigest("30392bb3-2c6911e8b5ea1cb72caa35fd")
@@ -182,7 +180,7 @@ class App : JavaPlugin() {
                 }.build()
         )
 
-        DonateViewer()
+        B.events(FamousListener(), GlobalListener(), Lootbox(), DonateViewer())
 
         B.regCommand({ player, strings ->
             if (player.isOp) {

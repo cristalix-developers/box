@@ -1,6 +1,10 @@
 package me.func.box.donate
 
+import clepto.bukkit.B
 import dev.implario.bukkit.item.item
+import implario.ListUtils
+import me.func.box.ClickServer
+import me.func.box.ServerType
 import me.func.box.User
 import me.func.box.app
 import org.bukkit.Location
@@ -8,6 +12,10 @@ import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.ItemStack
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.inventory.ClickableItem
@@ -22,19 +30,25 @@ import ru.cristalix.npcs.server.Npc
 import ru.cristalix.npcs.server.Npcs
 import java.util.function.Consumer
 
-class DonateViewer {
+class DonateViewer : Listener {
 
     private val costume = ControlledInventory.builder()
         .title("Костюмы")
-        .rows(2)
+        .rows(3)
         .columns(9)
         .provider(object : InventoryProvider {
             override fun init(player: Player, contents: InventoryContents) {
                 contents.setLayout(
                     "XOOOOOOOX",
                     "XOOOOOOOX",
+                    "XXXXLXXXX"
                 )
-
+                contents.add('L', ClickableItem.of(item {
+                    type = Material.BARRIER
+                    text("§cНазад")
+                }.build()) {
+                    player.performCommand("menu")
+                })
                 Armor.values().forEach { tag ->
                     val user = app.getUser(player)!!
                     val has = user.stat.skins!!.contains(tag.getCode())
@@ -114,15 +128,21 @@ class DonateViewer {
 
     private val sword = ControlledInventory.builder()
         .title("Скины")
-        .rows(2)
+        .rows(3)
         .columns(9)
         .provider(object : InventoryProvider {
             override fun init(player: Player, contents: InventoryContents) {
                 contents.setLayout(
                     "XXOOOOOXX",
                     "XXOOOOOXX",
+                    "XXXXLXXXX"
                 )
-
+                contents.add('L', ClickableItem.of(item {
+                    type = Material.BARRIER
+                    text("§cНазад")
+                }.build()) {
+                    player.performCommand("menu")
+                })
                 Sword.values().forEach { tag ->
                     if (tag == Sword.NONE)
                         return@forEach
@@ -189,14 +209,20 @@ class DonateViewer {
 
     private val starter = ControlledInventory.builder()
         .title("Начальные наборы")
-        .rows(1)
+        .rows(2)
         .columns(9)
         .provider(object : InventoryProvider {
             override fun init(player: Player, contents: InventoryContents) {
                 contents.setLayout(
-                    "XOOOOOOOO",
+                    "XOOOOOOOX",
+                    "XXXXLXXXX"
                 )
-
+                contents.add('L', ClickableItem.of(item {
+                    type = Material.BARRIER
+                    text("§cНазад")
+                }.build()) {
+                    player.performCommand("menu")
+                })
                 Starter.values().forEach { tag ->
                     if (tag == Starter.NONE)
                         return@forEach
@@ -260,15 +286,21 @@ class DonateViewer {
 
     private val money = ControlledInventory.builder()
         .title("§eЭто меню подтверждения")
-        .rows(1)
+        .rows(2)
         .columns(9)
         .provider(object : InventoryProvider {
             override fun init(player: Player, contents: InventoryContents) {
                 val user = app.getUser(player)!!
                 contents.setLayout(
                     "XXFXFXFXX",
+                    "XXXXLXXXX"
                 )
-
+                contents.add('L', ClickableItem.of(item {
+                    type = Material.BARRIER
+                    text("§cНазад")
+                }.build()) {
+                    player.performCommand("menu")
+                })
                 contents.add('F', ClickableItem.of(item {
                     type = Material.CLAY_BALL
                     nbt("other", "coin2")
@@ -300,36 +332,14 @@ class DonateViewer {
             }
         }).build()
 
-    private fun buy(user: User, money: Int, desc: String, accept: Consumer<User>) {
-        val player = user.player!!
-        ISocketClient.get().writeAndAwaitResponse<MoneyTransactionResponsePackage>(
-            MoneyTransactionRequestPackage(
-                player.uniqueId,
-                money,
-                true,
-                desc
-            )
-        ).thenAccept {
-            if (it.errorMessage != null) {
-                player.sendMessage(Formatting.error(it.errorMessage))
-                return@thenAccept
-            }
-            accept.accept(user)
-            player.closeInventory()
-            player.sendMessage(Formatting.fine("Спасибо за поддержку разработчиков!"))
-        }
-    }
-
     private val menu = ControlledInventory.builder()
         .title("Меню")
-        .rows(3)
+        .rows(1)
         .columns(9)
         .provider(object : InventoryProvider {
             override fun init(player: Player, contents: InventoryContents) {
                 contents.setLayout(
-                    "XXXXXXXXX",
                     "XNXHXGXPX",
-                    "XXXXXXXXX",
                 )
 
                 contents.add('N', ClickableItem.of(item {
@@ -365,6 +375,99 @@ class DonateViewer {
             }
         }).build()
 
+    private fun buy(user: User, money: Int, desc: String, accept: Consumer<User>) {
+        val player = user.player!!
+        ISocketClient.get().writeAndAwaitResponse<MoneyTransactionResponsePackage>(
+            MoneyTransactionRequestPackage(
+                player.uniqueId,
+                money,
+                true,
+                desc
+            )
+        ).thenAccept {
+            if (it.errorMessage != null) {
+                player.sendMessage(Formatting.error(it.errorMessage))
+                return@thenAccept
+            }
+            accept.accept(user)
+            player.closeInventory()
+            player.sendMessage(Formatting.fine("Спасибо за поддержку разработчиков!"))
+        }
+    }
+
+    private val servers = ControlledInventory.builder()
+        .title("Выбор игры")
+        .rows(1)
+        .columns(9)
+        .provider(object : InventoryProvider {
+            override fun init(player: Player, contents: InventoryContents) {
+                contents.setLayout(
+                    "XNXNNNXNX",
+                )
+
+                contents.add('N', ClickableItem.of(item {
+                    text("§c§l4§fx§c§l4 §eПВП 1.9")
+                    type = Material.DIAMOND_PICKAXE
+                }.build()) {
+                    ClickServer("BOXN", 16).accept(player)
+                })
+                contents.add('N', ClickableItem.of(item {
+                    text("§c§l4§fx§c§l2 §eПВП 1.8")
+                    type = Material.IRON_PICKAXE
+                }.build()) {
+                    ClickServer("BOX4", 8).accept(player)
+                })
+                contents.add('N', ClickableItem.of(item {
+                    text("§c§l4§fx§c§l4 §eПВП 1.8")
+                    type = Material.ENDER_PEARL
+                }.build()) {
+                    ClickServer("BOXS", 16).accept(player)
+                })
+                contents.add('N', ClickableItem.of(item {
+                    text("§c§l8§fx§c§l2 §eПВП 1.8")
+                    type = Material.IRON_SWORD
+                }.build()) {
+                    ClickServer("BOX8", 16).accept(player)
+                })
+                contents.add('N', ClickableItem.of(item {
+                    text("§c§l25§fx§c§l4 §eПВП 1.8")
+                    type = Material.WOOD_PICKAXE
+                }.build()) {
+                    ClickServer("BOX5", 100).accept(player)
+                })
+
+                contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
+            }
+        }).build()
+
+    private val stat = ControlledInventory.builder()
+        .title("Статистика")
+        .rows(1)
+        .columns(9)
+        .provider(object : InventoryProvider {
+            override fun init(player: Player, contents: InventoryContents) {
+                contents.setLayout(
+                    "XXXXNXXXX",
+                )
+
+                val stat = app.getUser(player)!!.stat
+                contents.add('N', ClickableItem.empty(item {
+                    text(
+                        "§bВаша статистика\n\n" +
+                                "§fПобед: §b${stat.wins}\n" +
+                                "§fУбийств: §c${stat.kills}\n" +
+                                "§fСмертей: §f${stat.deaths}\n" +
+                                "§fК/Д: §c${((stat.kills / (stat.deaths + 1)) * 100 % 1) / 100}\n" +
+                                "§fДенег: §e${stat.money} монет\n" +
+                                "§fИгр сыграно: §f${stat.games}\n"
+                    )
+                    type = Material.PAPER
+                }.build()))
+
+                contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
+            }
+        }).build()
+
     init {
         Npcs.spawn(
             Npc.builder()
@@ -376,5 +479,56 @@ class DonateViewer {
                 .type(EntityType.PLAYER)
                 .onClick { player -> menu.open(player) }.build()
         )
+
+        B.regCommand({ player: Player, strings: Array<String> ->
+            menu.open(player)
+            null
+        }, "menu", "donate")
+    }
+
+    private val menuItem = item {
+        type = Material.EMERALD
+        text("§aКосметика")
+    }.build()
+
+    private val serversItem = item {
+        type = Material.COMPASS
+        text("§bВыбор игры")
+    }.build()
+
+    private val randomItem = item {
+        type = Material.DIAMOND_SWORD
+        nbt("weapons_other", 41)
+        text("§eСлучайная игра")
+    }.build()
+
+    private val paperItem = item {
+        type = Material.PAPER
+        text("§bСтатистика")
+    }.build()
+
+    @EventHandler
+    fun PlayerJoinEvent.handle() {
+        player.inventory.setItem(0, serversItem)
+        player.inventory.setItem(1, randomItem)
+        player.inventory.setItem(4, menuItem)
+        player.inventory.setItem(8, paperItem)
+    }
+
+    @EventHandler
+    fun PlayerInteractEvent.handle() {
+        if (player.itemInHand.getType() == Material.COMPASS)
+            servers.open(player)
+        if (player.itemInHand.getType() == Material.DIAMOND_SWORD) {
+            val realm = ListUtils.random(ServerType.values())
+            player.sendMessage(Formatting.fine("Случайный сервер - " + realm.title))
+            player.sendMessage(Formatting.fine("Ожидайте 3 секунды..."))
+            player.sendTitle("§eПриятной игры", "§lУДАЧИ!")
+            B.postpone(60) { ClickServer(realm.name, realm.slot).accept(player) }
+        }
+        if (player.itemInHand.getType() == Material.EMERALD)
+            menu.open(player)
+        if (player.itemInHand.getType() == Material.PAPER)
+            stat.open(player)
     }
 }

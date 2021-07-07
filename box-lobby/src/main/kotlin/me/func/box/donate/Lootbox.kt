@@ -87,8 +87,7 @@ class Lootbox : Listener {
                         }.build()
                     }
 
-                    if (drop.getRare() == Rare.LEGENDARY)
-                        B.bc(Formatting.fine("§e" + user.name + " §fнашел §6легендарную §fнаграду! §6" + drop.getTitle()))
+                    B.bc(Formatting.fine("§e" + user.name + " §fнашел ${drop.getRare().color + drop.getRare().title.toLowerCase()} предмет! ${drop.getRare().color}" + drop.getTitle()))
 
                     player.closeInventory()
 

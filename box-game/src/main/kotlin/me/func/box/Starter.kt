@@ -2,6 +2,10 @@ package me.func.box
 
 import dev.implario.bukkit.item.item
 import org.bukkit.Material
+import ru.cristalix.core.util.UtilPlayer.damage
+
+
+
 
 /**
  * @author Рейдж 29.06.2021
@@ -23,11 +27,12 @@ enum class Starter(val title: String, val cost: Int, val consumer: (User) -> Any
         }.build())
     }),
     HURRIED("Торопливый", 9900, { user ->
-        user.player!!.inventory.addItem(item {
+        val item = item {
             type = Material.IRON_PICKAXE
-            nbt("RepairCount", 50)
             text("Быстрая кирка")
-        }.build())
+        }.build()
+        item.durability = (item.durability + 1 - 50).toShort()
+        user.player!!.inventory.addItem(item)
     }),
     DEFENDER("Защитник", 5690, { user ->
         user.player!!.inventory.addItem(item {

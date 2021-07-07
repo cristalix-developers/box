@@ -25,8 +25,6 @@ import ru.cristalix.core.inventory.IInventoryService
 import ru.cristalix.core.inventory.InventoryService
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.network.packages.RealmUpdatePackage
-import ru.cristalix.core.p13n.BukkitP13nService
-import ru.cristalix.core.p13n.P13nService
 import ru.cristalix.core.party.IPartyService
 import ru.cristalix.core.party.PartyService
 import ru.cristalix.core.realm.IRealmService
@@ -149,6 +147,8 @@ class Box : JavaPlugin() {
                         // Заполение команд
                         Bukkit.getOnlinePlayers().forEach { player ->
                             player.inventory.clear()
+                            player.openInventory.topInventory.clear()
+                            player.itemOnCursor = null
                             player.inventory.addItem(woodPickaxe)
                             player.sendTitle("§eПоехали!", "Враги без ника")
                             val user = app.getUser(player)!!
@@ -266,7 +266,7 @@ class Box : JavaPlugin() {
                     Bukkit.getOnlinePlayers().forEach { player ->
                         if (player.inventory.contains(Material.COMPASS)) {
                             player.compassTarget = if (app.getUser(player)!!.compassToPlayer) {
-                                Bukkit.getPlayer(teams.filter { !it.players.contains(player.uniqueId) }
+                                val someone = teams.filter { it.players.size > 0 && !it.players.contains(player.uniqueId) }
                                     .map {
                                         it.players.minByOrNull { current ->
                                             Bukkit.getPlayer(current).location.distanceSquared(
@@ -277,9 +277,13 @@ class Box : JavaPlugin() {
                                         Bukkit.getPlayer(current).location.distanceSquared(
                                             player.location
                                         )
-                                    }).location
+                                    }
+                                if (someone != null)
+                                    Bukkit.getPlayer(someone).location
+                                else
+                                    player.location
                             } else {
-                                Bukkit.getPlayer(teams.filter { !it.players.contains(player.uniqueId) }
+                                val someone = teams.filter { !it.players.contains(player.uniqueId) }
                                     .map {
                                         it.players.minByOrNull { current ->
                                             val enemyBed =
@@ -291,7 +295,11 @@ class Box : JavaPlugin() {
                                             return@minByOrNull 99999.0
                                         val enemyBed = app.getUser(current)!!.bed ?: return@minByOrNull 999999.0
                                         enemyBed.distanceSquared(player.location)
-                                    }).location
+                                    }
+                                if (someone != null)
+                                    Bukkit.getPlayer(someone).location
+                                else
+                                    player.location
                             }
                         }
                     }

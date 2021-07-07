@@ -15,6 +15,7 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import ru.cristalix.core.formatting.Formatting
+import java.util.*
 
 class BlockListener : Listener {
 
@@ -147,6 +148,14 @@ class BlockListener : Listener {
                         it.type == Material.GOLD_BLOCK ||
                         it.type == Material.CHEST ||
                         it.type == Material.WORKBENCH
+            }
+            if (entity.hasMetadata("shooter")) {
+                val shooter = Bukkit.getPlayer(UUID.fromString(entity.getMetadata("shooter")[0].asString()))
+                if (shooter != null) {
+                    blockList().forEach { it.drops.forEach { item -> shooter.inventory.addItem(item) } }
+                    cancel = true
+                    blockList().forEach { it.setTypeAndDataFast(0, 0) }
+                }
             }
         }
     }
