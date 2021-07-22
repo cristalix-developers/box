@@ -1,6 +1,6 @@
 package me.func.box
 
-import dev.implario.kensuke.Session
+import dev.implario.kensuke.KensukeSession
 import dev.implario.kensuke.impl.bukkit.IBukkitKensukeUser
 import me.func.box.donate.Starter
 import me.func.box.donate.Sword
@@ -10,7 +10,7 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.entity.Player
 import java.util.*
 
-class User(session: Session, stat: Stat?) : IBukkitKensukeUser {
+class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
 
     var looked = false
     var stat: Stat
@@ -25,8 +25,8 @@ class User(session: Session, stat: Stat?) : IBukkitKensukeUser {
         return player
     }
 
-    private var session: Session
-    override fun getSession(): Session {
+    private var session: KensukeSession
+    override fun getSession(): KensukeSession {
         return session
     }
 

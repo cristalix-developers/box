@@ -1,6 +1,8 @@
-package me.func.box
+package me.func.box.listener
 
 import clepto.bukkit.B
+import me.func.box.app
+import me.func.box.data.Status
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -28,8 +30,7 @@ class BlockListener : Listener {
         val user = app.getUser(player)!!
         if (block.type == Material.GOLD_BLOCK) {
             block.type = Material.AIR
-            user.stat.money += 100
-            player.sendMessage(Formatting.fine("Вы добыли §e100 монет§f!"))
+            user.giveMoney(100)
             cancel = true
             return
         }
@@ -118,8 +119,7 @@ class BlockListener : Listener {
             cancel = true
         }
         if (blockPlaced.type == Material.GOLD_BLOCK) {
-            player.sendMessage(Formatting.fine("Рукотворный?! Пойдет, заберу за §e5 монет"))
-            app.getUser(player)!!.stat.money += 5
+            app.getUser(player)!!.giveMoney(5)
             blockPlaced.type = Material.AIR
             return
         }

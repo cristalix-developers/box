@@ -5,14 +5,30 @@ import clepto.cristalix.Cristalix
 import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.item.item
 import dev.implario.bukkit.platform.Platforms
+import dev.implario.kensuke.KensukeSession
 import dev.implario.kensuke.Scope
-import dev.implario.kensuke.Session
 import dev.implario.kensuke.impl.bukkit.BukkitKensuke
 import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.bar.WaitingPlayers
+import me.func.box.data.BoxTeam
+import me.func.box.data.Status
+import me.func.box.info.Starter
+import me.func.box.info.Stat
+import me.func.box.listener.BlockListener
+import me.func.box.listener.DefaultListener
+import me.func.box.listener.EnchantTable
+import me.func.box.listener.Winner
+import me.func.box.map.Generator
+import me.func.box.map.MapLoader
+import me.func.box.map.TradeMenu
 import net.md_5.bungee.api.chat.ComponentBuilder
+import net.minecraft.server.v1_12_R1.EnumItemSlot
 import org.bukkit.*
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
@@ -41,7 +57,8 @@ import kotlin.math.max
 import kotlin.math.min
 
 lateinit var app: Box
-const val MAX_GAME_STREAK_COUNT = 5
+const val MAX_GAME_STREAK_COUNT = 8
+var sessionDurability = System.getProperty("TIME", "4000").toInt()
 
 class Box : JavaPlugin() {
 
@@ -51,17 +68,17 @@ class Box : JavaPlugin() {
     lateinit var spawn: Location
     private var userManager = BukkitUserManager(
         listOf(statScope),
-        { session: Session, context -> User(session, context.getData(statScope)) },
+        { session: KensukeSession, context -> User(session, context.getData(statScope)) },
         { user, context -> context.store(statScope, user.stat) }
     )
     lateinit var zero: Location
-    var status = Status.STARTING
     var slots = System.getenv("SLOT").toInt()
     val winMoney = System.getenv("WIN_REWARD").toInt()
     val finalMoney = System.getenv("FINAL_REWARD").toInt()
     val killMoney = System.getenv("KILL_REWARD").toInt()
     private var size = System.getenv("SIZE").toInt()
-    var teamSize = System.getenv("TEAM").toInt()
+    private var teamSize = System.getenv("TEAM").toInt()
+    var status = Status.STARTING
     val hub = "BOXL-1"
     var waitingBar = WaitingPlayers()
     var woodPickaxe = ItemStack(Material.WOOD_PICKAXE)
@@ -85,6 +102,25 @@ class Box : JavaPlugin() {
 
         // Загрузка карты
         loadMap()
+        // Создание туши
+        val guide = worldMeta.getLabel("guide")
+        val arguments = guide.tag.split(" ")
+        guide.yaw = arguments[0].toFloat()
+        guide.pitch = arguments[1].toFloat()
+        val mob = worldMeta.world.spawnEntity(
+            guide, arrayListOf(
+                EntityType.ZOMBIE, EntityType.WITHER_SKELETON, EntityType.SKELETON
+            ).random()
+        ) as LivingEntity
+        mob.isCustomNameVisible = true
+        mob.customName = "Моб-антистресс"
+        val bedrock = CraftItemStack.asNMSCopy(item {
+            type = Material.BEDROCK
+        }.build())
+        val handle = (mob as CraftLivingEntity).handle
+        handle.setSlot(EnumItemSlot.HEAD, bedrock)
+        handle.setSlot(EnumItemSlot.OFFHAND, bedrock)
+        handle.setSlot(EnumItemSlot.MAINHAND, bedrock)
 
         // Регистрация сервисов
         val core = CoreApi.get()
@@ -152,7 +188,10 @@ class Box : JavaPlugin() {
                             player.inventory.addItem(woodPickaxe)
                             player.sendTitle("§eПоехали!", "Враги без ника")
                             val user = app.getUser(player)!!
-                            user.stat.currentStarter?.let { it.consumer(user) }
+                            user.stat.currentStarter?.let {
+                                if (it == Starter.FUSE && slots > 20) player.sendMessage(Formatting.error("Данный стартовый набор недоступен в выбранном типе игры."))
+                                else it.consumer(user)
+                            }
                             user.stat.games++
                             waitingBar.removeViewer(player.uniqueId)
 
@@ -174,7 +213,7 @@ class Box : JavaPlugin() {
                                 .record { "Финальных: §6" + user.finalKills }
                                 .record { "Кровать " + if (user.bed != null) "§a✔" else "§c䂄" }
                                 .record {
-                                    val pTime = Status.END.lastSecond - time
+                                    val pTime = sessionDurability + 10 - time
                                     "§7Авторестарт " + String.format("%02d:%02d", pTime / 60, pTime % 60)
                                 }
                             Cristalix.scoreboardService().setCurrentObjective(player.uniqueId, address)
@@ -266,18 +305,19 @@ class Box : JavaPlugin() {
                     Bukkit.getOnlinePlayers().forEach { player ->
                         if (player.inventory.contains(Material.COMPASS)) {
                             player.compassTarget = if (app.getUser(player)!!.compassToPlayer) {
-                                val someone = teams.filter { it.players.size > 0 && !it.players.contains(player.uniqueId) }
-                                    .map {
-                                        it.players.minByOrNull { current ->
+                                val someone =
+                                    teams.filter { it.players.size > 0 && !it.players.contains(player.uniqueId) }
+                                        .map {
+                                            it.players.minByOrNull { current ->
+                                                Bukkit.getPlayer(current).location.distanceSquared(
+                                                    player.location
+                                                )
+                                            }
+                                        }.minByOrNull { current ->
                                             Bukkit.getPlayer(current).location.distanceSquared(
                                                 player.location
                                             )
                                         }
-                                    }.minByOrNull { current ->
-                                        Bukkit.getPlayer(current).location.distanceSquared(
-                                            player.location
-                                        )
-                                    }
                                 if (someone != null)
                                     Bukkit.getPlayer(someone).location
                                 else
@@ -304,7 +344,7 @@ class Box : JavaPlugin() {
                         }
                     }
 
-                    if (time == Status.GAME.lastSecond)
+                    if (time == sessionDurability)
                         status = Status.END
                     Winner.tryGetWinner()
                     // Идет игра
@@ -372,6 +412,15 @@ class Box : JavaPlugin() {
                 }
                 "Игра будет прекращена"
             }, "end"
+        )
+
+        B.regCommand(
+            { player, strings ->
+                if (player.isOp) {
+                    sessionDurability = strings[0].toInt()
+                }
+                "Максимальное время игры изменено"
+            }, "time"
         )
     }
 

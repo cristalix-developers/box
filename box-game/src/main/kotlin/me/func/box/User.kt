@@ -1,7 +1,13 @@
 package me.func.box
 
-import dev.implario.kensuke.Session
+import clepto.bukkit.B
+import dev.implario.kensuke.KensukeSession
 import dev.implario.kensuke.impl.bukkit.IBukkitKensukeUser
+import me.func.box.info.Starter
+import me.func.box.info.Stat
+import me.func.box.info.Sword
+import net.md_5.bungee.api.ChatMessageType
+import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.Packet
 import net.minecraft.server.v1_12_R1.PlayerConnection
 import org.bukkit.Location
@@ -9,7 +15,7 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.entity.Player
 import java.util.*
 
-class User(session: Session, stat: Stat?) : IBukkitKensukeUser {
+class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
 
     var bed: Location? = null
     var tempKills = 0
@@ -28,8 +34,8 @@ class User(session: Session, stat: Stat?) : IBukkitKensukeUser {
         return player
     }
 
-    private var session: Session
-    override fun getSession(): Session {
+    private var session: KensukeSession
+    override fun getSession(): KensukeSession {
         return session
     }
 
@@ -39,6 +45,17 @@ class User(session: Session, stat: Stat?) : IBukkitKensukeUser {
         if (connection == null)
             connection = (player as CraftPlayer).handle.playerConnection
         connection?.sendPacket(packet)
+    }
+
+    fun giveMoney(toGive: Int) {
+        player!!.sendMessage("§eПолучено $toGive монет.")
+        B.postpone(1) {
+            player!!.spigot().sendMessage(
+                ChatMessageType.ACTION_BAR,
+                TextComponent("§e§l+$toGive монет")
+            )
+        }
+        stat.money += toGive
     }
 
     init {

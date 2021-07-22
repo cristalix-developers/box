@@ -1,4 +1,4 @@
-package me.func.box
+package me.func.box.map
 
 import clepto.cristalix.Cristalix
 import clepto.cristalix.WorldMeta

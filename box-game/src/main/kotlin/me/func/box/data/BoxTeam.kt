@@ -1,4 +1,4 @@
-package me.func.box
+package me.func.box.data
 
 import org.bukkit.Location
 import org.bukkit.scoreboard.Team

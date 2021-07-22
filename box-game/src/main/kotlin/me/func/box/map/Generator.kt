@@ -1,6 +1,7 @@
-package me.func.box
+package me.func.box.map
 
 import clepto.bukkit.B
+import me.func.box.app
 import net.minecraft.server.v1_12_R1.MinecraftServer
 import org.bukkit.Location
 import org.bukkit.Material
@@ -8,9 +9,12 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.block.BlockFace
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftVillager
 import org.bukkit.entity.EntityType
+import java.security.SecureRandom
 
 
 object Generator {
+
+    private val random = SecureRandom()
 
     fun generateContentOfCube(
         start: Location,
@@ -25,7 +29,7 @@ object Generator {
             for (y in 1..ySize) {
                 for (z in 1..zSize) {
                     start.set((originalX + x).toDouble(), (originalY + y).toDouble(), (originalZ + z).toDouble())
-                    val random = Math.random()
+                    val random = random.nextDouble()
                     when {
                         random > 0.05 -> start.block.setTypeAndDataFast(1, 0)
                         random > 0.0002 -> start.block.setTypeAndDataFast(Material.EMERALD_ORE.id, 0)
@@ -59,29 +63,29 @@ object Generator {
     ): List<Location> {
         val locations = arrayListOf<Location>()
         if (app.teams.isNotEmpty()) {
-            start.set(0.0, ySize * Math.random() / 2 + ySize / 4, zSize * Math.random() / 2 + zSize / 4)
+            start.set(0.0, ySize * random.nextDouble() / 2 + ySize / 4, zSize * random.nextDouble() / 2 + zSize / 4)
             locations.add(generateRoom(start, -1, 0, 0, roomSize, wholeSize))
         }
         if (app.teams.size > 1) {
             start.set(
                 xSize.toDouble() - roomSize,
-                ySize * Math.random() / 3 + ySize / 4 + roomSize,
-                zSize * Math.random() / 2 + zSize / 4
+                ySize * random.nextDouble() / 3 + ySize / 4 + roomSize,
+                zSize * random.nextDouble() / 2 + zSize / 4
             )
             locations.add(generateRoom(start, 1, 0, 0, roomSize, wholeSize))
         }
         if (app.teams.size > 2) {
             start.set(
-                xSize * Math.random() / 2 + xSize / 4,
-                ySize * Math.random() / 3 + ySize / 4 + roomSize,
+                xSize * random.nextDouble() / 2 + xSize / 4,
+                ySize * random.nextDouble() / 3 + ySize / 4 + roomSize,
                 zSize.toDouble() - roomSize
             )
             locations.add(generateRoom(start, 0, 0, 1, roomSize, wholeSize))
         }
         if (app.teams.size > 3) {
             start.set(
-                xSize * Math.random() / 2 + xSize / 4,
-                ySize * Math.random() / 3 + ySize / 4 + roomSize,
+                xSize * random.nextDouble() / 2 + xSize / 4,
+                ySize * random.nextDouble() / 3 + ySize / 4 + roomSize,
                 0.0
             )
             locations.add(generateRoom(start, 0, 0, -1, roomSize, wholeSize))

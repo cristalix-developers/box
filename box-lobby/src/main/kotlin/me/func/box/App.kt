@@ -208,9 +208,9 @@ class App : JavaPlugin() {
                     for (entry in it) {
                         if (entry.data.stat.lastSeenName == null)
                             entry.data.stat.lastSeenName =
-                                IAccountService.get().getNameByUuid(UUID.fromString(entry.data.id)).get()
+                                IAccountService.get().getNameByUuid(UUID.fromString(entry.data.session.userId)).get()
                         blocks.addContent(
-                            UUID.fromString(entry.data.id),
+                            UUID.fromString(entry.data.session.userId),
                             "" + entry.position,
                             entry.data.stat.lastSeenName,
                             "§d" + function(entry.data.stat)

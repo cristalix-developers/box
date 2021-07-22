@@ -34,13 +34,14 @@ class DonateViewer : Listener {
 
     private val costume = ControlledInventory.builder()
         .title("Костюмы")
-        .rows(3)
+        .rows(4)
         .columns(9)
         .provider(object : InventoryProvider {
             override fun init(player: Player, contents: InventoryContents) {
                 contents.setLayout(
                     "XOOOOOOOX",
                     "XOOOOOOOX",
+                    "XXXXOXXXX",
                     "XXXXLXXXX"
                 )
                 contents.add('L', ClickableItem.of(item {
@@ -53,13 +54,7 @@ class DonateViewer : Listener {
                     val user = app.getUser(player)!!
                     val has = user.stat.skins!!.contains(tag.getCode())
                     val current = user.stat.currentSkin == tag.getCode()
-                    contents.add('O', ClickableItem.of(item {
-                        text((if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть") + "\n§7Редкость: " + tag.getRare().color + tag.getRare().title)
-                        nbt("armors", tag.getCode())
-                        if (current)
-                            enchant(Enchantment.LUCK, 1)
-                        type = Material.DIAMOND_HELMET
-                    }.build()) {
+                    contents.add('O', ClickableItem.of(tag.getItem(current, has)) {
                         if (current)
                             return@of
                         if (has) {
@@ -133,8 +128,8 @@ class DonateViewer : Listener {
         .provider(object : InventoryProvider {
             override fun init(player: Player, contents: InventoryContents) {
                 contents.setLayout(
-                    "XXOOOOOXX",
-                    "XXOOOOOXX",
+                    "XOOOOOOOX",
+                    "XOOOOOOOX",
                     "XXXXLXXXX"
                 )
                 contents.add('L', ClickableItem.of(item {
@@ -149,13 +144,7 @@ class DonateViewer : Listener {
                     val user = app.getUser(player)!!
                     val has = user.stat.swords!!.contains(tag)
                     val current = user.stat.currentSword == tag
-                    contents.add('O', ClickableItem.of(item {
-                        text((if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть") + "\n§7Редкость: " + tag.getRare().color + tag.getRare().title)
-                        nbt("weapons_other", tag.getCode())
-                        if (current)
-                            enchant(Enchantment.LUCK, 1)
-                        type = Material.DIAMOND_SWORD
-                    }.build()) {
+                    contents.add('O', ClickableItem.of(tag.getItem(current, has)) {
                         if (current)
                             return@of
                         if (has) {
@@ -209,12 +198,13 @@ class DonateViewer : Listener {
 
     private val starter = ControlledInventory.builder()
         .title("Начальные наборы")
-        .rows(2)
+        .rows(3)
         .columns(9)
         .provider(object : InventoryProvider {
             override fun init(player: Player, contents: InventoryContents) {
                 contents.setLayout(
                     "XOOOOOOOX",
+                    "XXXXOXXXX",
                     "XXXXLXXXX"
                 )
                 contents.add('L', ClickableItem.of(item {
@@ -224,12 +214,13 @@ class DonateViewer : Listener {
                     player.performCommand("menu")
                 })
                 Starter.values().forEach { tag ->
-                    if (tag == Starter.NONE)
-                        return@forEach
                     val user = app.getUser(player)!!
                     val has = user.stat.starters!!.contains(tag)
                     val current = user.stat.currentStarter == tag
-                    contents.add('O', ClickableItem.of(tag.lore) {
+                    if (tag == Starter.NONE)
+                        return@forEach
+                    val item = tag.getItem(current, has)
+                    contents.add('O', ClickableItem.of(item) {
                         if (current)
                             return@of
                         if (has) {
@@ -246,7 +237,7 @@ class DonateViewer : Listener {
                                     contents.setLayout(
                                         "XXXXKXXOP",
                                     )
-                                    contents.add('K', ClickableItem.empty(tag.lore))
+                                    contents.add('K', ClickableItem.empty(item))
                                     contents.add('P', ClickableItem.of(item {
                                         text("§cВыйти")
                                         nbt("other", "cancel")
@@ -255,7 +246,8 @@ class DonateViewer : Listener {
                                         player.closeInventory()
                                     })
                                     contents.add('O', ClickableItem.of(item {
-                                        text("§eКупить за ${tag.getPrice()} монет")
+                                        if (tag.getPrice() < 100000) text("§eКупить за ${tag.getPrice()} монет")
+                                        else text("§cСезонный предмет")
                                         nbt("other", "access")
                                         enchant(Enchantment.LUCK, 1)
                                         type = Material.CLAY_BALL
@@ -338,9 +330,9 @@ class DonateViewer : Listener {
         .columns(9)
         .provider(object : InventoryProvider {
             override fun init(player: Player, contents: InventoryContents) {
-                contents.setLayout(
-                    "XNXHXGXPX",
-                )
+                contents.setLayout("XNHXOXGPX")
+
+                val user = app.getUser(player)!!
 
                 contents.add('N', ClickableItem.of(item {
                     text("§eКостюмы")
@@ -369,6 +361,58 @@ class DonateViewer : Listener {
                     type = Material.CLAY_BALL
                 }.build()) {
                     money.open(player)
+                })
+                contents.add('O', ClickableItem.of(item {
+                    text("§bCезонный кит\n\n §e◉ §7Набор с §932 эндерняком\n §e◉ §6Квантовая броня\n §e◉ §6Топор разрушения\n\n§7Скидка §a70%§7, предложение\n§7действует §aдо 25-го числа")
+                    nbt("armors", "quantum")
+                    type = Material.DIAMOND_HELMET
+                }.build()) {
+                    ControlledInventory.builder()
+                        .title("§bCезонный кит")
+                        .rows(1)
+                        .columns(9)
+                        .provider(object : InventoryProvider {
+                            override fun init(player: Player, contents: InventoryContents) {
+                                contents.setLayout(
+                                    "XXHHHXXOP",
+                                )
+
+                                val starter = Starter.BLOCKER
+                                val armor = Armor.QUANTUM
+                                val sword = Sword.K
+                                val seasonCounter = 2
+
+                                contents.add('H', ClickableItem.empty(starter.getItem()))
+                                contents.add('H', ClickableItem.empty(armor.getItem()))
+                                contents.add('H', ClickableItem.empty(sword.getItem()))
+                                contents.add('P', ClickableItem.of(item {
+                                    text("§cВыйти")
+                                    nbt("other", "cancel")
+                                    type = Material.CLAY_BALL
+                                }.build()) {
+                                    player.closeInventory()
+                                })
+                                contents.add('O', ClickableItem.of(item {
+                                    text("§aКупить за 149 кристаликов")
+                                    nbt("other", "access")
+                                    enchant(Enchantment.LUCK, 1)
+                                    type = Material.CLAY_BALL
+                                }.build()) {
+                                    buy(user, 149, "Покупка сезонного кита $seasonCounter") {
+                                        if (user.stat.swords == null) user.stat.swords = arrayListOf(sword)
+                                        else user.stat.swords!!.add(sword)
+                                        user.stat.currentSword = sword
+                                        if (user.stat.starters == null) user.stat.starters = arrayListOf(starter)
+                                        else user.stat.starters!!.add(starter)
+                                        user.stat.currentStarter = starter
+                                        if (user.stat.skins == null) user.stat.skins = arrayListOf(armor.getCode())
+                                        else user.stat.skins!!.add(armor.getCode())
+                                        user.stat.currentSkin = armor.getCode()
+                                    }
+                                })
+                                contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
+                            }
+                        }).build().open(player)
                 })
 
                 contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))

@@ -1,15 +1,20 @@
-package me.func.box
+package me.func.box.listener
 
 import clepto.bukkit.B
 import clepto.cristalix.Cristalix
 import dev.implario.bukkit.item.item
 import io.netty.buffer.Unpooled
+import me.func.box.app
+import me.func.box.data.Status
+import me.func.box.info.Starter
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
-import net.minecraft.server.v1_12_R1.PacketDataSerializer
-import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload
+import net.minecraft.server.v1_12_R1.*
 import org.bukkit.*
+import org.bukkit.Material
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Firework
 import org.bukkit.entity.LivingEntity
@@ -23,7 +28,6 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
-import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -101,6 +105,21 @@ class DefaultListener : Listener {
                         .build()
                 )
             }
+            val starter = app.getUser(player)!!.stat.currentStarter
+            player.sendMessage(" ")
+            player.sendMessage("§b―――――――――――――――――")
+            player.sendMessage("      §eБедроковая коробка    ")
+            player.sendMessage("§7Добывайте §eкамень§7, обменивайте")
+            player.sendMessage("§7его на §eинструменты и оружие§7,")
+            player.sendMessage("§7сломайте вражеские §cкровати§7 и")
+            player.sendMessage("§7убейте §cврагов§7!")
+            player.sendMessage(
+                "§7Начальный набор: " +
+                        if (starter == null || starter == Starter.NONE) "§cОтсутсвует"
+                        else "§a${starter.title}"
+            )
+            player.sendMessage("§b―――――――――――――――――")
+            player.sendMessage(" ")
         }
     }
 
@@ -155,13 +174,19 @@ class DefaultListener : Listener {
     fun EntityDamageByEntityEvent.handle() {
         if (entityType == EntityType.VILLAGER)
             cancelled = true
-        if (app.status == Status.STARTING)
+        if (app.status == Status.STARTING && entityType != EntityType.PLAYER) {
+            damage = 0.0
+            playDamageEffect(entity.location)
+            if (Math.random() < 0.04 && damager is CraftPlayer)
+                app.getUser(damager as CraftPlayer)!!.giveMoney(1)
+        } else if (app.status == Status.STARTING) {
             cancelled = true
+        }
     }
 
     @EventHandler
     fun EntityDamageEvent.handle() {
-        if (app.status == Status.STARTING)
+        if (app.status == Status.STARTING && entityType == EntityType.PLAYER)
             cancelled = true
     }
 
@@ -230,9 +255,8 @@ class DefaultListener : Listener {
                 .forEach { team ->
                     var message = "" + team.color.chatColor + player.name + " §fубит"
                     if (player.killer != null) {
-                        app.getUser(player.killer)!!.stat.money += app.killMoney
+                        app.getUser(player.killer)!!.giveMoney(app.killMoney)
                         message += " игроком " + player.killer.name
-                        player.killer!!.sendMessage(Formatting.fine("Вы заработали " + app.killMoney + " монет."))
                     }
                     val user = app.getUser(player)!!
                     if (user.bed != null && user.bed!!.block.type == Material.BED_BLOCK) {
@@ -246,6 +270,31 @@ class DefaultListener : Listener {
                         entity.teleport(team.location)
                         player.inventory.addItem(app.woodPickaxe)
                     } else {
+                        // Скрытие врагов
+                        app.teams.filter { !it.players.contains(player.uniqueId) }
+                            .forEach { boxTeam ->
+                                boxTeam.players.mapNotNull { Bukkit.getPlayer(it) }
+                                    .forEach { player.hidePlayer(app, it) }
+                            }
+                        player.sendMessage(Formatting.fine("Враги были скрыты."))
+                        // Создание могилы
+                        val grove = player.world.spawnEntity(
+                            player.location.clone().subtract(0.0, 1.0, 0.0),
+                            EntityType.ARMOR_STAND
+                        )
+                        val nmsGrove = (grove as CraftArmorStand).handle
+                        grove.isInvulnerable = true
+                        grove.customName = "§fМогила §b§l${player.name}"
+                        nmsGrove.isMarker = true
+                        nmsGrove.isInvisible = true
+                        nmsGrove.isNoGravity = true
+                        nmsGrove.isSmall = true
+                        nmsGrove.customNameVisible = true
+                        nmsGrove.setSlot(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(item {
+                            type = Material.CLAY_BALL
+                            nbt("other", "g4")
+                        }.build()))
+
                         team.players.remove(player.uniqueId)
                         Winner.tryGetWinner()
                         player.gameMode = GameMode.SPECTATOR
@@ -254,8 +303,7 @@ class DefaultListener : Listener {
                         if (player.killer != null) {
                             val killer = app.getUser(player.killer)!!
                             killer.finalKills++
-                            killer.stat.money += app.finalMoney
-                            player.killer!!.sendMessage(Formatting.fine("Вы заработали " + app.finalMoney + " монет."))
+                            killer.giveMoney(app.finalMoney)
                             killer.stat.kills++
                         }
                     }
@@ -296,10 +344,26 @@ class DefaultListener : Listener {
                 }
             } else {
                 Bukkit.getOnlinePlayers().forEach {
-                    it.sendMessage("§f[" + team[0].color.chatColor + team[0].color.teamName.substring(0, 1) + "§f] ${player.name} > " + message.drop(1))
+                    it.sendMessage(
+                        "§f[" + team[0].color.chatColor + team[0].color.teamName.substring(
+                            0,
+                            1
+                        ) + "§f] ${player.name} > " + message.drop(1)
+                    )
                 }
             }
         }
+    }
+
+    private fun playDamageEffect(location: Location) {
+        location.getWorld().playSound(location, Sound.ENTITY_PLAYER_HURT, 0.1f, 1f)
+        val packet = PacketPlayOutWorldParticles(
+            EnumParticle.BLOCK_CRACK,
+            false,
+            location.getX().toFloat(), location.getY().toFloat(), location.getZ().toFloat(),
+            .35f, 1.25f, .35f, .5f, 50, 152
+        )
+        location.getNearbyPlayers(24.0).forEach { (it as CraftPlayer).handle.playerConnection.sendPacket(packet) }
     }
 }
 
@@ -311,22 +375,22 @@ object Winner {
         if (list.size == 1) {
 
             B.bc(" ")
-            B.bc(" ")
+            B.bc("§b―――――――――――――――――")
             B.bc("" + list[0].color.chatColor + list[0].color.teamName + " §f победили!")
             B.bc(" ")
             B.bc("§e§lТОП УБИЙСТВ")
-            Bukkit.getOnlinePlayers().map { app.getUser(it) }.sortedBy { -it!!.tempKills }.subList(0, min(3, Bukkit.getOnlinePlayers().size))
+            Bukkit.getOnlinePlayers().map { app.getUser(it) }.sortedBy { -it!!.tempKills }
+                .subList(0, min(3, Bukkit.getOnlinePlayers().size))
                 .forEachIndexed { index, user ->
                     B.bc(" §l${index + 1}. §e" + user!!.player?.name + " §с" + user.tempKills + " убийств")
                 }
-            B.bc(" ")
+            B.bc("§b―――――――――――――――――")
             B.bc(" ")
             list[0].players.forEach {
                 val user = app.getUser(it)
                 if (user?.stat != null) {
                     user.stat.wins++
-                    user.stat.money += app.winMoney
-                    user.player!!.sendMessage(Formatting.fine("Вы заработали " + app.finalMoney + " монет."))
+                    user.giveMoney(app.winMoney)
                     user.player?.sendTitle("§aПОБЕДА", "§aвы выиграли!")
                     val firework = user.player?.world!!.spawn(user.player!!.location, Firework::class.java)
                     val meta = firework.fireworkMeta
@@ -360,4 +424,3 @@ object Winner {
         }
     }
 }
-

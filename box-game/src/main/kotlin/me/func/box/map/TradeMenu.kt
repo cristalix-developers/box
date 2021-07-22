@@ -1,6 +1,8 @@
-package me.func.box
+package me.func.box.map
 
 import dev.implario.bukkit.item.item
+import me.func.box.app
+import me.func.box.info.Sword
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.enchantments.Enchantment
@@ -30,7 +32,7 @@ class TradeMenu : Listener {
                     "XAXDXPXOX",
                     "XAXDXPXOX",
                     "XAXDXPXOX",
-                    "GSXXLXXJK"
+                    "GISXLXXJK"
                 )
 
                 val stat = app.getUser(player)!!.stat
@@ -110,6 +112,7 @@ class TradeMenu : Listener {
                 contents.add('L', slot(player, ItemStack(Material.GOLD_INGOT), Pair(Material.COBBLESTONE, 48)))
                 contents.add('J', slot(player, ItemStack(Material.COMPASS), Pair(Material.EMERALD, 128)))
                 contents.add('S', slot(player, ItemStack(Material.BED), Pair(Material.EMERALD, 192)))
+                contents.add('I', slot(player, ItemStack(Material.BOOKSHELF), Pair(Material.EMERALD, 12)))
                 contents.add('G', slot(player, ItemStack(Material.ENCHANTMENT_TABLE), Pair(Material.EMERALD, 128)))
                 contents.add('K', slot(player, ItemStack(Material.TNT), Pair(Material.EMERALD, 12)))
 

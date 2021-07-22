@@ -28,7 +28,10 @@ class Lootbox : Listener {
         type = Material.CLAY_BALL
     }.build())
 
-    private val dropList = Armor.values().map { it }.plus(Sword.values().filter { it != Sword.NONE }.map { it })
+    private val dropList = Armor.values()
+        .map { it }
+        .filter { it != Armor.DRAK }
+        .plus(Sword.values().filter { it != Sword.NONE }.map { it })
 
     private val lootbox = ControlledInventory.builder()
         .title("Покупка ящика")

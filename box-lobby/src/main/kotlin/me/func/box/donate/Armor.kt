@@ -1,5 +1,10 @@
 package me.func.box.donate
 
+import dev.implario.bukkit.item.item
+import org.bukkit.Material
+import org.bukkit.enchantments.Enchantment
+import org.bukkit.inventory.ItemStack
+
 enum class Armor(private val price: Int, private val rare: Rare, private val title: String, private val code: String) :
     Donate {
 
@@ -17,6 +22,7 @@ enum class Armor(private val price: Int, private val rare: Rare, private val tit
     QUANTUM(79, Rare.LEGENDARY, "Квантовая броня", "quantum"),
     FROST(79, Rare.LEGENDARY, "Ледяная броня", "frost"),
     CHICKEN(79, Rare.LEGENDARY, "Ассасин", "chicken"),
+    DRAK(299, Rare.LEGENDARY, "Бессмертный", "drak"),
     ;
 
     override fun getPrice(): Int {
@@ -33,5 +39,23 @@ enum class Armor(private val price: Int, private val rare: Rare, private val tit
 
     override fun getRare(): Rare {
         return rare
+    }
+
+    fun getItem(current: Boolean, has: Boolean): ItemStack {
+        return item {
+            text((if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть") + "\n§7Редкость: " + rare.color + rare.title + " \n§7Название: " + rare.color + title)
+            nbt("armors", code)
+            if (current)
+                enchant(Enchantment.LUCK, 1)
+            type = Material.DIAMOND_HELMET
+        }.build()
+    }
+
+    fun getItem(): ItemStack {
+        return item {
+            text(rare.color + rare.title + " §7" + title)
+            nbt("armors", code)
+            type = Material.DIAMOND_HELMET
+        }.build()
     }
 }

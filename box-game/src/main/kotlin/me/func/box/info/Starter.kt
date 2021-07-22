@@ -1,17 +1,13 @@
-package me.func.box
+package me.func.box.info
 
 import dev.implario.bukkit.item.item
+import me.func.box.User
 import org.bukkit.Material
-import ru.cristalix.core.util.UtilPlayer.damage
-
-
-
 
 /**
- * @author Рейдж 29.06.2021
+ * @author Reidj 29.06.2021
  * @project box
  */
-
 enum class Starter(val title: String, val cost: Int, val consumer: (User) -> Any) {
     NONE("Отсутствует", 0, {}),
     MINER("Шахтёр", 4500, { user ->
@@ -61,6 +57,12 @@ enum class Starter(val title: String, val cost: Int, val consumer: (User) -> Any
             type = Material.TNT
             text("Взрывчатка")
             amount(10)
+        }.build())
+    }),
+    HEAL("Целитель", 999000, { user ->
+        user.player!!.inventory.addItem(item {
+            type = Material.GOLDEN_APPLE
+            text("Золотое яблоко")
         }.build())
     }),
     SONYA("Соня", 100000, { user ->

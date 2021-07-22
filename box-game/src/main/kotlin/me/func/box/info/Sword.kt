@@ -1,4 +1,4 @@
-package me.func.box
+package me.func.box.info
 
 enum class Sword(private val price: Int, val title: String, val code: Int) {
 

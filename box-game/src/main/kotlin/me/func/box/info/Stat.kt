@@ -1,4 +1,4 @@
-package me.func.box
+package me.func.box.info
 
 import java.util.*
 
