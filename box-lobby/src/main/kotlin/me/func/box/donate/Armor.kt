@@ -23,6 +23,7 @@ enum class Armor(private val price: Int, private val rare: Rare, private val tit
     FROST(79, Rare.LEGENDARY, "Ледяная броня", "frost"),
     CHICKEN(79, Rare.LEGENDARY, "Ассасин", "chicken"),
     DRAK(299, Rare.LEGENDARY, "Бессмертный", "drak"),
+    TITAN(299, Rare.LEGENDARY, "Одеяние титана", "titans"),
     ;
 
     override fun getPrice(): Int {

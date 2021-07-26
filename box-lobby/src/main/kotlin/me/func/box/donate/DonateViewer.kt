@@ -41,7 +41,7 @@ class DonateViewer : Listener {
                 contents.setLayout(
                     "XOOOOOOOX",
                     "XOOOOOOOX",
-                    "XXXXOXXXX",
+                    "XXXOXOXXX",
                     "XXXXLXXXX"
                 )
                 contents.add('L', ClickableItem.of(item {
@@ -204,7 +204,7 @@ class DonateViewer : Listener {
             override fun init(player: Player, contents: InventoryContents) {
                 contents.setLayout(
                     "XOOOOOOOX",
-                    "XXXXOXXXX",
+                    "XXXOXOXXX",
                     "XXXXLXXXX"
                 )
                 contents.add('L', ClickableItem.of(item {
@@ -363,8 +363,8 @@ class DonateViewer : Listener {
                     money.open(player)
                 })
                 contents.add('O', ClickableItem.of(item {
-                    text("§bCезонный кит\n\n §e◉ §7Набор с §932 эндерняком\n §e◉ §6Квантовая броня\n §e◉ §6Топор разрушения\n\n§7Скидка §a70%§7, предложение\n§7действует §aдо 25-го числа")
-                    nbt("armors", "quantum")
+                    text("§bCезонный кит\n\n §e◉ §6Набор титана\n §e◉ §6Одеяния титана\n §e◉ §6Коса титана\n\n§7Скидка §a70%§7, предложение\n§7действует §aдо 6-го числа")
+                    nbt("armors", "titans")
                     type = Material.DIAMOND_HELMET
                 }.build()) {
                     ControlledInventory.builder()
@@ -377,10 +377,10 @@ class DonateViewer : Listener {
                                     "XXHHHXXOP",
                                 )
 
-                                val starter = Starter.BLOCKER
-                                val armor = Armor.QUANTUM
-                                val sword = Sword.K
-                                val seasonCounter = 2
+                                val starter = Starter.TITAN
+                                val armor = Armor.TITAN
+                                val sword = Sword.M
+                                val seasonCounter = 3
 
                                 contents.add('H', ClickableItem.empty(starter.getItem()))
                                 contents.add('H', ClickableItem.empty(armor.getItem()))
@@ -431,6 +431,10 @@ class DonateViewer : Listener {
         ).thenAccept {
             if (it.errorMessage != null) {
                 player.sendMessage(Formatting.error(it.errorMessage))
+                return@thenAccept
+            }
+            if (!user.session.isActive) {
+                player.sendMessage(Formatting.error("Что-то пошло не так... Попробуйте перезайти"))
                 return@thenAccept
             }
             accept.accept(user)

@@ -28,6 +28,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
+import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -240,27 +241,35 @@ class DefaultListener : Listener {
             val user = app.getUser(player.killer)!!
             user.tempKills++
         }
-        app.getUser(player)!!.stat.deaths++
+        val user = app.getUser(player)!!
+        val userKiller = app.getUser(player.killer)!!
+        user.stat.deaths++
+
+        val isTitan = user.stat.currentStarter != null && user.stat.currentStarter == Starter.TITAN
 
         B.postpone(1) {
+            val itemsToGive = arrayListOf<ItemStack>()
             player.inventory.forEach {
-                if (it != null && it.getType() != Material.WOOD_PICKAXE)
-                    player.world.dropItemNaturally(player.location, it)
+                if (it != null && it.getType() != Material.WOOD_PICKAXE) {
+                    if (isTitan && Math.random() < 0.05) itemsToGive.add(it)
+                    else player.world.dropItemNaturally(player.location, it)
+                }
             }
             if (player.openInventory != null && player.openInventory.topInventory != null)
                 player.openInventory.topInventory.clear()
             player.inventory.clear()
+            if (isTitan)
+                itemsToGive.forEach { player.inventory.addItem(it) }
             player.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 255, false, false))
             app.teams.filter { it.players.contains(entity.uniqueId) }
                 .forEach { team ->
                     var message = "" + team.color.chatColor + player.name + " §fубит"
                     if (player.killer != null) {
-                        app.getUser(player.killer)!!.giveMoney(app.killMoney)
+                        userKiller.giveMoney(app.killMoney)
                         message += " игроком " + player.killer.name
                     }
-                    val user = app.getUser(player)!!
                     if (user.bed != null && user.bed!!.block.type == Material.BED_BLOCK) {
-                        player.teleport(app.getUser(player)!!.bed)
+                        player.teleport(user.bed)
                         player.inventory.addItem(app.woodPickaxe)
                         B.bc(Formatting.fine(message))
                         return@postpone
@@ -301,10 +310,9 @@ class DefaultListener : Listener {
                         player.sendTitle("Вы проиграли!", "Наблюдение...")
                         message = "§e§lФИНАЛЬНОЕ УБИЙСТВО! $message"
                         if (player.killer != null) {
-                            val killer = app.getUser(player.killer)!!
-                            killer.finalKills++
-                            killer.giveMoney(app.finalMoney)
-                            killer.stat.kills++
+                            userKiller.finalKills++
+                            userKiller.giveMoney(app.finalMoney)
+                            userKiller.stat.kills++
                         }
                     }
                     B.bc(Formatting.fine(message))

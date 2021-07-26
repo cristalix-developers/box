@@ -52,7 +52,7 @@ enum class Starter(val title: String, val cost: Int, val consumer: (User) -> Any
             amount(31)
         }.build())
     }),
-    FUSE("Взрыватель", 30000, { user ->
+    FUSE("Взрыватель", 50000, { user ->
         user.player!!.inventory.addItem(item {
             type = Material.TNT
             text("Взрывчатка")
@@ -63,6 +63,12 @@ enum class Starter(val title: String, val cost: Int, val consumer: (User) -> Any
         user.player!!.inventory.addItem(item {
             type = Material.GOLDEN_APPLE
             text("Золотое яблоко")
+        }.build())
+    }),
+    TITAN("Титан", 50000, { user ->
+        user.player!!.inventory.addItem(item {
+            type = Material.ENDER_STONE
+            text("Эндерняк")
         }.build())
     }),
     SONYA("Соня", 100000, { user ->

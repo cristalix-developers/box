@@ -27,6 +27,7 @@ enum class Starter(
     HURRIED("Торопливый", 30000, Rare.RARE, Material.IRON_PICKAXE to 1, "§bЖелезная кирка"),
     SCOUT("Лазутчик", 30000, Rare.RARE, Material.WEB to 16, "§bПаутина (16 штук)"),
     FUSE("Взрыватель", 50000, Rare.LEGENDARY, Material.TNT to 10, "§bДинамит (10 штук)"),
+    TITAN("Титан", 50000, Rare.LEGENDARY, Material.ENDER_STONE to 1, "§b1 эндерняк\n\n§a5% вещей остануться\n§aпосле смерти"),
     HEAL("Целитель", 999999, Rare.LEGENDARY, Material.GOLDEN_APPLE to 1, "§eЗолотое яблоко");
 /*    SONYA("Соня", 100000, Rare.COMMON, { user ->
         user.player!!.inventory.addItem(item {
