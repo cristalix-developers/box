@@ -60,7 +60,7 @@ object Generator {
 
                                 val location = start.toCenterLocation()
                                 val stand: ArmorStand = location.getWorld().spawnEntity(
-                                    location.clone().subtract(-1.0, 2.0, -1.0),
+                                    location.clone().subtract(-1.0, 2.0 - 1.0 / 16, -1.0),
                                     EntityType.ARMOR_STAND
                                 ) as ArmorStand
                                 stand.helmet = luckBlock
