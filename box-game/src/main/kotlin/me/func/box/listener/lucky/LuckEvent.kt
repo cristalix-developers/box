@@ -66,7 +66,6 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
             )
         )
     }),
-    TNT_BOW({}),
     ARROW({
         it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
             type = Material.ARROW
@@ -101,7 +100,39 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
             type = Material.SNOW_BALL
             amount(16)
         }.build())
-    })
+    }),
+    FAST_DIGGING({
+        it.player!!.addPotionEffect(
+            org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.FAST_DIGGING,
+                10 * 20,
+                3
+            )
+        )
+    }),
+    STRIKE_LIGHTNING({ it.player!!.world.strikeLightning(it.player!!.location) }),
+    WEB({
+        it.player!!.location.block.type = org.bukkit.Material.WEB
+        it.player!!
+    }),
+    WITHER({
+        it.player!!.addPotionEffect(
+            org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.WITHER,
+                20 * 20,
+                1
+            )
+        )
+    }),
+    ANVIL_DROP({
+        it.player!!.location.subtract(0.0, 2.0, 0.0).block.type = Material.ANVIL
+        it.player!!
+    }),
+    AIR_SWORD({ SuperSword.AIR_SWORD.give(it) }),
+    FIRE_SWORD({ SuperSword.FIRE_SWORD.give(it) }),
+    POISON_SWORD({ SuperSword.POISON_SWORD.give(it) }),
+    WITHER_SWORD({ SuperSword.WITHER_SWORD.give(it) }),
+    HAMMER({ SuperSword.HAMMER.give(it) }),
     ;
 
     fun accept(user: User) {
