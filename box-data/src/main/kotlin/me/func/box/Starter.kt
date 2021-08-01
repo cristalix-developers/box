@@ -34,6 +34,8 @@ enum class Starter(
             it.inventory.addItem(dev.implario.bukkit.item.item {
                 type = org.bukkit.Material.IRON_CHESTPLATE
                 text("Нагрудник защитника")
+            }.build())
+            it.inventory.addItem(dev.implario.bukkit.item.item {
                 type = org.bukkit.Material.LEATHER_BOOTS
                 text("Ботинки защитника")
             }.build())
