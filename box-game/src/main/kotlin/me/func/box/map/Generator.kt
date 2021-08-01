@@ -12,6 +12,7 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.BlockFace
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftVillager
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.entity.ArmorStand
@@ -66,7 +67,6 @@ object Generator {
                                 stand.helmet = luckBlock
                                 stand.isInvulnerable = true
                                 stand.setGravity(false)
-                                stand.setCanMove(false)
                                 stand.isVisible = false
                                 stand.setMetadata("lucky", FixedMetadataValue(app, true))
 
