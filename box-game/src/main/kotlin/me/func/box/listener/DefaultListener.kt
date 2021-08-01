@@ -174,6 +174,11 @@ class DefaultListener : Listener {
     }
 
     @EventHandler
+    fun PlayerArmorStandManipulateEvent.handle() {
+        isCancelled = true
+    }
+
+    @EventHandler
     fun EntityDamageByEntityEvent.handle() {
         if (entityType == EntityType.VILLAGER)
             cancelled = true
