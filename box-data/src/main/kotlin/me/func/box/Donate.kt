@@ -1,4 +1,4 @@
-package me.func.box.donate
+package me.func.box
 
 interface Donate {
 

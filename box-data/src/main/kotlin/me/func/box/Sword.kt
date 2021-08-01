@@ -1,9 +1,4 @@
-package me.func.box.donate
-
-import dev.implario.bukkit.item.item
-import org.bukkit.Material
-import org.bukkit.enchantments.Enchantment
-import org.bukkit.inventory.ItemStack
+package me.func.box
 
 enum class Sword(private val price: Int, private val rare: Rare, private val title: String, private val code: Int) :
     Donate {
@@ -37,21 +32,21 @@ enum class Sword(private val price: Int, private val rare: Rare, private val tit
         return rare
     }
 
-    fun getItem(current: Boolean, has: Boolean): ItemStack {
-        return item {
+    fun getItem(current: Boolean, has: Boolean): org.bukkit.inventory.ItemStack {
+        return dev.implario.bukkit.item.item {
             text((if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть") + "\n§7Редкость: " + rare.color + rare.title + " \n§7Название: " + rare.color + title)
             nbt("weapons_other", code)
             if (current)
-                enchant(Enchantment.LUCK, 1)
-            type = Material.DIAMOND_SWORD
+                enchant(org.bukkit.enchantments.Enchantment.LUCK, 1)
+            type = org.bukkit.Material.DIAMOND_SWORD
         }.build()
     }
 
-    fun getItem(): ItemStack {
-        return item {
+    fun getItem(): org.bukkit.inventory.ItemStack {
+        return dev.implario.bukkit.item.item {
             text(rare.color + rare.title + " §7" + title)
             nbt("weapons_other", code)
-            type = Material.DIAMOND_SWORD
+            type = org.bukkit.Material.DIAMOND_SWORD
         }.build()
     }
 }

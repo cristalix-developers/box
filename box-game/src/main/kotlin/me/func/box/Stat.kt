@@ -1,4 +1,4 @@
-package me.func.box.info
+package me.func.box
 
 import java.util.*
 
@@ -18,5 +18,6 @@ data class Stat (
     var starters: MutableList<Starter>?,
     var currentStarter: Starter?,
     var swords: MutableList<Sword>?,
-    var currentSword: Sword?
+    var currentSword: Sword?,
+    var luckyOpened: Int
 )

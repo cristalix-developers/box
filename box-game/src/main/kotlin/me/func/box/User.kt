@@ -3,9 +3,6 @@ package me.func.box
 import clepto.bukkit.B
 import dev.implario.kensuke.KensukeSession
 import dev.implario.kensuke.impl.bukkit.IBukkitKensukeUser
-import me.func.box.info.Starter
-import me.func.box.info.Stat
-import me.func.box.info.Sword
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.Packet
@@ -65,7 +62,7 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
                     Starter.NONE
                 ), Starter.NONE, mutableListOf(
                     Sword.NONE
-                ), Sword.NONE
+                ), Sword.NONE, 0
             )
         } else {
             if (stat.currentStarter == null)

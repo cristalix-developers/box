@@ -28,10 +28,10 @@ class Lootbox : Listener {
         type = Material.CLAY_BALL
     }.build())
 
-    private val dropList = Armor.values()
+    private val dropList = me.func.box.Armor.values()
         .map { it }
-        .filter { it != Armor.DRAK }
-        .plus(Sword.values().filter { it != Sword.NONE }.map { it })
+        .filter { it != me.func.box.Armor.DRAK }
+        .plus(me.func.box.Sword.values().filter { it != me.func.box.Sword.NONE }.map { it })
 
     private val lootbox = ControlledInventory.builder()
         .title("Покупка ящика")
@@ -60,9 +60,9 @@ class Lootbox : Listener {
 
                     user.stat.money += moneyDrop
 
-                    val drop = ListUtils.random(dropList) as Donate
+                    val drop = ListUtils.random(dropList) as me.func.box.Donate
 
-                    val item = if (drop is Sword) {
+                    val item = if (drop is me.func.box.Sword) {
                         if (user.stat.swords == null) user.stat.swords = arrayListOf(drop)
                         else {
                             if (user.stat.swords!!.contains(drop)) {

@@ -32,6 +32,9 @@ object Generator {
                     val random = random.nextDouble()
                     when {
                         random > 0.05 -> start.block.setTypeAndDataFast(1, 0)
+                        random > 0.007 && app.isLuckyGame -> {
+                            // todo: спавн лаки блока
+                        }
                         random > 0.0002 -> start.block.setTypeAndDataFast(Material.EMERALD_ORE.id, 0)
                         else -> start.block.setTypeAndDataFast(Material.GOLD_BLOCK.id, 0)
                     }

@@ -60,6 +60,7 @@ dependencies {
     implementation 'dev.implario.bukkit:bukkit-tools:4.0.0'
     implementation 'dev.implario.bukkit:kotlin-api:1.0.0'
     implementation 'dev.implario.bukkit:dark-paper:1.0.0'
+    implementation project(':box-data')
 }
 
 remotes {

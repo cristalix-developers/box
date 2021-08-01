@@ -2,8 +2,8 @@ package me.func.box
 
 import dev.implario.kensuke.KensukeSession
 import dev.implario.kensuke.impl.bukkit.IBukkitKensukeUser
-import me.func.box.donate.Starter
-import me.func.box.donate.Sword
+import me.func.box.Starter
+import me.func.box.Sword
 import net.minecraft.server.v1_12_R1.Packet
 import net.minecraft.server.v1_12_R1.PlayerConnection
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
@@ -41,11 +41,11 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
     init {
         if (stat == null) {
             this.stat = Stat(
-                UUID.fromString(session.userId), arrayListOf("hi"), "", 0, 0, 0, 0, 0, 0, 0, null, 500, mutableListOf(
+                UUID.fromString(session.userId), arrayListOf(), "", 0, 0, 0, 0, 0, 0, 0, null, 500, mutableListOf(
                     Starter.NONE
                 ), Starter.NONE, mutableListOf(
                     Sword.NONE
-                ), Sword.NONE
+                ), Sword.NONE, 0
             )
         } else {
             if (stat.currentStarter == null)
@@ -59,7 +59,7 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
             this.stat = stat
         }
         if (this.stat.skins == null)
-            this.stat.skins = arrayListOf("hi")
+            this.stat.skins = arrayListOf()
         this.session = session
     }
 

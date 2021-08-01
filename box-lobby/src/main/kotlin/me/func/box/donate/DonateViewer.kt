@@ -50,7 +50,7 @@ class DonateViewer : Listener {
                 }.build()) {
                     player.performCommand("menu")
                 })
-                Armor.values().forEach { tag ->
+                me.func.box.Armor.values().forEach { tag ->
                     val user = app.getUser(player)!!
                     val has = user.stat.skins!!.contains(tag.getCode())
                     val current = user.stat.currentSkin == tag.getCode()
@@ -138,8 +138,8 @@ class DonateViewer : Listener {
                 }.build()) {
                     player.performCommand("menu")
                 })
-                Sword.values().forEach { tag ->
-                    if (tag == Sword.NONE)
+                me.func.box.Sword.values().forEach { tag ->
+                    if (tag == me.func.box.Sword.NONE)
                         return@forEach
                     val user = app.getUser(player)!!
                     val has = user.stat.swords!!.contains(tag)
@@ -213,11 +213,11 @@ class DonateViewer : Listener {
                 }.build()) {
                     player.performCommand("menu")
                 })
-                Starter.values().forEach { tag ->
+                me.func.box.Starter.values().forEach { tag ->
                     val user = app.getUser(player)!!
                     val has = user.stat.starters!!.contains(tag)
                     val current = user.stat.currentStarter == tag
-                    if (tag == Starter.NONE)
+                    if (tag == me.func.box.Starter.NONE)
                         return@forEach
                     val item = tag.getItem(current, has)
                     contents.add('O', ClickableItem.of(item) {
@@ -377,9 +377,9 @@ class DonateViewer : Listener {
                                     "XXHHHXXOP",
                                 )
 
-                                val starter = Starter.TITAN
-                                val armor = Armor.TITAN
-                                val sword = Sword.M
+                                val starter = me.func.box.Starter.TITAN
+                                val armor = me.func.box.Armor.TITAN
+                                val sword = me.func.box.Sword.M
                                 val seasonCounter = 3
 
                                 contents.add('H', ClickableItem.empty(starter.getItem()))
@@ -507,6 +507,7 @@ class DonateViewer : Listener {
                                 "§fСмертей: §f${stat.deaths}\n" +
                                 "§fК/Д: §c${((stat.kills / (stat.deaths + 1)) * 100 % 1) / 100}\n" +
                                 "§fДенег: §e${stat.money} монет\n" +
+                                "§fЛакиблоков: §e${stat.luckyOpened}\n" +
                                 "§fИгр сыграно: §f${stat.games}\n"
                     )
                     type = Material.PAPER

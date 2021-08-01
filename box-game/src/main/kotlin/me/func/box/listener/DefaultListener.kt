@@ -4,9 +4,9 @@ import clepto.bukkit.B
 import clepto.cristalix.Cristalix
 import dev.implario.bukkit.item.item
 import io.netty.buffer.Unpooled
+import me.func.box.Starter
 import me.func.box.app
 import me.func.box.data.Status
-import me.func.box.info.Starter
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.*
@@ -117,7 +117,7 @@ class DefaultListener : Listener {
             player.sendMessage(
                 "§7Начальный набор: " +
                         if (starter == null || starter == Starter.NONE) "§cОтсутсвует"
-                        else "§a${starter.title}"
+                        else "§a${starter.getTitle()}"
             )
             player.sendMessage("§b―――――――――――――――――")
             player.sendMessage(" ")

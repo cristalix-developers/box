@@ -13,12 +13,8 @@ import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.bar.WaitingPlayers
 import me.func.box.data.BoxTeam
 import me.func.box.data.Status
-import me.func.box.info.Starter
-import me.func.box.info.Stat
-import me.func.box.listener.BlockListener
-import me.func.box.listener.DefaultListener
-import me.func.box.listener.EnchantTable
-import me.func.box.listener.Winner
+import me.func.box.listener.*
+import me.func.box.listener.lucky.LuckyManager
 import me.func.box.map.Generator
 import me.func.box.map.MapLoader
 import me.func.box.map.TradeMenu
@@ -72,6 +68,7 @@ class Box : JavaPlugin() {
         { user, context -> context.store(statScope, user.stat) }
     )
     lateinit var zero: Location
+    var isLuckyGame = System.getenv("LUCKY").toBoolean()
     var slots = System.getenv("SLOT").toInt()
     val winMoney = System.getenv("WIN_REWARD").toInt()
     val finalMoney = System.getenv("FINAL_REWARD").toInt()
@@ -145,7 +142,7 @@ class Box : JavaPlugin() {
         userManager.isOptional = true
 
         // Регистрация обработчиков
-        B.events(BlockListener(), DefaultListener(), TradeMenu(), EnchantTable())
+        B.events(BlockListener(), DefaultListener(), TradeMenu(), EnchantTable(), LuckyManager())
 
         // Скорборд команды
         val manager = Bukkit.getScoreboardManager()
@@ -190,7 +187,7 @@ class Box : JavaPlugin() {
                             val user = app.getUser(player)!!
                             user.stat.currentStarter?.let {
                                 if (it == Starter.FUSE && slots > 20) player.sendMessage(Formatting.error("Данный стартовый набор недоступен в выбранном типе игры."))
-                                else it.consumer(user)
+                                else it.consumer(user.player!!)
                             }
                             user.stat.games++
                             waitingBar.removeViewer(player.uniqueId)

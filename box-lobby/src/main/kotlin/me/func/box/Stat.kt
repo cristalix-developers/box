@@ -1,7 +1,7 @@
 package me.func.box
 
-import me.func.box.donate.Starter
-import me.func.box.donate.Sword
+import me.func.box.Starter
+import me.func.box.Sword
 import java.util.*
 
 data class Stat (
@@ -20,5 +20,6 @@ data class Stat (
     var starters: MutableList<Starter>?,
     var currentStarter: Starter?,
     var swords: MutableList<Sword>?,
-    var currentSword: Sword?
+    var currentSword: Sword?,
+    var luckyOpened: Int
 )

@@ -1,4 +1,4 @@
-package me.func.box.donate
+package me.func.box
 
 enum class Rare(val title: String, val color: String) {
 
