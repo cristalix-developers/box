@@ -8,6 +8,7 @@ import me.func.box.Starter
 import me.func.box.User
 import me.func.box.app
 import me.func.box.data.Status
+import me.func.box.listener.lucky.SuperSword
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.*
@@ -183,6 +184,15 @@ class DefaultListener : Listener {
                 app.getUser(damager as CraftPlayer)!!.giveMoney(1)
         } else if (app.status == Status.STARTING) {
             cancelled = true
+        } else if (entity is CraftPlayer && damager is CraftPlayer && (damager as CraftPlayer).itemInHand != null) {
+            val item = (damager as CraftPlayer).itemInHand
+            val nmsItem = CraftItemStack.asNMSCopy(item)
+            if (nmsItem.hasTag() && nmsItem.tag.hasKeyOfType("super", 8)) {
+                SuperSword.valueOf(nmsItem.tag.getString("super")).onDamage(
+                    app.getUser(damager as CraftPlayer)!!,
+                    app.getUser(entity as CraftPlayer)!!
+                )
+            }
         }
     }
 
