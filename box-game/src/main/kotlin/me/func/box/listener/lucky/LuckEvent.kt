@@ -46,7 +46,7 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
                 0
             )
         )
-        it.player!!.sendTitle("§bЭффекты", "§7Слепота (8 секунд) Сила I (8 секунд)", 10, 35, 20)
+        it.player!!.sendTitle("§bЭффекты", "§7Слепота (8 секунд.) Сила I (8 секунд.)", 10, 35, 20)
     }),
     LEVITATION({
         it.player!!.addPotionEffect(
@@ -56,7 +56,7 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
                 0
             )
         )
-        it.player!!.sendTitle("§bЭффект", "§7Левитация (6 секунд)", 10, 35, 20)
+        it.player!!.sendTitle("§bЭффект", "§7Левитация (6 секунд.)", 10, 35, 20)
     }),
     SPEED({
         it.player!!.addPotionEffect(org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SPEED, 5 * 20, 0))
@@ -67,7 +67,7 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
                 0
             )
         )
-        it.player!!.sendTitle("§bЭффект", "§7Невидимость (8 секунд)", 10, 35, 20)
+        it.player!!.sendTitle("§bЭффект", "§7Невидимость (8 секунд.)", 10, 35, 20)
     }),
     ARROW({
         it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
@@ -112,7 +112,7 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
                 3
             )
         )
-        it.player!!.sendTitle("§bЭффект", "§7Быстрое вскапывание (10 секунд)", 10, 35, 20)
+        it.player!!.sendTitle("§bЭффект", "§7Быстрое вскапывание (10 секунд.)", 10, 35, 20)
     }),
     STRIKE_LIGHTNING({ it.player!!.world.strikeLightning(it.player!!.location) }),
     WEB({
@@ -127,7 +127,7 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
                 1
             )
         )
-        it.player!!.sendTitle("§bЭффект", "§7Иссушение(20 секунд)", 10, 35, 20)
+        it.player!!.sendTitle("§bЭффект", "§7Иссушение(20 секунд.)", 10, 35, 20)
     }),
     ANVIL_DROP({
         it.player!!.location.subtract(0.0, 2.0, 0.0).block.type = Material.ANVIL
