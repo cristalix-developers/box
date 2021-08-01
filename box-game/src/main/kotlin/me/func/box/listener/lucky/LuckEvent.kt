@@ -5,7 +5,6 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack;
 
 enum class LuckEvent(val luckyConsumer: (User) -> Any) {
-
     GOLDEN_APPLE({
         it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
             type = Material.GOLDEN_APPLE

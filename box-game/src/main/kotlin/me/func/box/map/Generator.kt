@@ -1,20 +1,40 @@
 package me.func.box.map
 
 import clepto.bukkit.B
+import com.mojang.brigadier.arguments.StringArgumentType.string
+import dev.implario.bukkit.item.item
 import me.func.box.app
+import net.minecraft.server.v1_12_R1.ItemStack
 import net.minecraft.server.v1_12_R1.MinecraftServer
+import net.minecraft.server.v1_12_R1.NBTCompressedStreamTools
+import net.minecraft.server.v1_12_R1.NBTTagCompound
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.BlockFace
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftVillager
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
+import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
+import org.bukkit.metadata.FixedMetadataValue
+import ru.cristalix.core.util.UtilEntity
+import java.io.ByteArrayInputStream
 import java.security.SecureRandom
+import java.util.*
 
 
 object Generator {
 
     private val random = SecureRandom()
+
+    private val luckBlock: org.bukkit.inventory.ItemStack
+
+    init {
+        // Десерелизация предмета лакиблока
+        val stream = ByteArrayInputStream(Base64.getDecoder().decode("H4sIAAAAAAAAAE2OPVPCMBzG/4AodnF0ZXDQoXdBoFy8Y1DwIBwpAuEl3UIboDQpXGmF8IVc/Qx+Muvmsz0vv7vHAqhAMQzgToex9BOxTl+OUaZUAcqdfRanBQtKqdhYYE3/4tEplklOkAAeUAM1sI+RHdQlthvOc83Gvljb6E9CiFoL4Zz7SPYHmaShPN5CJZXnNEvk0QKAQgXKc6EyCd/SDJC33KJgOVC+IU7u2RSpEdkdWiSem1WHOETnff/VGRr8b9tMxaKpeH2w9eJxttJzNKxPlOxPar6efbo90qTaDd0uvdCLu+WMG7qgddqbK283UVxzM2Iq5Gx8ppogt+tpj70bj1FEF+6OX2YNqvmFsshQtmmSuIbX43Y7f2/BTRAeD0qYCly5Qku4//nCw8yPTPVN7f2o+mikUvvTE0ARrrtCi42EEvwCE+bPt3IBAAA="))
+        val compound: NBTTagCompound = NBTCompressedStreamTools.a(stream)
+        luckBlock = CraftItemStack.asBukkitCopy(ItemStack(compound))
+    }
 
     fun generateContentOfCube(
         start: Location,
@@ -33,7 +53,21 @@ object Generator {
                     when {
                         random > 0.05 -> start.block.setTypeAndDataFast(1, 0)
                         random > 0.007 && app.isLuckyGame -> {
-                            // todo: спавн лаки блока
+                            start.block.setTypeAndDataFast(0, 0)
+
+                            val location = start.toCenterLocation()
+                            val stand: ArmorStand = location.getWorld().spawnEntity(
+                                location.clone().subtract(-0.5, 2.45, -0.5),
+                                EntityType.ARMOR_STAND
+                            ) as ArmorStand
+                            stand.helmet = luckBlock
+                            stand.isInvulnerable = true
+                            stand.setGravity(false)
+                            stand.setCanMove(false)
+                            stand.isVisible = false
+                            stand.setMetadata("lucky", FixedMetadataValue(app, true))
+
+                            UtilEntity.setScale(stand, 1.7, 1.7, 1.7)
                         }
                         random > 0.0002 -> start.block.setTypeAndDataFast(Material.EMERALD_ORE.id, 0)
                         else -> start.block.setTypeAndDataFast(Material.GOLD_BLOCK.id, 0)
