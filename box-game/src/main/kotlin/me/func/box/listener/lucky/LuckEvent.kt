@@ -24,13 +24,82 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
     BLOCK_BREAK({
         val block = it.player!!.location.subtract(0.0, 10.0, 0.0).block
         if (block?.type != Material.BEDROCK)
-            block.breakNaturally(ItemStack(org.bukkit.Material.AIR))
+            block.breakNaturally(ItemStack(Material.AIR))
     }),
     GIVE_BED({
         it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
             type = Material.BED
         }.build())
     }),
+    GIVE_EFFECTS({
+        it.player!!.addPotionEffect(
+            org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.BLINDNESS,
+                8 * 20,
+                0
+            )
+        )
+        it.player!!.addPotionEffect(
+            org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.INCREASE_DAMAGE,
+                8 * 20,
+                0
+            )
+        )
+    }),
+    LEVITATION({
+        it.player!!.addPotionEffect(
+            org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.LEVITATION,
+                6 * 20,
+                0
+            )
+        )
+    }),
+    SPEED({
+        it.player!!.addPotionEffect(org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SPEED, 5 * 20, 0))
+        it.player!!.addPotionEffect(
+            org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.INVISIBILITY,
+                8 * 20,
+                0
+            )
+        )
+    }),
+    TNT_BOW({}),
+    ARROW({
+        it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
+            type = Material.ARROW
+            amount(8)
+        }.build())
+    }),
+    THREADS_STICKS({
+        it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
+            type = Material.WEB
+            amount(6)
+            type = Material.STICK
+            amount(6)
+        }.build())
+    }),
+    ANVIL({
+        it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
+            type = Material.ANVIL
+        }.build())
+    }),
+    WATER({
+        it.player!!.location.block.type = Material.WATER
+        it.player!!
+    }),
+    LAVA({
+        it.player!!.location.block.type = Material.LAVA
+        it.player!!
+    }),
+    SNOWBALL({
+        it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
+            type = Material.SNOW_BALL
+            amount(16)
+        }.build())
+    })
     ;
 
     fun accept(user: User) {
