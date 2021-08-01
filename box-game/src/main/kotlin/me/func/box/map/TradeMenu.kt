@@ -99,7 +99,7 @@ class TradeMenu : Listener {
                 else
                     contents.add('O', slot(player, item {
                         type = Material.DIAMOND_SWORD
-                        nbt("weapons_other", sword.code.toString())
+                        nbt("weapons_other", sword.getCode())
                     }.build(), Pair(Material.COBBLESTONE, 128)))
                 contents.add('O', slot(player, item {
                     type = Material.IRON_SWORD

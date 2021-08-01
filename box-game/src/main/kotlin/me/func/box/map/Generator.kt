@@ -51,25 +51,29 @@ object Generator {
                     start.set((originalX + x).toDouble(), (originalY + y).toDouble(), (originalZ + z).toDouble())
                     val random = random.nextDouble()
                     when {
-                        random > 0.05 -> start.block.setTypeAndDataFast(1, 0)
-                        random > 0.007 && app.isLuckyGame -> {
-                            start.block.setTypeAndDataFast(0, 0)
+                        random > 0.1 -> start.block.setTypeAndDataFast(1, 0)
+                        random > 0.0002 -> {
+                            if (!app.isLuckyGame || random > 0.01) {
+                                start.block.setTypeAndDataFast(Material.EMERALD_ORE.id, 0)
+                            } else {
+                                B.bc("Generated as $start")
+                                start.block.setTypeAndDataFast(0, 0)
 
-                            val location = start.toCenterLocation()
-                            val stand: ArmorStand = location.getWorld().spawnEntity(
-                                location.clone().subtract(-0.5, 2.45, -0.5),
-                                EntityType.ARMOR_STAND
-                            ) as ArmorStand
-                            stand.helmet = luckBlock
-                            stand.isInvulnerable = true
-                            stand.setGravity(false)
-                            stand.setCanMove(false)
-                            stand.isVisible = false
-                            stand.setMetadata("lucky", FixedMetadataValue(app, true))
+                                val location = start.toCenterLocation()
+                                val stand: ArmorStand = location.getWorld().spawnEntity(
+                                    location.clone().subtract(-0.5, 2.45, -0.5),
+                                    EntityType.ARMOR_STAND
+                                ) as ArmorStand
+                                stand.helmet = luckBlock
+                                stand.isInvulnerable = true
+                                stand.setGravity(false)
+                                stand.setCanMove(false)
+                                stand.isVisible = false
+                                stand.setMetadata("lucky", FixedMetadataValue(app, true))
 
-                            UtilEntity.setScale(stand, 1.7, 1.7, 1.7)
+                                UtilEntity.setScale(stand, 1.7, 1.7, 1.7)
+                            }
                         }
-                        random > 0.0002 -> start.block.setTypeAndDataFast(Material.EMERALD_ORE.id, 0)
                         else -> start.block.setTypeAndDataFast(Material.GOLD_BLOCK.id, 0)
                     }
                 }

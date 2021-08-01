@@ -69,7 +69,7 @@ class Box : JavaPlugin() {
         { user, context -> context.store(statScope, user.stat) }
     )
     lateinit var zero: Location
-    var isLuckyGame = System.getenv("LUCKY").toBoolean()
+    var isLuckyGame = System.getenv("LUCKY").toInt() == 1
     var slots = System.getenv("SLOT").toInt()
     val winMoney = System.getenv("WIN_REWARD").toInt()
     val finalMoney = System.getenv("FINAL_REWARD").toInt()

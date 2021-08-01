@@ -75,9 +75,11 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
     }),
     THREADS_STICKS({
         it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
-            type = Material.WEB
-            amount(6)
             type = Material.STICK
+            amount(6)
+        }.build())
+        it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
+            type = org.bukkit.Material.WEB
             amount(6)
         }.build())
     }),
