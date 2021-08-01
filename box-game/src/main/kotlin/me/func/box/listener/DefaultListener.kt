@@ -5,6 +5,7 @@ import clepto.cristalix.Cristalix
 import dev.implario.bukkit.item.item
 import io.netty.buffer.Unpooled
 import me.func.box.Starter
+import me.func.box.User
 import me.func.box.app
 import me.func.box.data.Status
 import net.md_5.bungee.api.ChatMessageType
@@ -237,12 +238,12 @@ class DefaultListener : Listener {
         droppedExp = 0
         deathMessage = null
 
+        var userKiller: User? = null
         if (player.killer != null) {
-            val user = app.getUser(player.killer)!!
-            user.tempKills++
+            userKiller = app.getUser(player.killer)!!
+            userKiller.tempKills++
         }
         val user = app.getUser(player)!!
-        val userKiller = app.getUser(player.killer)!!
         user.stat.deaths++
 
         val isTitan = user.stat.currentStarter != null && user.stat.currentStarter == Starter.TITAN
@@ -265,7 +266,7 @@ class DefaultListener : Listener {
                 .forEach { team ->
                     var message = "" + team.color.chatColor + player.name + " §fубит"
                     if (player.killer != null) {
-                        userKiller.giveMoney(app.killMoney)
+                        userKiller?.giveMoney(app.killMoney)
                         message += " игроком " + player.killer.name
                     }
                     if (user.bed != null && user.bed!!.block.type == Material.BED_BLOCK) {
@@ -310,7 +311,7 @@ class DefaultListener : Listener {
                         player.sendTitle("Вы проиграли!", "Наблюдение...")
                         message = "§e§lФИНАЛЬНОЕ УБИЙСТВО! $message"
                         if (player.killer != null) {
-                            userKiller.finalKills++
+                            userKiller!!.finalKills++
                             userKiller.giveMoney(app.finalMoney)
                             userKiller.stat.kills++
                         }
