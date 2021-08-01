@@ -31,6 +31,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scoreboard.NameTagVisibility
 import org.bukkit.scoreboard.Team
 import ru.cristalix.core.CoreApi
+import ru.cristalix.core.datasync.EntityDataParameters
 import ru.cristalix.core.formatting.Color
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.inventory.IInventoryService
@@ -90,6 +91,7 @@ class Box : JavaPlugin() {
     override fun onEnable() {
         B.plugin = this
         app = this
+        EntityDataParameters.register()
         teams = teams.dropLast(teams.size - teamSize)
         Platforms.set(PlatformDarkPaper())
         woodPickaxe = item {
@@ -366,6 +368,7 @@ class Box : JavaPlugin() {
                             it.location = null
                             it.bed = true
                         }
+                        getWorld().livingEntities.filter { it.hasMetadata("lucky") }.forEach { it.remove() }
                         loadMap()
                         time = 0
                         status = Status.STARTING
