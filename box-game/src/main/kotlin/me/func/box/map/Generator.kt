@@ -28,15 +28,6 @@ object Generator {
 
     private val random = SecureRandom()
 
-    private val luckBlock: org.bukkit.inventory.ItemStack
-
-    init {
-        // Десерелизация предмета лакиблока
-        val stream = ByteArrayInputStream(Base64.getDecoder().decode("H4sIAAAAAAAAAE2OPVPCMBzG/4AodnF0ZXDQoXdBoFy8Y1DwIBwpAuEl3UIboDQpXGmF8IVc/Qx+Muvmsz0vv7vHAqhAMQzgToex9BOxTl+OUaZUAcqdfRanBQtKqdhYYE3/4tEplklOkAAeUAM1sI+RHdQlthvOc83Gvljb6E9CiFoL4Zz7SPYHmaShPN5CJZXnNEvk0QKAQgXKc6EyCd/SDJC33KJgOVC+IU7u2RSpEdkdWiSem1WHOETnff/VGRr8b9tMxaKpeH2w9eJxttJzNKxPlOxPar6efbo90qTaDd0uvdCLu+WMG7qgddqbK283UVxzM2Iq5Gx8ppogt+tpj70bj1FEF+6OX2YNqvmFsshQtmmSuIbX43Y7f2/BTRAeD0qYCly5Qku4//nCw8yPTPVN7f2o+mikUvvTE0ARrrtCi42EEvwCE+bPt3IBAAA="))
-        val compound: NBTTagCompound = NBTCompressedStreamTools.a(stream)
-        luckBlock = CraftItemStack.asBukkitCopy(ItemStack(compound))
-    }
-
     fun generateContentOfCube(
         start: Location,
         xSize: Int,
@@ -53,26 +44,7 @@ object Generator {
                     val random = random.nextDouble()
                     when {
                         random > 0.1 -> start.block.setTypeAndDataFast(1, 0)
-                        random > 0.0002 -> {
-                            if (!app.isLuckyGame || random > 0.01) {
-                                start.block.setTypeAndDataFast(Material.EMERALD_ORE.id, 0)
-                            } else {
-                                start.block.setTypeAndDataFast(0, 0)
-
-                                val location = start.toCenterLocation()
-                                val stand: ArmorStand = location.getWorld().spawnEntity(
-                                    location.clone().subtract(-1.0, 2.0 - 1.0 / 16, -1.0),
-                                    EntityType.ARMOR_STAND
-                                ) as ArmorStand
-                                stand.helmet = luckBlock
-                                stand.isInvulnerable = true
-                                stand.setGravity(false)
-                                stand.isVisible = false
-                                stand.setMetadata("lucky", FixedMetadataValue(app, true))
-
-                                UtilEntity.setScale(stand, 1.7, 1.7, 1.7)
-                            }
-                        }
+                        random > 0.0002 -> start.block.setTypeAndDataFast(Material.EMERALD_ORE.id, 0)
                         else -> start.block.setTypeAndDataFast(Material.GOLD_BLOCK.id, 0)
                     }
                 }

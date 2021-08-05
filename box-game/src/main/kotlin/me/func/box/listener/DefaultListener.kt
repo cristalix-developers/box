@@ -123,6 +123,8 @@ class DefaultListener : Listener {
             )
             player.sendMessage("§b―――――――――――――――――")
             player.sendMessage(" ")
+        } else {
+            player.gameMode = GameMode.SPECTATOR
         }
     }
 
@@ -180,8 +182,11 @@ class DefaultListener : Listener {
 
     @EventHandler
     fun EntityDamageByEntityEvent.handle() {
-        if (entityType == EntityType.VILLAGER)
+        if (entityType == EntityType.VILLAGER) {
             cancelled = true
+            isCancelled = true
+            damage = 0.0
+        }
         if (app.status == Status.STARTING && entityType != EntityType.PLAYER) {
             damage = 0.0
             playDamageEffect(entity.location)
@@ -205,6 +210,11 @@ class DefaultListener : Listener {
     fun EntityDamageEvent.handle() {
         if (app.status == Status.STARTING && entityType == EntityType.PLAYER)
             cancelled = true
+        else if (entityType == EntityType.VILLAGER) {
+            cancelled = true
+            isCancelled = true
+            damage = 0.0
+        }
     }
 
     @EventHandler
@@ -250,6 +260,7 @@ class DefaultListener : Listener {
         val player = entity as CraftPlayer
         player.itemOnCursor = null
 
+        entity.fireTicks = 0
         droppedExp = 0
         deathMessage = null
 

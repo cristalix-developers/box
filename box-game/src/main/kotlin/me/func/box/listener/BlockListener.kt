@@ -1,25 +1,47 @@
 package me.func.box.listener
 
 import clepto.bukkit.B
+import me.func.box.User
 import me.func.box.app
 import me.func.box.data.Status
+import me.func.box.map.LuckyGet
+import net.minecraft.server.v1_12_R1.ItemStack
+import net.minecraft.server.v1_12_R1.NBTCompressedStreamTools
+import net.minecraft.server.v1_12_R1.NBTTagCompound
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.block.BlockFace
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
+import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ExperienceOrb
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityExplodeEvent
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.metadata.FixedMetadataValue
 import ru.cristalix.core.formatting.Formatting
+import ru.cristalix.core.util.UtilEntity
+import java.io.ByteArrayInputStream
 import java.util.*
 
 class BlockListener : Listener {
+
+    private val luckBlock: org.bukkit.inventory.ItemStack
+
+    init {
+        // Десерелизация предмета лакиблока
+        val stream = ByteArrayInputStream(
+            Base64.getDecoder()
+                .decode("H4sIAAAAAAAAAE2OPVPCMBzG/4AodnF0ZXDQoXdBoFy8Y1DwIBwpAuEl3UIboDQpXGmF8IVc/Qx+Muvmsz0vv7vHAqhAMQzgToex9BOxTl+OUaZUAcqdfRanBQtKqdhYYE3/4tEplklOkAAeUAM1sI+RHdQlthvOc83Gvljb6E9CiFoL4Zz7SPYHmaShPN5CJZXnNEvk0QKAQgXKc6EyCd/SDJC33KJgOVC+IU7u2RSpEdkdWiSem1WHOETnff/VGRr8b9tMxaKpeH2w9eJxttJzNKxPlOxPar6efbo90qTaDd0uvdCLu+WMG7qgddqbK283UVxzM2Iq5Gx8ppogt+tpj70bj1FEF+6OX2YNqvmFsshQtmmSuIbX43Y7f2/BTRAeD0qYCly5Qku4//nCw8yPTPVN7f2o+mikUvvTE0ARrrtCi42EEvwCE+bPt3IBAAA=")
+        )
+        val compound: NBTTagCompound = NBTCompressedStreamTools.a(stream)
+        luckBlock = CraftItemStack.asBukkitCopy(ItemStack(compound))
+    }
 
     @EventHandler
     fun BlockBreakEvent.handle() {
@@ -28,13 +50,13 @@ class BlockListener : Listener {
             return
         }
         val user = app.getUser(player)!!
+
         if (block.type == Material.GOLD_BLOCK) {
             block.type = Material.AIR
             user.giveMoney(100)
             cancel = true
             return
-        }
-        if (block.type == Material.BED_BLOCK) {
+        } else if (block.type == Material.BED_BLOCK) {
             cancel = true
             app.teams.filter { it.location!!.distanceSquared(block.location) < 25 && !it.players.contains(player.uniqueId) }
                 .forEach {
@@ -64,7 +86,7 @@ class BlockListener : Listener {
             return
         }
 
-        block.drops.forEach { player.inventory.addItem(it) }
+        breakBlock(user, block.location, 0, 0, 0)
         block.drops.clear()
         dropItems = false
 
@@ -79,32 +101,32 @@ class BlockListener : Listener {
                 val pitch = player.location.pitch
 
                 if (pitch < -45 || pitch > 45) {
-                    breakBlock(player, block.location, 1, 0, 0)
-                    breakBlock(player, block.location, 1, 0, 1)
-                    breakBlock(player, block.location, 1, 0, -1)
-                    breakBlock(player, block.location, 0, 0, 1)
-                    breakBlock(player, block.location, 0, 0, -1)
-                    breakBlock(player, block.location, -1, 0, -1)
-                    breakBlock(player, block.location, -1, 0, 0)
-                    breakBlock(player, block.location, -1, 0, 1)
+                    breakBlock(user, block.location, 1, 0, 0)
+                    breakBlock(user, block.location, 1, 0, 1)
+                    breakBlock(user, block.location, 1, 0, -1)
+                    breakBlock(user, block.location, 0, 0, 1)
+                    breakBlock(user, block.location, 0, 0, -1)
+                    breakBlock(user, block.location, -1, 0, -1)
+                    breakBlock(user, block.location, -1, 0, 0)
+                    breakBlock(user, block.location, -1, 0, 1)
                 } else if ((yaw > -45 && yaw < 45) || (yaw > 135 && yaw < 225) || yaw < -135) {
-                    breakBlock(player, block.location, -1, 1, 0)
-                    breakBlock(player, block.location, 0, 1, 0)
-                    breakBlock(player, block.location, 1, 1, 0)
-                    breakBlock(player, block.location, -1, -1, 0)
-                    breakBlock(player, block.location, 0, -1, 0)
-                    breakBlock(player, block.location, 1, -1, 0)
-                    breakBlock(player, block.location, -1, 0, 0)
-                    breakBlock(player, block.location, 1, 0, 0)
+                    breakBlock(user, block.location, -1, 1, 0)
+                    breakBlock(user, block.location, 0, 1, 0)
+                    breakBlock(user, block.location, 1, 1, 0)
+                    breakBlock(user, block.location, -1, -1, 0)
+                    breakBlock(user, block.location, 0, -1, 0)
+                    breakBlock(user, block.location, 1, -1, 0)
+                    breakBlock(user, block.location, -1, 0, 0)
+                    breakBlock(user, block.location, 1, 0, 0)
                 } else {
-                    breakBlock(player, block.location, 0, 1, -1)
-                    breakBlock(player, block.location, 0, 1, 0)
-                    breakBlock(player, block.location, 0, 1, 1)
-                    breakBlock(player, block.location, 0, -1, -1)
-                    breakBlock(player, block.location, 0, -1, 0)
-                    breakBlock(player, block.location, 0, -1, 1)
-                    breakBlock(player, block.location, 0, 0, -1)
-                    breakBlock(player, block.location, 0, 0, 1)
+                    breakBlock(user, block.location, 0, 1, -1)
+                    breakBlock(user, block.location, 0, 1, 0)
+                    breakBlock(user, block.location, 0, 1, 1)
+                    breakBlock(user, block.location, 0, -1, -1)
+                    breakBlock(user, block.location, 0, -1, 0)
+                    breakBlock(user, block.location, 0, -1, 1)
+                    breakBlock(user, block.location, 0, 0, -1)
+                    breakBlock(user, block.location, 0, 0, 1)
                 }
             }
         }
@@ -169,7 +191,18 @@ class BlockListener : Listener {
         }
     }
 
-    private fun breakBlock(player: Player, location: Location, x: Int, y: Int, z: Int) {
+    @EventHandler
+    fun PlayerInteractAtEntityEvent.handle() {
+        if (clickedEntity.type == EntityType.ARMOR_STAND && app.isLuckyGame && app.status == Status.GAME)
+            LuckyGet.removeBlock(
+                clickedEntity.location.clone().add(0.0, 3 - 1.0 / 16, 0.0),
+                clickedEntity.uniqueId,
+                app.getUser(player)!!
+            )
+    }
+
+    private fun breakBlock(user: User, location: Location, x: Int, y: Int, z: Int) {
+        val player = user.player!!
         val clone = location.clone().add(x.toDouble(), y.toDouble(), z.toDouble())
         val type = clone.block.type
         if (type == Material.BEDROCK || type == Material.WOOD || type == Material.BED_BLOCK || type == Material.GOLD_BLOCK)
@@ -180,5 +213,33 @@ class BlockListener : Listener {
         }
         clone.block.drops.forEach { player.inventory.addItem(it) }
         clone.block.type = Material.AIR
+        if (app.isLuckyGame) {
+            if (clone.block.hasMetadata("lucky")) {
+                LuckyGet.removeBlock(clone, UUID.fromString(clone.block.getMetadata("lucky")[0].asString()), user)
+            }
+            BlockFace.values().forEach {
+                val nextBlock = clone.block.getRelative(it)
+                if (nextBlock != null && nextBlock.type == Material.STONE && Math.random() < 0.008) {
+                    generateLuckyBlock(nextBlock.location)
+                }
+            }
+        }
+    }
+
+    private fun generateLuckyBlock(blockLocation: Location) {
+        val location = blockLocation.clone().toCenterLocation()
+        val stand: ArmorStand = location.getWorld().spawnEntity(
+            location.clone().subtract(0.0, 3.0 - 1.0 / 16, 0.0),
+            EntityType.ARMOR_STAND
+        ) as ArmorStand
+        stand.helmet = luckBlock
+        stand.isInvulnerable = true
+        stand.setGravity(false)
+        stand.isVisible = false
+        stand.setMetadata("lucky", FixedMetadataValue(app, true))
+
+        blockLocation.block.setMetadata("lucky", FixedMetadataValue(app, stand.uniqueId.toString()))
+
+        UtilEntity.setScale(stand, 1.7, 1.7, 1.7)
     }
 }

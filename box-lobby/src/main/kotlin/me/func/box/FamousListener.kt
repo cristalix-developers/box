@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import ru.cristalix.core.display.DisplayChannels
 import ru.cristalix.core.display.messages.Mod
+import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.realm.IRealmService
 import java.io.File
 import java.nio.file.Files
@@ -36,6 +37,8 @@ class FamousListener : Listener {
 
     @EventHandler
     fun PlayerJoinEvent.handle() {
+        player.sendMessage(Formatting.fine("Сезон закончен, сведенья о призах появятся в 16:00 МСК в группе вконтакте."))
+
         B.postpone(1) {
             player.allowFlight = true
             player.teleport(app.spawn)

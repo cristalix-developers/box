@@ -460,7 +460,7 @@ class DonateViewer : Listener {
                     ClickServer("BOXN", 16).accept(player)
                 })
                 contents.add('N', ClickableItem.of(item {
-                    text("§c§l4§fx§c§l2 §eПВП 1.8")
+                    text("§c§l2§fx§c§l4 §eLUCKY")
                     type = Material.IRON_PICKAXE
                 }.build()) {
                     ClickServer("BOX4", 8).accept(player)
@@ -472,7 +472,7 @@ class DonateViewer : Listener {
                     ClickServer("BOXS", 16).accept(player)
                 })
                 contents.add('N', ClickableItem.of(item {
-                    text("§c§l8§fx§c§l2 §eПВП 1.8")
+                    text("§c§l4§fx§c§l4 §eLUCKY")
                     type = Material.IRON_SWORD
                 }.build()) {
                     ClickServer("BOX8", 16).accept(player)

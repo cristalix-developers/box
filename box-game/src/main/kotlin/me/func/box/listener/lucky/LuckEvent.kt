@@ -26,10 +26,22 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
         if (block?.type != Material.BEDROCK)
             block.breakNaturally(ItemStack(Material.AIR))
     }),
-    GIVE_BED({
-        it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
-            type = Material.BED
-        }.build())
+    GIVE_EMERALD({
+        val drop = kotlin.collections.listOf(
+            org.bukkit.inventory.ItemStack(org.bukkit.Material.EMERALD_BLOCK),
+            org.bukkit.inventory.ItemStack(org.bukkit.Material.GOLD_BLOCK),
+            org.bukkit.inventory.ItemStack(org.bukkit.Material.DIAMOND_BLOCK)
+        )
+        val spawnPoint = it.player!!.location.clone().add(0.0, 0.4, 0.0)
+        repeat(7) { time ->
+            clepto.bukkit.B.postpone(13 * time) {
+                val item = me.func.box.app.getWorld()
+                    .spawnEntity(spawnPoint, org.bukkit.entity.EntityType.DROPPED_ITEM) as org.bukkit.entity.Item
+                item.velocity =
+                    org.bukkit.util.Vector(java.lang.Math.random() - 0.5, 0.2, java.lang.Math.random() - 0.5)
+                item.itemStack = drop.random()
+            }
+        }
     }),
     GIVE_EFFECTS({
         it.player!!.addPotionEffect(
@@ -95,6 +107,13 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
         it.player!!
     }),
     LAVA({
+        it.player!!.addPotionEffect(
+            org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.FIRE_RESISTANCE,
+                9 * 20,
+                3
+            )
+        )
         it.player!!.location.block.type = Material.LAVA
         it.player!!
     }),
@@ -114,6 +133,16 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
         )
         it.player!!.sendTitle("§bЭффект", "§7Быстрое вскапывание (10 секунд.)", 10, 35, 20)
     }),
+    VERY_FAST_DIGGING({
+        it.player!!.addPotionEffect(
+            org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.FAST_DIGGING,
+                6 * 20,
+                8
+            )
+        )
+        it.player!!.sendTitle("§bЭффект", "§7Быстрое вскапывание (6 секунд.)", 10, 35, 20)
+    }),
     STRIKE_LIGHTNING({ it.player!!.world.strikeLightning(it.player!!.location) }),
     WEB({
         it.player!!.location.block.type = Material.WEB
@@ -123,22 +152,22 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
         it.player!!.addPotionEffect(
             org.bukkit.potion.PotionEffect(
                 org.bukkit.potion.PotionEffectType.WITHER,
-                20 * 20,
+                3 * 20,
                 1
             )
         )
-        it.player!!.sendTitle("§bЭффект", "§7Иссушение(20 секунд.)", 10, 35, 20)
+        it.player!!.sendTitle("§bЭффект", "§7Иссушение (3 секунды.)", 10, 35, 20)
     }),
     ANVIL_DROP({
         it.player!!.location.subtract(0.0, 2.0, 0.0).block.type = Material.ANVIL
         it.player!!
     }),
-    AIR_SWORD({ SuperSword.AIR_SWORD.give(it) }),
-    FIRE_SWORD({ SuperSword.FIRE_SWORD.give(it) }),
-    POISON_SWORD({ SuperSword.POISON_SWORD.give(it) }),
-    WITHER_SWORD({ SuperSword.WITHER_SWORD.give(it) }),
-    HAMMER({ SuperSword.HAMMER.give(it) }),
-    ;
+    TELEPORT({ it ->
+        it.player!!.teleport(
+            org.bukkit.Bukkit.getOnlinePlayers().filter { it.gameMode != org.bukkit.GameMode.SPECTATOR }.random()
+        )
+    }),
+    SWORD({ SuperSword.values().random().give(it) }), ;
 
     fun accept(user: User) {
         luckyConsumer(user)

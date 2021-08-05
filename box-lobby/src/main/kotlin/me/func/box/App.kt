@@ -117,7 +117,7 @@ class App : JavaPlugin() {
         Npcs.spawn(
             Npc.builder()
                 .location(Location(worldMeta.world, -262.0, 112.0, 36.0, -152f, 0f))
-                .name("§c§l8 §fx §c§l2 §eПВП 1.8")
+                .name("§c§l4 §fx §c§l4 §e§lLUCKY")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/30719b68-2c69-11e8-b5ea-1cb72caa35fd")
                 .skinDigest("307264a1-2c6911e8b5ea1cb72caa35fd")
@@ -130,7 +130,7 @@ class App : JavaPlugin() {
         Npcs.spawn(
             Npc.builder()
                 .location(Location(worldMeta.world, -255.0, 112.0, 36.0, 162f, 0f))
-                .name("§c§l4 §fx §c§l2 §eПВП 1.8")
+                .name("§c§l2 §fx §c§l4 §e§lLUCKY")
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/6f3f4a2e-7f84-11e9-8374-1cb72caa35fd")
                 .skinDigest("6f3f4a2e-7f8411e983741cb72caa35fd")

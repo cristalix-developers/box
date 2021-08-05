@@ -14,7 +14,6 @@ import me.func.box.bar.WaitingPlayers
 import me.func.box.data.BoxTeam
 import me.func.box.data.Status
 import me.func.box.listener.*
-import me.func.box.listener.lucky.LuckyManager
 import me.func.box.map.Generator
 import me.func.box.map.MapLoader
 import me.func.box.map.TradeMenu
@@ -144,7 +143,7 @@ class Box : JavaPlugin() {
         userManager.isOptional = true
 
         // Регистрация обработчиков
-        B.events(BlockListener(), DefaultListener(), TradeMenu(), EnchantTable(), LuckyManager())
+        B.events(BlockListener(), DefaultListener(), TradeMenu(), EnchantTable())
 
         // Скорборд команды
         val manager = Bukkit.getScoreboardManager()
