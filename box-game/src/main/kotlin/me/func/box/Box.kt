@@ -143,7 +143,7 @@ class Box : JavaPlugin() {
         userManager.isOptional = true
 
         // Регистрация обработчиков
-        B.events(BlockListener(), DefaultListener(), TradeMenu(), EnchantTable())
+        B.events(BlockListener(), DefaultListener(), TradeMenu(), EnchantTable(), ShootBowListener())
 
         // Скорборд команды
         val manager = Bukkit.getScoreboardManager()

@@ -363,7 +363,7 @@ class DonateViewer : Listener {
                     money.open(player)
                 })
                 contents.add('O', ClickableItem.of(item {
-                    text("§bCезонный кит\n\n §e◉ §6Набор титана\n §e◉ §6Одеяния титана\n §e◉ §6Коса титана\n\n§7Скидка §a70%§7, предложение\n§7действует §aдо 6-го числа")
+                    text("§bCезонный кит\n\n §e◉ §6Набор титана\n §e◉ §6Одеяния титана\n §e◉ §6Коса титана\n\n§7Скидка §a70%§7, предложение\n§7действует §aдо 15-го числа")
                     nbt("armors", "titans")
                     type = Material.DIAMOND_HELMET
                 }.build()) {
@@ -395,7 +395,8 @@ class DonateViewer : Listener {
                                 contents.add('O', ClickableItem.of(item {
                                     text("§aКупить за 149 кристаликов")
                                     nbt("other", "access")
-                                    enchant(Enchantment.LUCK, 1)
+                                    nbt("HideFlags", 63)
+                                    enchant(Enchantment.LUCK, 0)
                                     type = Material.CLAY_BALL
                                 }.build()) {
                                     buy(user, 149, "Покупка сезонного кита $seasonCounter") {

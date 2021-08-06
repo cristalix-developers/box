@@ -27,10 +27,10 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
             block.breakNaturally(ItemStack(Material.AIR))
     }),
     GIVE_EMERALD({
-        val drop = kotlin.collections.listOf(
-            org.bukkit.inventory.ItemStack(org.bukkit.Material.EMERALD_BLOCK),
-            org.bukkit.inventory.ItemStack(org.bukkit.Material.GOLD_BLOCK),
-            org.bukkit.inventory.ItemStack(org.bukkit.Material.DIAMOND_BLOCK)
+        val drop = listOf(
+            ItemStack(org.bukkit.Material.EMERALD_BLOCK),
+            ItemStack(org.bukkit.Material.GOLD_BLOCK),
+            ItemStack(org.bukkit.Material.DIAMOND_BLOCK)
         )
         val spawnPoint = it.player!!.location.clone().add(0.0, 0.4, 0.0)
         repeat(7) { time ->
@@ -38,7 +38,7 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
                 val item = me.func.box.app.getWorld()
                     .spawnEntity(spawnPoint, org.bukkit.entity.EntityType.DROPPED_ITEM) as org.bukkit.entity.Item
                 item.velocity =
-                    org.bukkit.util.Vector(java.lang.Math.random() - 0.5, 0.2, java.lang.Math.random() - 0.5)
+                    org.bukkit.util.Vector(Math.random() - 0.5, 0.2, Math.random() - 0.5)
                 item.itemStack = drop.random()
             }
         }
@@ -158,14 +158,13 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
         )
         it.player!!.sendTitle("§bЭффект", "§7Иссушение (3 секунды.)", 10, 35, 20)
     }),
-    ANVIL_DROP({
-        it.player!!.location.subtract(0.0, 2.0, 0.0).block.type = Material.ANVIL
-        it.player!!
-    }),
     TELEPORT({ it ->
         it.player!!.teleport(
             org.bukkit.Bukkit.getOnlinePlayers().filter { it.gameMode != org.bukkit.GameMode.SPECTATOR }.random()
         )
+    }),
+    GIVE_BOW({ it ->
+        it.player!!.inventory.addItem(org.bukkit.inventory.ItemStack(org.bukkit.Material.BOW))
     }),
     SWORD({ SuperSword.values().random().give(it) }), ;
 

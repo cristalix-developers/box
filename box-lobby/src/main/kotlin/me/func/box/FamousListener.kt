@@ -37,8 +37,6 @@ class FamousListener : Listener {
 
     @EventHandler
     fun PlayerJoinEvent.handle() {
-        player.sendMessage(Formatting.fine("Сезон закончен, сведенья о призах появятся в 16:00 МСК в группе вконтакте."))
-
         B.postpone(1) {
             player.allowFlight = true
             player.teleport(app.spawn)

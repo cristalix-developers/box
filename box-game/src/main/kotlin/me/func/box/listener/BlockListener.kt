@@ -139,6 +139,7 @@ class BlockListener : Listener {
         if (blockPlaced.location.subtract(0.0, 1.0, 0.0).block.type == Material.BED_BLOCK) {
             player.sendMessage(Formatting.error("Над кроватью нельзя ставить блоки!"))
             cancel = true
+            return
         }
         if (blockPlaced.type == Material.GOLD_BLOCK) {
             app.getUser(player)!!.giveMoney(5)
