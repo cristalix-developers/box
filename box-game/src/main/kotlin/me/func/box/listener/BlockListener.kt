@@ -213,8 +213,9 @@ class BlockListener : Listener {
             exp.experience = 5
         }
         clone.block.drops.forEach { player.inventory.addItem(it) }
+        val beforeType = clone.block.type
         clone.block.type = Material.AIR
-        if (app.isLuckyGame) {
+        if (app.isLuckyGame && beforeType == Material.STONE) {
             if (clone.block.hasMetadata("lucky")) {
                 LuckyGet.removeBlock(clone, UUID.fromString(clone.block.getMetadata("lucky")[0].asString()), user)
             }

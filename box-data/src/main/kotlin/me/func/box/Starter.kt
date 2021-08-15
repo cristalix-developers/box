@@ -1,5 +1,7 @@
 package me.func.box
 
+import dev.implario.bukkit.item.item
+import org.bukkit.Material
 import org.bukkit.entity.Player
 
 /**
@@ -83,17 +85,16 @@ enum class Starter(
         }
     ),
     HEAL("Целитель", 999999, Rare.LEGENDARY, org.bukkit.Material.GOLDEN_APPLE to 1, "§eЗолотое яблоко", {
-        it.inventory.addItem(dev.implario.bukkit.item.item {
-            type = org.bukkit.Material.GOLDEN_APPLE
+        it.inventory.addItem(item {
+            type = Material.GOLDEN_APPLE
             text("Золотое яблоко")
         }.build())
-    });
-/*    SONYA("Соня", 100000, Rare.COMMON, { user ->
+    }), SONYA("Соня", 999999, Rare.LEGENDARY, org.bukkit.Material.BED to 1, "§bКровать", { user ->
         user.player!!.inventory.addItem(item {
-            type = Material.BED
+            type = org.bukkit.Material.BED
             text("Кровать")
         }.build())
-    });*/
+    });
 
     override fun getPrice(): Int {
         return price

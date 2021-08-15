@@ -190,8 +190,6 @@ class DefaultListener : Listener {
         if (app.status == Status.STARTING && entityType != EntityType.PLAYER) {
             damage = 0.0
             playDamageEffect(entity.location)
-            if (Math.random() < 0.04 && damager is CraftPlayer)
-                app.getUser(damager as CraftPlayer)!!.giveMoney(1)
         } else if (app.status == Status.STARTING) {
             cancelled = true
         } else if (entity is CraftPlayer && damager is CraftPlayer && (damager as CraftPlayer).itemInHand != null) {

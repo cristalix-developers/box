@@ -5,6 +5,7 @@ import clepto.cristalix.Cristalix
 import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.item.item
 import dev.implario.bukkit.platform.Platforms
+import dev.implario.kensuke.Kensuke
 import dev.implario.kensuke.KensukeSession
 import dev.implario.kensuke.Scope
 import dev.implario.kensuke.impl.bukkit.BukkitKensuke
@@ -68,6 +69,7 @@ class Box : JavaPlugin() {
         { user, context -> context.store(statScope, user.stat) }
     )
     lateinit var zero: Location
+    lateinit var kensuke: Kensuke
     var isLuckyGame = System.getenv("LUCKY").toInt() == 1
     var slots = System.getenv("SLOT").toInt()
     val winMoney = System.getenv("WIN_REWARD").toInt()
@@ -137,7 +139,7 @@ class Box : JavaPlugin() {
         info.readableName = "БКоробка ${slots / 2}x${slots / 2} #$id"
         info.groupName = "БКоробка ${slots / 2}x${slots / 2} #$id"
 
-        val kensuke = BukkitKensuke.setup(this)
+        kensuke = BukkitKensuke.setup(this)
         kensuke.addGlobalUserManager(userManager)
         kensuke.globalRealm = info.realmId.realmName
         userManager.isOptional = true

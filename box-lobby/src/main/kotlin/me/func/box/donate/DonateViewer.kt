@@ -41,7 +41,7 @@ class DonateViewer : Listener {
                 contents.setLayout(
                     "XOOOOOOOX",
                     "XOOOOOOOX",
-                    "XXXOXOXXX",
+                    "XXXOOOXXX",
                     "XXXXLXXXX"
                 )
                 contents.add('L', ClickableItem.of(item {
@@ -204,7 +204,7 @@ class DonateViewer : Listener {
             override fun init(player: Player, contents: InventoryContents) {
                 contents.setLayout(
                     "XOOOOOOOX",
-                    "XXXOXOXXX",
+                    "XXXOOOXXX",
                     "XXXXLXXXX"
                 )
                 contents.add('L', ClickableItem.of(item {
@@ -363,9 +363,9 @@ class DonateViewer : Listener {
                     money.open(player)
                 })
                 contents.add('O', ClickableItem.of(item {
-                    text("§bCезонный кит\n\n §e◉ §6Набор титана\n §e◉ §6Одеяния титана\n §e◉ §6Коса титана\n\n§7Скидка §a70%§7, предложение\n§7действует §aдо 15-го числа")
-                    nbt("armors", "titans")
-                    type = Material.DIAMOND_HELMET
+                    text("§bCезонный кит\n\n §e◉ §6Набор сони\n §e◉ §6Костюм безопасности\n §e◉ §6Сусальный топорик\n\n§7Скидка §a70%§7, предложение\n§7действует §aдо 31-го числа")
+                    nbt("other", "new_booster_2")
+                    type = Material.CLAY_BALL
                 }.build()) {
                     ControlledInventory.builder()
                         .title("§bCезонный кит")
@@ -377,10 +377,10 @@ class DonateViewer : Listener {
                                     "XXHHHXXOP",
                                 )
 
-                                val starter = me.func.box.Starter.TITAN
-                                val armor = me.func.box.Armor.TITAN
-                                val sword = me.func.box.Sword.M
-                                val seasonCounter = 3
+                                val starter = me.func.box.Starter.SONYA
+                                val armor = me.func.box.Armor.NUCLEAR
+                                val sword = me.func.box.Sword.L
+                                val seasonCounter = 4
 
                                 contents.add('H', ClickableItem.empty(starter.getItem()))
                                 contents.add('H', ClickableItem.empty(armor.getItem()))

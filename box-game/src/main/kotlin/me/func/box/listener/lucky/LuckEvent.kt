@@ -97,11 +97,6 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
             amount(6)
         }.build())
     }),
-    ANVIL({
-        it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
-            type = Material.ANVIL
-        }.build())
-    }),
     WATER({
         it.player!!.location.block.type = Material.WATER
         it.player!!
@@ -159,12 +154,21 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
         it.player!!.sendTitle("§bЭффект", "§7Иссушение (3 секунды.)", 10, 35, 20)
     }),
     TELEPORT({ it ->
-        it.player!!.teleport(
-            org.bukkit.Bukkit.getOnlinePlayers().filter { it.gameMode != org.bukkit.GameMode.SPECTATOR }.random()
-        )
+        if (Math.random() < 0.2) {
+            it.player!!.teleport(
+                org.bukkit.Bukkit.getOnlinePlayers().filter { it.gameMode != org.bukkit.GameMode.SPECTATOR }.random()
+            )
+        } else {
+            it.player!!.world.dropItemNaturally(it.player!!.location, dev.implario.bukkit.item.item {
+                type = org.bukkit.Material.EMERALD_BLOCK
+            }.build())
+        }
     }),
-    GIVE_BOW({ it ->
-        it.player!!.inventory.addItem(org.bukkit.inventory.ItemStack(org.bukkit.Material.BOW))
+    GIVE_BOW({
+        it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
+            type = org.bukkit.Material.BOW
+            text("§cTNT лук")
+        }.build())
     }),
     SWORD({ SuperSword.values().random().give(it) }), ;
 
