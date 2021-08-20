@@ -62,7 +62,10 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
                     Starter.NONE
                 ), Starter.NONE, mutableListOf(
                     Sword.NONE
-                ), Sword.NONE, 0
+                ), Sword.NONE, 0, Messages.NONE,
+                mutableListOf(
+                    Messages.NONE
+                )
             )
         } else {
             if (stat.currentStarter == null)
@@ -77,6 +80,10 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
         }
         if (this.stat.skins == null)
             this.stat.skins = arrayListOf("hi")
+        if (stat?.currentKillMessage == null)
+            stat?.currentKillMessage = Messages.NONE
+        if (stat?.killMessages == null || stat.killMessages.isEmpty())
+            stat?.killMessages = mutableListOf(Messages.NONE)
         this.session = session
     }
 }

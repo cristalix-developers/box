@@ -2,7 +2,7 @@ package me.func.box
 
 import java.util.*
 
-data class Stat (
+data class Stat(
     val id: UUID,
     var skins: MutableList<String>?,
     var currentSkin: String,
@@ -19,5 +19,7 @@ data class Stat (
     var currentStarter: Starter?,
     var swords: MutableList<Sword>?,
     var currentSword: Sword?,
-    var luckyOpened: Int
+    var luckyOpened: Int,
+    var currentKillMessage: Messages,
+    var killMessages: MutableList<Messages>,
 )

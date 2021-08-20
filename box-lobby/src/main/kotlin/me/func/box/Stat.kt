@@ -21,5 +21,7 @@ data class Stat (
     var currentStarter: Starter?,
     var swords: MutableList<Sword>?,
     var currentSword: Sword?,
-    var luckyOpened: Int
+    var luckyOpened: Int,
+    var currentKillMessage: Messages,
+    var killMessages: MutableList<Messages>,
 )
