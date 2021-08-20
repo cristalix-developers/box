@@ -330,7 +330,7 @@ class DonateViewer : Listener {
         .columns(9)
         .provider(object : InventoryProvider {
             override fun init(player: Player, contents: InventoryContents) {
-                contents.setLayout("MNHXOXGPX")
+                contents.setLayout("MNHXOXGPP")
 
                 val user = app.getUser(player)!!
 
@@ -340,6 +340,13 @@ class DonateViewer : Listener {
                     type = Material.CLAY_BALL
                 }.build()) {
                     killMessages.open(player)
+                })
+
+                contents.add('P', ClickableItem.of(item {
+                    text("§eЭффекты разрушения кровати")
+                    type = Material.SLIME_BALL
+                }.build()) {
+                    breakBed.open(player)
                 })
 
                 contents.add('N', ClickableItem.of(item {
@@ -446,7 +453,7 @@ class DonateViewer : Listener {
                 }.build()) {
                     player.performCommand("menu")
                 })
-                me.func.box.Messages.values().forEach { tag ->
+                me.func.box.KillMessage.values().forEach { tag ->
                     val user = app.getUser(player)!!
                     val has = user.stat.killMessages.contains(tag)
                     val current = user.stat.currentKillMessage == tag
@@ -487,6 +494,76 @@ class DonateViewer : Listener {
                                         buy(user, tag.getPrice(), "Покупка сообщения ${tag.getTitle()}") {
                                             user.stat.killMessages.add(tag)
                                             user.stat.currentKillMessage = tag
+                                        }
+                                    })
+                                    contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
+                                }
+                            }).build().open(player)
+                    })
+                }
+                contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
+            }
+        }).build()
+
+    private val breakBed = ControlledInventory.builder()
+        .title("Эффекты разрушения кровати")
+        .rows(4)
+        .columns(9)
+        .provider(object : InventoryProvider {
+            override fun init(player: Player, contents: InventoryContents) {
+                contents.setLayout(
+                    "XXXXXXXXX",
+                    "OOOOOOOOO",
+                    "OOOOOOOOO",
+                    "XXXXLXXXX"
+                )
+                contents.add('L', ClickableItem.of(item {
+                    type = Material.BARRIER
+                    text("§cНазад")
+                }.build()) {
+                    player.performCommand("menu")
+                })
+                me.func.box.BreakBedEffect.values().forEach { tag ->
+                    val user = app.getUser(player)!!
+                    val has = user.stat.breakBedEffects.contains(tag)
+                    val current = user.stat.currentBreakBedEffect == tag
+                    contents.add('O', ClickableItem.of(tag.getItem(current, has)) {
+                        if (current)
+                            return@of
+                        if (has) {
+                            user.stat.currentBreakBedEffect = tag
+                            player.closeInventory()
+                            return@of
+                        }
+                        ControlledInventory.builder()
+                            .title(tag.getRare().color + tag.getRare().title + " §f" + tag.getTitle())
+                            .rows(1)
+                            .columns(9)
+                            .provider(object : InventoryProvider {
+                                override fun init(player: Player, contents: InventoryContents) {
+                                    contents.setLayout(
+                                        "XXXXKXXOP",
+                                    )
+                                    contents.add('K', ClickableItem.empty(item {
+                                        text(tag.getRare().color + tag.getRare().title + " §f" + tag.getTitle())
+                                        type = tag.getItemStack().getType()
+                                    }.build()))
+                                    contents.add('P', ClickableItem.of(item {
+                                        text("§cВыйти")
+                                        nbt("other", "cancel")
+                                        type = Material.CLAY_BALL
+                                    }.build()) {
+                                        player.closeInventory()
+                                    })
+                                    contents.add('O', ClickableItem.of(item {
+                                        text("§aКупить за ${tag.getPrice()} кристаликов")
+                                        nbt("other", "access")
+                                        enchant(Enchantment.LUCK, 1)
+                                        type = Material.CLAY_BALL
+                                    }.build()) {
+                                        buy(user, tag.getPrice(), "Покупка эффекта ${tag.getTitle()}") {
+                                            user.stat.breakBedEffects.add(tag)
+                                            user.stat.currentBreakBedEffect = tag
                                         }
                                     })
                                     contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))

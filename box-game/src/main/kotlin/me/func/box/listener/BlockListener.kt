@@ -63,6 +63,8 @@ class BlockListener : Listener {
                     it.bed = false
                     cancel = false
                     dropItems = false
+                    if (user.stat.currentBreakBedEffect.getParticle() != null)
+                        app.getWorld().spawnParticle(user.stat.currentBreakBedEffect.getParticle(), block.location, 1)
                     B.bc(Formatting.fine(player.name + " сломал кровать команды " + it.color.chatColor + it.color.teamName))
                     it.players.forEach { uid ->
                         Bukkit.getPlayer(uid)?.playSound(player.location, "entity.enderdragon.ambient", 1f, 1f)

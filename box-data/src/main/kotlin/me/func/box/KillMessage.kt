@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack
  * @author Рейдж 20.08.2021
  * @project box
  */
-enum class Messages(
+enum class KillMessage(
     private val itemStack: ItemStack,
     private val price: Int,
     private val rare: Rare,

@@ -20,6 +20,8 @@ data class Stat(
     var swords: MutableList<Sword>?,
     var currentSword: Sword?,
     var luckyOpened: Int,
-    var currentKillMessage: Messages,
-    var killMessages: MutableList<Messages>,
+    var currentKillMessage: KillMessage,
+    var killMessages: MutableList<KillMessage>,
+    var currentBreakBedEffect: BreakBedEffect,
+    var breakBedEffects: MutableList<BreakBedEffect>
 )

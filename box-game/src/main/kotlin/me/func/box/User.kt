@@ -62,9 +62,13 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
                     Starter.NONE
                 ), Starter.NONE, mutableListOf(
                     Sword.NONE
-                ), Sword.NONE, 0, Messages.NONE,
+                ), Sword.NONE, 0, KillMessage.NONE,
                 mutableListOf(
-                    Messages.NONE
+                    KillMessage.NONE
+                ),
+                BreakBedEffect.NONE,
+                mutableListOf(
+                    BreakBedEffect.NONE
                 )
             )
         } else {
@@ -81,9 +85,13 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
         if (this.stat.skins == null)
             this.stat.skins = arrayListOf("hi")
         if (stat?.currentKillMessage == null)
-            stat?.currentKillMessage = Messages.NONE
+            stat?.currentKillMessage = KillMessage.NONE
         if (stat?.killMessages == null || stat.killMessages.isEmpty())
-            stat?.killMessages = mutableListOf(Messages.NONE)
+            stat?.killMessages = mutableListOf(KillMessage.NONE)
+        if (stat?.currentBreakBedEffect == null)
+            stat?.currentBreakBedEffect = BreakBedEffect.NONE
+        if (stat?.breakBedEffects == null || stat.breakBedEffects.isEmpty())
+            stat?.breakBedEffects = mutableListOf(BreakBedEffect.NONE)
         this.session = session
     }
 }
