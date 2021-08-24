@@ -166,7 +166,8 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
     }),
     GIVE_BOW({
         it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
-            type = org.bukkit.Material.BOW
+            type = Material.BOW
+            enchant(org.bukkit.enchantments.Enchantment.LUCK, 1)
             text("§cTNT лук")
         }.build())
     }),
