@@ -63,8 +63,18 @@ class BlockListener : Listener {
                     it.bed = false
                     cancel = false
                     dropItems = false
-                    if (user.stat.currentBreakBedEffect.getParticle() != null)
-                        app.getWorld().spawnParticle(user.stat.currentBreakBedEffect.getParticle(), block.location, 1)
+                    if (user.stat.currentBreakBedEffect.getParticle() != null) {
+                        repeat(200) { time ->
+                            block.world.spawnParticle(
+                                user.stat.currentBreakBedEffect.getParticle(),
+                                block.location.x - kotlin.math.sin(Math.toRadians(time * 10.0)) * time / 100.0,
+                                block.location.y + 1,
+                                block.location.z - kotlin.math.cos(Math.toRadians(time * 10.0)) * time / 100.0,
+                                1
+                            )
+                        }
+                    }
+
                     B.bc(Formatting.fine(player.name + " сломал кровать команды " + it.color.chatColor + it.color.teamName))
                     it.players.forEach { uid ->
                         Bukkit.getPlayer(uid)?.playSound(player.location, "entity.enderdragon.ambient", 1f, 1f)

@@ -577,6 +577,9 @@ class DonateViewer : Listener {
 
     private fun buy(user: User, money: Int, desc: String, accept: Consumer<User>) {
         val player = user.player!!
+        if (player.isOp) {
+            accept.accept(user)
+        }
         ISocketClient.get().writeAndAwaitResponse<MoneyTransactionResponsePackage>(
             MoneyTransactionRequestPackage(
                 player.uniqueId,

@@ -288,8 +288,8 @@ class DefaultListener : Listener {
             player.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 255, false, false))
             app.teams.filter { it.players.contains(entity.uniqueId) }
                 .forEach { team ->
-                    var message = "" + team.color.chatColor + player.name + " §fубит"
-                    val playerName = "" + team.color.chatColor + player.name + "§f"
+                    val between = " §f" + (userKiller?.stat?.currentKillMessage?.getDescription() ?: "убит")
+                    var message = "" + team.color.chatColor + player.name + between
                     if (player.killer != null) {
                         userKiller?.giveMoney(app.killMoney)
                         message += " игроком " + player.killer.name
@@ -297,11 +297,6 @@ class DefaultListener : Listener {
                     if (user.bed != null && user.bed!!.block.type == Material.BED_BLOCK) {
                         player.teleport(user.bed)
                         player.inventory.addItem(app.woodPickaxe)
-                        B.bc(
-                            Formatting.fine(
-                                playerName + userKiller?.stat?.currentKillMessage?.getDescription() + player.killer.name
-                            )
-                        )
                         return@postpone
                     } else
                         user.bed = null

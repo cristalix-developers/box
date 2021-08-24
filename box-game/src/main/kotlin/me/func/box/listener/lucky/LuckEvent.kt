@@ -28,7 +28,7 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
     }),
     GIVE_EMERALD({
         val drop = listOf(
-            ItemStack(org.bukkit.Material.EMERALD_BLOCK),
+            ItemStack(Material.EMERALD_BLOCK),
             ItemStack(org.bukkit.Material.GOLD_BLOCK),
             ItemStack(org.bukkit.Material.DIAMOND_BLOCK)
         )
@@ -160,7 +160,7 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
             )
         } else {
             it.player!!.world.dropItemNaturally(it.player!!.location, dev.implario.bukkit.item.item {
-                type = org.bukkit.Material.EMERALD_BLOCK
+                type = Material.EMERALD_BLOCK
             }.build())
         }
     }),
