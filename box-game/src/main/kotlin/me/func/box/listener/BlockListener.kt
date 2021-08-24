@@ -218,7 +218,7 @@ class BlockListener : Listener {
         val player = user.player!!
         val clone = location.clone().add(x.toDouble(), y.toDouble(), z.toDouble())
         val type = clone.block.type
-        if (type == Material.BEDROCK || type == Material.WOOD || type == Material.BED_BLOCK || type == Material.GOLD_BLOCK)
+        if (type == Material.BEDROCK || type == Material.WOOD || type == Material.BED_BLOCK || type == Material.GOLD_BLOCK || type == Material.WORKBENCH)
             return
         if (type == Material.EMERALD_ORE) {
             val exp = clone.world.spawnEntity(clone, EntityType.EXPERIENCE_ORB) as ExperienceOrb
