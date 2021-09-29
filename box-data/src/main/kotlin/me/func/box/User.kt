@@ -1,16 +1,29 @@
 package me.func.box
 
+import clepto.bukkit.B
 import dev.implario.kensuke.KensukeSession
 import dev.implario.kensuke.impl.bukkit.IBukkitKensukeUser
+import me.func.box.cosmetic.BreakBedEffect
+import me.func.box.cosmetic.KillMessage
+import me.func.box.cosmetic.Starter
+import me.func.box.cosmetic.Sword
+import net.md_5.bungee.api.ChatMessageType
+import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.Packet
 import net.minecraft.server.v1_12_R1.PlayerConnection
+import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.entity.Player
 import java.util.*
 
 class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
 
-    var looked = false
+    var bed: Location? = null
+    var tempKills = 0
+    var compassToPlayer = true
+    var finalKills = 0
+    var lock = false
+
     var stat: Stat
     private var player: Player? = null
     override fun setPlayer(p0: Player?) {
@@ -36,10 +49,21 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
         connection?.sendPacket(packet)
     }
 
+    fun giveMoney(toGive: Int) {
+        player!!.sendMessage("§eПолучено $toGive монет.")
+        B.postpone(1) {
+            player!!.spigot().sendMessage(
+                ChatMessageType.ACTION_BAR,
+                TextComponent("§e§l+$toGive монет")
+            )
+        }
+        stat.money += toGive
+    }
+
     init {
         if (stat == null) {
             this.stat = Stat(
-                UUID.fromString(session.userId), arrayListOf(), "", 0, 0, 0, 0, 0, 0, 0, null, 500, mutableListOf(
+                UUID.fromString(session.userId), arrayListOf("hi"), "", 0, 0, 0, 0, 0, 0, 0, null, 500, mutableListOf(
                     Starter.NONE
                 ), Starter.NONE, mutableListOf(
                     Sword.NONE
@@ -50,7 +74,10 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
                 BreakBedEffect.NONE,
                 mutableListOf(
                     BreakBedEffect.NONE
-                )
+                ),
+                0,
+                0,
+                0
             )
         } else {
             if (stat.currentStarter == null)
@@ -64,7 +91,7 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
             this.stat = stat
         }
         if (this.stat.skins == null)
-            this.stat.skins = arrayListOf()
+            this.stat.skins = arrayListOf("hi")
         if (stat?.currentKillMessage == null)
             stat?.currentKillMessage = KillMessage.NONE
         if (stat?.killMessages == null || stat.killMessages.isEmpty())
@@ -75,5 +102,4 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
             stat?.breakBedEffects = mutableListOf(BreakBedEffect.NONE)
         this.session = session
     }
-
 }

@@ -5,13 +5,12 @@ import clepto.cristalix.Cristalix
 import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.item.item
 import dev.implario.bukkit.platform.Platforms
-import dev.implario.kensuke.Kensuke
-import dev.implario.kensuke.KensukeSession
-import dev.implario.kensuke.Scope
+import dev.implario.kensuke.*
 import dev.implario.kensuke.impl.bukkit.BukkitKensuke
 import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.bar.WaitingPlayers
+import me.func.box.cosmetic.Starter
 import me.func.box.data.BoxTeam
 import me.func.box.data.Status
 import me.func.box.listener.*
@@ -59,15 +58,11 @@ var sessionDurability = System.getProperty("TIME", "4000").toInt()
 
 class Box : JavaPlugin() {
 
-    private val statScope = Scope("boxl", Stat::class.java)
+    private val statScope = Scope("boxll", Stat::class.java)
 
     private lateinit var worldMeta: WorldMeta
     lateinit var spawn: Location
-    private var userManager = BukkitUserManager(
-        listOf(statScope),
-        { session: KensukeSession, context -> User(session, context.getData(statScope)) },
-        { user, context -> context.store(statScope, user.stat) }
-    )
+    lateinit var userManager: UserManager<User>
     lateinit var zero: Location
     lateinit var kensuke: Kensuke
     var isLuckyGame = System.getenv("LUCKY").toInt() == 1
@@ -78,7 +73,7 @@ class Box : JavaPlugin() {
     private var size = System.getenv("SIZE").toInt()
     private var teamSize = System.getenv("TEAM").toInt()
     var status = Status.STARTING
-    val hub = "BOXL-1"
+    val hub = "BOXL-2"
     var waitingBar = WaitingPlayers()
     var woodPickaxe = ItemStack(Material.WOOD_PICKAXE)
     var teams = listOf(
@@ -99,6 +94,12 @@ class Box : JavaPlugin() {
             type = Material.WOOD_PICKAXE
             nbt("Unbreakable", 1)
         }.build()
+
+        userManager = BukkitUserManager(
+            listOf(statScope),
+            { session: KensukeSession, context -> User(session, context.getData(statScope)) },
+            { user, context -> context.store(statScope, user.stat) }
+        )
 
         // Загрузка карты
         loadMap()
@@ -426,7 +427,7 @@ class Box : JavaPlugin() {
     }
 
     fun getUser(player: Player): User? {
-        return userManager.getUser(player)
+        return userManager.getUser(player.uniqueId)
     }
 
     fun getUser(uuid: UUID): User? {

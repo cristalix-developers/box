@@ -1,4 +1,6 @@
-package me.func.box
+package me.func.box.cosmetic
+
+import me.func.box.User
 
 interface Donate {
 
@@ -9,5 +11,7 @@ interface Donate {
     fun getCode(): String
 
     fun getRare(): Rare
+
+    fun give(user: User)
 
 }

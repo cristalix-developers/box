@@ -1,6 +1,7 @@
-package me.func.box
+package me.func.box.cosmetic
 
 import dev.implario.bukkit.item.item
+import me.func.box.User
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
@@ -17,10 +18,10 @@ enum class Starter(
     val consumer: (Player) -> Any
 ) :
     Donate {
-    NONE("Отсутствует", 0, Rare.COMMON, org.bukkit.Material.CLAY to 1, "", {}),
-    MINER("Шахтёр", 15000, Rare.COMMON, org.bukkit.Material.STONE_PICKAXE to 1, "§bКаменная кирка", {
-        it.inventory.addItem(dev.implario.bukkit.item.item {
-            type = org.bukkit.Material.STONE_PICKAXE
+    NONE("Отсутствует", 0, Rare.COMMON, Material.CLAY to 1, "", {}),
+    MINER("Шахтёр", 15000, Rare.COMMON, Material.STONE_PICKAXE to 1, "§bКаменная кирка", {
+        it.inventory.addItem(item {
+            type = Material.STONE_PICKAXE
             text("Шахтёрская кирка")
         }.build())
     }),
@@ -126,5 +127,14 @@ enum class Starter(
             type = items.first
             amount = items.second
         }.build()
+    }
+
+    override fun give(user: User) {
+        if (user.stat.starters == null)
+            user.stat.starters = arrayListOf(this)
+        else
+            user.stat.starters!!.add(this)
+        user.stat.currentStarter = this
+        user.stat.money -= this.getPrice()
     }
 }

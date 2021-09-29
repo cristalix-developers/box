@@ -1,8 +1,12 @@
 package me.func.box
 
+import me.func.box.cosmetic.BreakBedEffect
+import me.func.box.cosmetic.KillMessage
+import me.func.box.cosmetic.Starter
+import me.func.box.cosmetic.Sword
 import java.util.*
 
-data class Stat (
+data class Stat(
     val id: UUID,
     var skins: MutableList<String>?,
     var currentSkin: String,
@@ -23,5 +27,9 @@ data class Stat (
     var currentKillMessage: KillMessage,
     var killMessages: MutableList<KillMessage>,
     var currentBreakBedEffect: BreakBedEffect,
-    var breakBedEffects: MutableList<BreakBedEffect>
+    var breakBedEffects: MutableList<BreakBedEffect>,
+
+    var dailyClaimTimestamp: Long,
+    var lastEnter: Long,
+    var rewardStreak: Int,
 )

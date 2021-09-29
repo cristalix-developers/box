@@ -17,6 +17,8 @@ class Box : KotlinMod() {
     override fun onEnable() {
         UIEngine.initialize(this)
 
+        RewardManager()
+
         // Загрузка фотографий
         loadTextures(
             load("box.png", "08832C088F83D8890128127"),

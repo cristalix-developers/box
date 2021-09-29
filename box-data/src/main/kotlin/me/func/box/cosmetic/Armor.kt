@@ -1,4 +1,6 @@
-package me.func.box
+package me.func.box.cosmetic
+
+import me.func.box.User
 
 enum class Armor(private val price: Int, private val rare: Rare, private val title: String, private val code: String) :
     Donate {
@@ -54,5 +56,13 @@ enum class Armor(private val price: Int, private val rare: Rare, private val tit
             nbt("armors", code)
             type = org.bukkit.Material.DIAMOND_HELMET
         }.build()
+    }
+
+    override fun give(user: User) {
+        if (user.stat.skins == null)
+            user.stat.skins = arrayListOf(getCode())
+        else
+            user.stat.skins!!.add(getCode())
+        user.stat.currentSkin = getCode()
     }
 }

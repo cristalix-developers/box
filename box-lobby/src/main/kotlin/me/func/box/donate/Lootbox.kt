@@ -4,7 +4,11 @@ import clepto.bukkit.B
 import dev.implario.bukkit.item.item
 import implario.ListUtils
 import me.func.box.ModTransfer
+import me.func.box.User
 import me.func.box.app
+import me.func.box.cosmetic.Armor
+import me.func.box.cosmetic.Donate
+import me.func.box.cosmetic.Sword
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
@@ -21,17 +25,17 @@ import ru.cristalix.core.inventory.ControlledInventory
 import ru.cristalix.core.inventory.InventoryContents
 import ru.cristalix.core.inventory.InventoryProvider
 
-class Lootbox : Listener {
+object Lootbox : Listener {
 
     private val coin = CraftItemStack.asNMSCopy(item {
         nbt("other", "coin4")
         type = Material.CLAY_BALL
     }.build())
 
-    private val dropList = me.func.box.Armor.values()
+    private val dropList = Armor.values()
         .map { it }
-        .filter { it != me.func.box.Armor.DRAK }
-        .plus(me.func.box.Sword.values().filter { it != me.func.box.Sword.NONE }.map { it })
+        .filter { it != Armor.DRAK }
+        .plus(Sword.values().filter { it != Sword.NONE }.map { it })
 
     private val lootbox = ControlledInventory.builder()
         .title("Покупка ящика")
@@ -56,55 +60,10 @@ class Lootbox : Listener {
 
                     user.stat.money -= 5000
 
-                    val moneyDrop = (Math.random() * 300).toInt() + 100
+                    open(user)
 
-                    user.stat.money += moneyDrop
-
-                    val drop = ListUtils.random(dropList) as me.func.box.Donate
-
-                    val item = if (drop is me.func.box.Sword) {
-                        if (user.stat.swords == null) user.stat.swords = arrayListOf(drop)
-                        else {
-                            if (user.stat.swords!!.contains(drop)) {
-                                player.sendMessage(Formatting.fine("У вас уже есть §b" + drop.getTitle() + "§f, замена на §e2000§f монет!"))
-                                user.stat.money += 2000
-                            } else
-                                user.stat.swords!!.add(drop)
-                        }
-                        item {
-                            nbt("weapons_other", drop.getCode())
-                            type = Material.DIAMOND_SWORD
-                        }.build()
-                    } else {
-                        if (user.stat.skins == null) user.stat.skins = arrayListOf(drop.getCode())
-                        else {
-                            if (user.stat.skins!!.contains(drop.getCode())) {
-                                player.sendMessage(Formatting.fine("У вас уже есть §b" + drop.getTitle() + "§f, замена на §e2000§f монет!"))
-                                user.stat.money += 2000
-                            } else
-                                user.stat.skins!!.add(drop.getCode())
-                        }
-                        item {
-                            nbt("armors", drop.getCode())
-                            type = Material.DIAMOND_HELMET
-                        }.build()
-                    }
-
-                    B.bc(Formatting.fine("§e" + user.name + " §fнашел ${drop.getRare().color + drop.getRare().title.toLowerCase()} предмет! ${drop.getRare().color}" + drop.getTitle()))
-
-                    player.closeInventory()
-
-                    ModTransfer()
-                        .integer(2)
-                        .item(CraftItemStack.asNMSCopy(item))
-                        .string(drop.getTitle())
-                        .string(drop.getRare().name)
-                        .item(coin)
-                        .string("§e$moneyDrop монет")
-                        .string("")
-                        .send("lootbox", user)
+                    contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
                 })
-                contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
             }
         }).build()
 
@@ -115,11 +74,60 @@ class Lootbox : Listener {
         }, "lootboxsound")
     }
 
+    fun open(user: User) {
+        val moneyDrop = (Math.random() * 300).toInt() + 100
+
+        user.stat.money += moneyDrop
+
+        val drop = ListUtils.random(dropList) as Donate
+
+        val item = if (drop is Sword) {
+            if (user.stat.swords == null) user.stat.swords = arrayListOf(drop)
+            else {
+                if (user.stat.swords!!.contains(drop)) {
+                    user.player!!.sendMessage(Formatting.fine("У вас уже есть §b" + drop.getTitle() + "§f, замена на §e2000§f монет!"))
+                    user.stat.money += 2000
+                } else
+                    user.stat.swords!!.add(drop)
+            }
+            item {
+                nbt("weapons_other", drop.getCode())
+                type = Material.DIAMOND_SWORD
+            }.build()
+        } else {
+            if (user.stat.skins == null) user.stat.skins = arrayListOf(drop.getCode())
+            else {
+                if (user.stat.skins!!.contains(drop.getCode())) {
+                    user.player!!.sendMessage(Formatting.fine("У вас уже есть §b" + drop.getTitle() + "§f, замена на §e2000§f монет!"))
+                    user.stat.money += 2000
+                } else
+                    user.stat.skins!!.add(drop.getCode())
+            }
+            item {
+                nbt("armors", drop.getCode())
+                type = Material.DIAMOND_HELMET
+            }.build()
+        }
+
+        B.bc(Formatting.fine("§e" + user.name + " §fнашел ${drop.getRare().color + drop.getRare().title.toLowerCase()} предмет! ${drop.getRare().color}" + drop.getTitle()))
+
+        user.player!!.closeInventory()
+
+        ModTransfer()
+            .integer(2)
+            .item(CraftItemStack.asNMSCopy(item))
+            .string(drop.getTitle())
+            .string(drop.getRare().name)
+            .item(coin)
+            .string("§e$moneyDrop монет")
+            .string("")
+            .send("lootbox", user)
+    }
+
     @EventHandler
     fun InventoryOpenEvent.handle() {
         if (inventory.type == InventoryType.ENDER_CHEST) {
             B.postpone(1) { lootbox.open(player as Player) }
         }
     }
-
 }

@@ -1,5 +1,6 @@
-package me.func.box
+package me.func.box.cosmetic
 
+import me.func.box.User
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
@@ -16,7 +17,7 @@ enum class KillMessage(
 ) : Donate {
     NONE(ItemStack(Material.BEDROCK), 0, Rare.COMMON, "Стандартное сообщение", "убит"),
     FIRE(ItemStack(Material.BLAZE_POWDER), 29, Rare.COMMON, "Огонь", "превращён в пыль"),
-    GALACTIC(ItemStack(Material.ENDER_STONE), 29, Rare.COMMON, "Галактический", "превращен космическую пыль"),
+    GALACTIC(ItemStack(Material.ENDER_STONE), 29, Rare.COMMON, "Галактический", "превращен в космическую пыль"),
     COMPUTER(ItemStack(Material.RECORD_7), 29, Rare.COMMON, "Компьютер", "был удалён"),
     HONORABLE(ItemStack(Material.DIAMOND), 29, Rare.COMMON, "Почётный", "завоеван"),
     BARBECUE(ItemStack(Material.COOKED_BEEF),39, Rare.RARE, "Барбекю", "измазан в соусе барбекю"),
@@ -58,5 +59,10 @@ enum class KillMessage(
             amount = 1
             text((if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть") + "\n§7Редкость: " + rare.color + rare.title + " \n§7Название: " + rare.color + title + "\n§7Пример: \n§dFunc ${getDescription()} reidj")
         }.build()
+    }
+
+    override fun give(user: User) {
+        user.stat.killMessages.add(this)
+        user.stat.currentKillMessage = this
     }
 }

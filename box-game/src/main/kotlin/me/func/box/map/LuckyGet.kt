@@ -16,6 +16,7 @@ object LuckyGet {
 
         LuckEvent.values().random().accept(user)
         user.stat.luckyOpened++
+
         location.block.removeMetadata("lucky", app)
     }
 

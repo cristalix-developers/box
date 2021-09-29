@@ -4,7 +4,7 @@ import clepto.bukkit.B
 import clepto.cristalix.Cristalix
 import dev.implario.bukkit.item.item
 import io.netty.buffer.Unpooled
-import me.func.box.Starter
+import me.func.box.cosmetic.Starter
 import me.func.box.User
 import me.func.box.app
 import me.func.box.data.Status
@@ -195,7 +195,7 @@ class DefaultListener : Listener {
         } else if (entity is CraftPlayer && damager is CraftPlayer && (damager as CraftPlayer).itemInHand != null) {
             val item = (damager as CraftPlayer).itemInHand
             val nmsItem = CraftItemStack.asNMSCopy(item)
-            if (nmsItem.hasTag() && nmsItem.tag.hasKeyOfType("super", 8)) {
+            if (nmsItem.tag != null && nmsItem.tag.hasKeyOfType("super", 8)) {
                 SuperSword.valueOf(nmsItem.tag.getString("super")).onDamage(
                     app.getUser(damager as CraftPlayer)!!,
                     app.getUser(entity as CraftPlayer)!!

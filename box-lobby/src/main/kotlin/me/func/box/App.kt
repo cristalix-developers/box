@@ -5,11 +5,13 @@ import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.kensuke.Kensuke
 import dev.implario.kensuke.Scope
+import dev.implario.kensuke.UserManager
 import dev.implario.kensuke.impl.bukkit.BukkitKensuke
 import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.donate.DonateViewer
 import me.func.box.donate.Lootbox
+import me.func.box.reward.DailyRewardManager
 import org.bukkit.*
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -32,21 +34,15 @@ import java.util.*
 import kotlin.math.cos
 import kotlin.math.sin
 
-
 lateinit var app: App
 
 class App : JavaPlugin() {
 
-    private val statScope = Scope("boxl", Stat::class.java)
-
+    private lateinit var statScope: Scope<Stat>
     lateinit var worldMeta: WorldMeta
     private lateinit var kensuke: Kensuke
     lateinit var spawn: Location
-    private var userManager = BukkitUserManager(
-        listOf(statScope),
-        { session, context -> User(session, context.getData(statScope)) },
-        { user, context -> context.store(statScope, user.stat) }
-    )
+    lateinit var userManager: UserManager<User>
 
     override fun onEnable() {
         B.plugin = this
@@ -56,6 +52,13 @@ class App : JavaPlugin() {
         // Загрузка карты
         worldMeta = MapLoader().load("Event")!!
         spawn = worldMeta.getLabel("spawn").add(0.0, 3.0, 0.0).toCenterLocation()
+
+        statScope = Scope("boxll", Stat::class.java)
+        userManager = BukkitUserManager(
+            listOf(statScope),
+            { session, context -> User(session, context.getData(statScope)) },
+            { user, context -> context.store(statScope, user.stat) }
+        )
 
         // Конфигурация реалма
         val info = IRealmService.get().currentRealmInfo
@@ -117,7 +120,7 @@ class App : JavaPlugin() {
         Npcs.spawn(
             Npc.builder()
                 .location(Location(worldMeta.world, -262.0, 112.0, 36.0, -152f, 0f))
-                .name("§c§l4 §fx §c§l4 §e§lLUCKY")
+                .name(ServerType.BOX8.title)
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/30719b68-2c69-11e8-b5ea-1cb72caa35fd")
                 .skinDigest("307264a1-2c6911e8b5ea1cb72caa35fd")
@@ -130,7 +133,7 @@ class App : JavaPlugin() {
         Npcs.spawn(
             Npc.builder()
                 .location(Location(worldMeta.world, -255.0, 112.0, 36.0, 162f, 0f))
-                .name("§c§l2 §fx §c§l4 §e§lLUCKY")
+                .name(ServerType.BOX4.title)
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/6f3f4a2e-7f84-11e9-8374-1cb72caa35fd")
                 .skinDigest("6f3f4a2e-7f8411e983741cb72caa35fd")
@@ -143,7 +146,7 @@ class App : JavaPlugin() {
         Npcs.spawn(
             Npc.builder()
                 .location(Location(worldMeta.world, -265.0, 112.0, 34.0, -125f, 0f))
-                .name("§c§l25 §fx §c§l4 §eПВП 1.8")
+                .name(ServerType.BOX5.title)
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/30392bb3-2c69-11e8-b5ea-1cb72caa35fd")
                 .skinDigest("30392bb3-2c6911e8b5ea1cb72caa35fd")
@@ -156,7 +159,7 @@ class App : JavaPlugin() {
         Npcs.spawn(
             Npc.builder()
                 .location(Location(worldMeta.world, -258.5, 112.0, 36.0, -174f, 0f))
-                .name("§c§l4 §fx §c§l4 §eПВП 1.8")
+                .name(ServerType.BOXS.title)
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/7f3fea26-be9f-11e9-80c4-1cb72caa35fd")
                 .skinDigest("7f3fea26-be9f11e980c41cb72caa35fd")
@@ -169,7 +172,7 @@ class App : JavaPlugin() {
         Npcs.spawn(
             Npc.builder()
                 .location(Location(worldMeta.world, -252.0, 112.0, 34.0, 137f, 0f))
-                .name("§c§l4 §fx §c§l4 §eПВП 1.9")
+                .name(ServerType.BOXN.title)
                 .behaviour(NpcBehaviour.STARE_AT_PLAYER)
                 .skinUrl("https://webdata.c7x.dev/textures/skin/e7c13d3d-ac38-11e8-8374-1cb72caa35fd")
                 .skinDigest("e7c13d3d-ac3811e883741cb72caa35fd")
@@ -180,7 +183,7 @@ class App : JavaPlugin() {
                 }.build()
         )
 
-        B.events(FamousListener(), GlobalListener(), Lootbox(), DonateViewer())
+        B.events(FamousListener(), GlobalListener(), Lootbox, DonateViewer())
 
         B.regCommand({ player, strings ->
             if (player.isOp) {
@@ -223,8 +226,8 @@ class App : JavaPlugin() {
         )
     }
 
-    fun getUser(player: Player): User? {
-        return userManager.getUser(player)
+    fun getUser(player: Player): User {
+        return userManager.getUser(player.uniqueId)
     }
 
 }

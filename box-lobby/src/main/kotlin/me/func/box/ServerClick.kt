@@ -95,13 +95,13 @@ class ClickServer(private val server: String, private val maxPlayers: Int) : Con
     }
 
     override fun accept(player: Player) {
-        val user = app.getUser(player)!!
-        if (user.looked)
+        val user = app.getUser(player)
+        if (user.lock)
             return
-        user.looked = true
-        B.postpone(1) { user.looked = false }
-        B.postpone(2) {
+        B.postpone(3) {
             try {
+                user.lock = true
+                B.postpone(10) { user.lock = false }
                 sendToServer(player)
             } catch (e: ExecutionException) {
                 e.printStackTrace()

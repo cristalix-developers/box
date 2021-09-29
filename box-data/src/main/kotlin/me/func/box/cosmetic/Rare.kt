@@ -1,4 +1,4 @@
-package me.func.box
+package me.func.box.cosmetic
 
 enum class Rare(val title: String, val color: String) {
 

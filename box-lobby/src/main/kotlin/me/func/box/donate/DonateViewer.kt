@@ -7,6 +7,8 @@ import me.func.box.ClickServer
 import me.func.box.ServerType
 import me.func.box.User
 import me.func.box.app
+import me.func.box.cosmetic.*
+import me.func.box.cosmetic.SeasonKit.seasonCounter
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
@@ -28,6 +30,7 @@ import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage
 import ru.cristalix.npcs.data.NpcBehaviour
 import ru.cristalix.npcs.server.Npc
 import ru.cristalix.npcs.server.Npcs
+import sun.audio.AudioPlayer
 import java.util.function.Consumer
 
 class DonateViewer : Listener {
@@ -50,8 +53,8 @@ class DonateViewer : Listener {
                 }.build()) {
                     player.performCommand("menu")
                 })
-                me.func.box.Armor.values().forEach { tag ->
-                    val user = app.getUser(player)!!
+                Armor.values().forEach { tag ->
+                    val user = app.getUser(player)
                     val has = user.stat.skins!!.contains(tag.getCode())
                     val current = user.stat.currentSkin == tag.getCode()
                     contents.add('O', ClickableItem.of(tag.getItem(current, has)) {
@@ -104,13 +107,7 @@ class DonateViewer : Listener {
                                         enchant(Enchantment.LUCK, 1)
                                         type = Material.CLAY_BALL
                                     }.build()) {
-                                        buy(user, tag.getPrice(), "Покупка сета ${tag.getCode()}") {
-                                            if (user.stat.skins == null)
-                                                user.stat.skins = arrayListOf(tag.getCode())
-                                            else
-                                                user.stat.skins!!.add(tag.getCode())
-                                            user.stat.currentSkin = tag.getCode()
-                                        }
+                                        buy(user, tag.getPrice(), "Покупка сета ${tag.getCode()}", tag)
                                     })
                                     contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
                                 }
@@ -138,8 +135,8 @@ class DonateViewer : Listener {
                 }.build()) {
                     player.performCommand("menu")
                 })
-                me.func.box.Sword.values().forEach { tag ->
-                    if (tag == me.func.box.Sword.NONE)
+                Sword.values().forEach { tag ->
+                    if (tag == Sword.NONE)
                         return@forEach
                     val user = app.getUser(player)!!
                     val has = user.stat.swords!!.contains(tag)
@@ -179,13 +176,7 @@ class DonateViewer : Listener {
                                         enchant(Enchantment.LUCK, 1)
                                         type = Material.CLAY_BALL
                                     }.build()) {
-                                        buy(user, tag.getPrice(), "Покупка скина на меч ${tag.getCode()}") {
-                                            if (user.stat.swords == null)
-                                                user.stat.swords = arrayListOf(tag)
-                                            else
-                                                user.stat.swords!!.add(tag)
-                                            user.stat.currentSword = tag
-                                        }
+                                        buy(user, tag.getPrice(), "Покупка скина на меч ${tag.getCode()}", tag)
                                     })
                                     contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
                                 }
@@ -213,11 +204,11 @@ class DonateViewer : Listener {
                 }.build()) {
                     player.performCommand("menu")
                 })
-                me.func.box.Starter.values().forEach { tag ->
+                Starter.values().forEach { tag ->
                     val user = app.getUser(player)!!
                     val has = user.stat.starters!!.contains(tag)
                     val current = user.stat.currentStarter == tag
-                    if (tag == me.func.box.Starter.NONE)
+                    if (tag == Starter.NONE)
                         return@forEach
                     val item = tag.getItem(current, has)
                     contents.add('O', ClickableItem.of(item) {
@@ -257,12 +248,7 @@ class DonateViewer : Listener {
                                             player.closeInventory()
                                             return@of
                                         }
-                                        if (user.stat.starters == null)
-                                            user.stat.starters = arrayListOf(tag)
-                                        else
-                                            user.stat.starters!!.add(tag)
-                                        user.stat.currentStarter = tag
-                                        user.stat.money -= tag.getPrice()
+                                        tag.give(user)
 
                                         player.closeInventory()
                                         player.sendMessage(Formatting.fine("Вы успешно купили стартовый набор!"))
@@ -282,7 +268,7 @@ class DonateViewer : Listener {
         .columns(9)
         .provider(object : InventoryProvider {
             override fun init(player: Player, contents: InventoryContents) {
-                val user = app.getUser(player)!!
+                val user = app.getUser(player)
                 contents.setLayout(
                     "XXFXFXFXX",
                     "XXXXLXXXX"
@@ -293,33 +279,15 @@ class DonateViewer : Listener {
                 }.build()) {
                     player.performCommand("menu")
                 })
-                contents.add('F', ClickableItem.of(item {
-                    type = Material.CLAY_BALL
-                    nbt("other", "coin2")
-                    text("§aКупить 1`000 монет\n\n§7Цена: §b19 кристаликов\n§7Скидка: §cнет")
-                }.build()) {
-                    buy(user, 19, "Покупка 1`000 монет") {
-                        it.stat.money += 1000
-                    }
-                })
-                contents.add('F', ClickableItem.of(item {
-                    type = Material.CLAY_BALL
-                    nbt("other", "coin3")
-                    text("§aКупить 10`000 монет\n\n§7Цена: §b159 кристаликов\n§7Скидка: §a20%")
-                }.build()) {
-                    buy(user, 159, "Покупка 10`000 монет") {
-                        it.stat.money += 10000
-                    }
-                })
-                contents.add('F', ClickableItem.of(item {
-                    type = Material.CLAY_BALL
-                    nbt("other", "coin4")
-                    text("§aКупить 50`000 монет\n\n§7Цена: §b799 кристаликов\n§7Скидка: §a30%")
-                }.build()) {
-                    buy(user, 799, "Покупка 50`000 монет") {
-                        it.stat.money += 50000
-                    }
-                })
+                MoneyBuy.values().forEach { money ->
+                    contents.add('F', ClickableItem.of(item {
+                        type = Material.CLAY_BALL
+                        nbt("other", money.getCode())
+                        text(money.getTitle())
+                    }.build()) {
+                        buy(user, money.realPrice, "Покупка ${money.money} монет", money)
+                    })
+                }
                 contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
             }
         }).build()
@@ -388,18 +356,8 @@ class DonateViewer : Listener {
                         .columns(9)
                         .provider(object : InventoryProvider {
                             override fun init(player: Player, contents: InventoryContents) {
-                                contents.setLayout(
-                                    "XXHHHXXOP",
-                                )
+                                SeasonKit.fill(contents)
 
-                                val starter = me.func.box.Starter.SONYA
-                                val armor = me.func.box.Armor.NUCLEAR
-                                val sword = me.func.box.Sword.L
-                                val seasonCounter = 4
-
-                                contents.add('H', ClickableItem.empty(starter.getItem()))
-                                contents.add('H', ClickableItem.empty(armor.getItem()))
-                                contents.add('H', ClickableItem.empty(sword.getItem()))
                                 contents.add('P', ClickableItem.of(item {
                                     text("§cВыйти")
                                     nbt("other", "cancel")
@@ -408,25 +366,14 @@ class DonateViewer : Listener {
                                     player.closeInventory()
                                 })
                                 contents.add('O', ClickableItem.of(item {
-                                    text("§aКупить за 149 кристаликов")
+                                    text("§aКупить за ${me.func.box.cosmetic.SeasonKit.getPrice()} кристаликов")
                                     nbt("other", "access")
                                     nbt("HideFlags", 63)
                                     enchant(Enchantment.LUCK, 0)
                                     type = Material.CLAY_BALL
                                 }.build()) {
-                                    buy(user, 149, "Покупка сезонного кита $seasonCounter") {
-                                        if (user.stat.swords == null) user.stat.swords = arrayListOf(sword)
-                                        else user.stat.swords!!.add(sword)
-                                        user.stat.currentSword = sword
-                                        if (user.stat.starters == null) user.stat.starters = arrayListOf(starter)
-                                        else user.stat.starters!!.add(starter)
-                                        user.stat.currentStarter = starter
-                                        if (user.stat.skins == null) user.stat.skins = arrayListOf(armor.getCode())
-                                        else user.stat.skins!!.add(armor.getCode())
-                                        user.stat.currentSkin = armor.getCode()
-                                    }
+                                    buy(user, SeasonKit.getPrice(), "Покупка сезонного кита $seasonCounter", SeasonKit)
                                 })
-                                contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
                             }
                         }).build().open(player)
                 })
@@ -453,7 +400,7 @@ class DonateViewer : Listener {
                 }.build()) {
                     player.performCommand("menu")
                 })
-                me.func.box.KillMessage.values().forEach { tag ->
+                KillMessage.values().forEach { tag ->
                     val user = app.getUser(player)!!
                     val has = user.stat.killMessages.contains(tag)
                     val current = user.stat.currentKillMessage == tag
@@ -491,10 +438,7 @@ class DonateViewer : Listener {
                                         enchant(Enchantment.LUCK, 1)
                                         type = Material.CLAY_BALL
                                     }.build()) {
-                                        buy(user, tag.getPrice(), "Покупка сообщения ${tag.getTitle()}") {
-                                            user.stat.killMessages.add(tag)
-                                            user.stat.currentKillMessage = tag
-                                        }
+                                        buy(user, tag.getPrice(), "Покупка сообщения ${tag.getTitle()}", tag)
                                     })
                                     contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
                                 }
@@ -523,7 +467,7 @@ class DonateViewer : Listener {
                 }.build()) {
                     player.performCommand("menu")
                 })
-                me.func.box.BreakBedEffect.values().forEach { tag ->
+                BreakBedEffect.values().forEach { tag ->
                     val user = app.getUser(player)!!
                     val has = user.stat.breakBedEffects.contains(tag)
                     val current = user.stat.currentBreakBedEffect == tag
@@ -561,10 +505,7 @@ class DonateViewer : Listener {
                                         enchant(Enchantment.LUCK, 1)
                                         type = Material.CLAY_BALL
                                     }.build()) {
-                                        buy(user, tag.getPrice(), "Покупка эффекта ${tag.getTitle()}") {
-                                            user.stat.breakBedEffects.add(tag)
-                                            user.stat.currentBreakBedEffect = tag
-                                        }
+                                        buy(user, tag.getPrice(), "Покупка эффекта ${tag.getTitle()}", tag)
                                     })
                                     contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
                                 }
@@ -575,10 +516,10 @@ class DonateViewer : Listener {
             }
         }).build()
 
-    private fun buy(user: User, money: Int, desc: String, accept: Consumer<User>) {
+    private fun buy(user: User, money: Int, desc: String, donate: Donate) {
         val player = user.player!!
         if (player.isOp) {
-            accept.accept(user)
+            donate.give(user)
         }
         ISocketClient.get().writeAndAwaitResponse<MoneyTransactionResponsePackage>(
             MoneyTransactionRequestPackage(
@@ -596,7 +537,7 @@ class DonateViewer : Listener {
                 player.sendMessage(Formatting.error("Что-то пошло не так... Попробуйте перезайти"))
                 return@thenAccept
             }
-            accept.accept(user)
+            donate.give(user)
             player.closeInventory()
             player.sendMessage(Formatting.fine("Спасибо за поддержку разработчиков!"))
         }

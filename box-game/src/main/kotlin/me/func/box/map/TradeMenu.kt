@@ -1,7 +1,7 @@
 package me.func.box.map
 
 import dev.implario.bukkit.item.item
-import me.func.box.Sword
+import me.func.box.cosmetic.Sword
 import me.func.box.app
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer

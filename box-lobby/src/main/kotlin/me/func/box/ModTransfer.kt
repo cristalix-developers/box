@@ -33,6 +33,11 @@ class ModTransfer {
         return this
     }
 
+    fun boolean(boolean: Boolean): ModTransfer {
+        serializer.writeBoolean(boolean)
+        return this
+    }
+
     fun double(double: Double): ModTransfer {
         serializer.writeDouble(double)
         return this

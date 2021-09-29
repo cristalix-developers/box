@@ -3,6 +3,8 @@ package me.func.box
 import clepto.bukkit.B
 import clepto.cristalix.Cristalix
 import io.netty.buffer.Unpooled
+import me.func.box.reward.DailyRewardManager
+import me.func.box.reward.WeekRewards
 import net.minecraft.server.v1_12_R1.PacketDataSerializer
 import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload
 import org.bukkit.GameMode
@@ -37,24 +39,22 @@ class FamousListener : Listener {
 
     @EventHandler
     fun PlayerJoinEvent.handle() {
-        B.postpone(1) {
+        val user = app.getUser(player)
+
+        B.postpone(2) {
             player.allowFlight = true
             player.teleport(app.spawn)
 
-            val user = app.getUser(player)
-
-            if (user != null) {
-                modList.forEach {
-                    user.sendPacket(
-                        PacketPlayOutCustomPayload(
-                            DisplayChannels.MOD_CHANNEL,
-                            PacketDataSerializer(it.retainedSlice())
-                        )
+            modList.forEach {
+                user.sendPacket(
+                    PacketPlayOutCustomPayload(
+                        DisplayChannels.MOD_CHANNEL,
+                        PacketDataSerializer(it.retainedSlice())
                     )
-                }
+                )
             }
 
-            val stat = user!!.stat
+            val stat = user.stat
             stat.lastSeenName = Cristalix.getDisplayName(player)
             val address = UUID.randomUUID().toString()
             val objective =
@@ -78,6 +78,25 @@ class FamousListener : Listener {
                 }
             Cristalix.scoreboardService().setCurrentObjective(player.uniqueId, address)
         }
+
+        B.postpone(10) {
+            val now = System.currentTimeMillis()
+            // Обнулить комбо сбора наград если прошло больше суток или комбо >7
+            if ((user.stat.rewardStreak > 0 && now - user.stat.lastEnter > 24 * 60 * 60 * 1000) || user.stat.rewardStreak > 6) {
+                user.stat.rewardStreak = 0
+            }
+            if (now - user.stat.dailyClaimTimestamp > 14 * 60 * 60 * 1000) {
+                user.stat.dailyClaimTimestamp = now
+                DailyRewardManager.open(user, false)
+
+                val dailyReward = WeekRewards.values()[user.stat.rewardStreak]
+                player.sendMessage(Formatting.fine("Ваша ежедневная награда: " + dailyReward.title))
+                dailyReward.give(user)
+                user.stat.rewardStreak++
+            }
+            user.stat.lastEnter = now
+        }
+
         player.gameMode = GameMode.ADVENTURE
     }
 

@@ -28,7 +28,8 @@ enum class SuperSword(private val item: ItemStack, val onDamage: (attacker: User
             nbt("weapons", "emerald_dagger")
             nbt("super", "POISON_SWORD")
         }.build(),
-        { _, victim -> {
+        { _, victim ->
+            {
                 victim.player!!.addPotionEffect(
                     org.bukkit.potion.PotionEffect(
                         org.bukkit.potion.PotionEffectType.POISON,
@@ -45,7 +46,8 @@ enum class SuperSword(private val item: ItemStack, val onDamage: (attacker: User
             nbt("weapons", "diamond_tiger")
             nbt("super", "WITHER_SWORD")
         }.build(),
-        { _, victim -> {
+        { _, victim ->
+            {
                 victim.player!!.addPotionEffect(
                     org.bukkit.potion.PotionEffect(
                         org.bukkit.potion.PotionEffectType.WITHER,
@@ -62,7 +64,13 @@ enum class SuperSword(private val item: ItemStack, val onDamage: (attacker: User
             nbt("weapons", "iron_mace")
             nbt("super", "HAMMER")
         }.build(),
-        { _, victim -> { victim.player!!.location.clone().subtract(0.0, 1.0, 0.0).block.type = org.bukkit.Material.AIR } }),
+        { _, victim ->
+            {
+                val underBlock = victim.player!!.location.clone().subtract(0.0, 1.0, 0.0).block
+                if (underBlock.type == org.bukkit.Material.STONE)
+                    underBlock.type = org.bukkit.Material.AIR
+            }
+        }),
     ;
 
     fun give(user: User) {

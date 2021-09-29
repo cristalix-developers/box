@@ -1,5 +1,6 @@
-package me.func.box
+package me.func.box.cosmetic
 
+import me.func.box.User
 import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.inventory.ItemStack
@@ -58,5 +59,10 @@ enum class BreakBedEffect(
             amount = 1
             text((if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть") + "\n§7Редкость: " + rare.color + rare.title + " \n§7Название: " + rare.color + title)
         }.build()
+    }
+
+    override fun give(user: User) {
+        user.stat.breakBedEffects.add(this)
+        user.stat.currentBreakBedEffect = this
     }
 }

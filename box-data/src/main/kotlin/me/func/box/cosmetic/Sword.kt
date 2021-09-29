@@ -1,4 +1,6 @@
-package me.func.box
+package me.func.box.cosmetic
+
+import me.func.box.User
 
 enum class Sword(private val price: Int, private val rare: Rare, private val title: String, private val code: Int) :
     Donate {
@@ -50,5 +52,13 @@ enum class Sword(private val price: Int, private val rare: Rare, private val tit
             nbt("weapons_other", code)
             type = org.bukkit.Material.DIAMOND_SWORD
         }.build()
+    }
+
+    override fun give(user: User) {
+        if (user.stat.swords == null)
+            user.stat.swords = arrayListOf(this)
+        else
+            user.stat.swords!!.add(this)
+        user.stat.currentSword = this
     }
 }
