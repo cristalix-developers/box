@@ -75,29 +75,29 @@ object Generator {
     ): List<Location> {
         val locations = arrayListOf<Location>()
         if (app.teams.isNotEmpty()) {
-            start.set(0.0, ySize * random.nextDouble() / 2 + ySize / 4, zSize * random.nextDouble() / 2 + zSize / 4)
+            start.set(0.0, ySize * random.nextDouble() / 2 + ySize / 3, zSize * random.nextDouble() / 2 + zSize / 3)
             locations.add(generateRoom(start, -1, 0, 0, roomSize, wholeSize))
         }
         if (app.teams.size > 1) {
             start.set(
                 xSize.toDouble() - roomSize,
-                ySize * random.nextDouble() / 3 + ySize / 4 + roomSize,
-                zSize * random.nextDouble() / 2 + zSize / 4
+                ySize * random.nextDouble() / 3 + ySize / 3 + roomSize,
+                zSize * random.nextDouble() / 2 + zSize / 3
             )
             locations.add(generateRoom(start, 1, 0, 0, roomSize, wholeSize))
         }
         if (app.teams.size > 2) {
             start.set(
-                xSize * random.nextDouble() / 2 + xSize / 4,
-                ySize * random.nextDouble() / 3 + ySize / 4 + roomSize,
+                xSize * random.nextDouble() / 2 + xSize / 3,
+                ySize * random.nextDouble() / 3 + ySize / 3 + roomSize,
                 zSize.toDouble() - roomSize
             )
             locations.add(generateRoom(start, 0, 0, 1, roomSize, wholeSize))
         }
         if (app.teams.size > 3) {
             start.set(
-                xSize * random.nextDouble() / 2 + xSize / 4,
-                ySize * random.nextDouble() / 3 + ySize / 4 + roomSize,
+                xSize * random.nextDouble() / 2 + xSize / 3,
+                ySize * random.nextDouble() / 3 + ySize / 3 + roomSize,
                 0.0
             )
             locations.add(generateRoom(start, 0, 0, -1, roomSize, wholeSize))

@@ -58,7 +58,7 @@ var sessionDurability = System.getProperty("TIME", "4000").toInt()
 
 class Box : JavaPlugin() {
 
-    private val statScope = Scope("boxll", Stat::class.java)
+    private val statScope = Scope("boxl", Stat::class.java)
 
     private lateinit var worldMeta: WorldMeta
     lateinit var spawn: Location
@@ -137,8 +137,8 @@ class Box : JavaPlugin() {
         info.status = RealmStatus.WAITING_FOR_PLAYERS
         info.extraSlots = 1
         info.maxPlayers = slots
-        info.readableName = "БКоробка ${slots / 2}x${slots / 2} #$id"
-        info.groupName = "БКоробка ${slots / 2}x${slots / 2} #$id"
+        info.readableName = "Коробка#$id v.3.4.5"
+        info.groupName = "Коробка#$id v.3.4.5"
 
         kensuke = BukkitKensuke.setup(this)
         kensuke.addGlobalUserManager(userManager)
@@ -191,7 +191,7 @@ class Box : JavaPlugin() {
                             val user = app.getUser(player)!!
                             user.stat.currentStarter?.let {
                                 if (it == Starter.FUSE && slots > 20) player.sendMessage(Formatting.error("Данный стартовый набор недоступен в выбранном типе игры."))
-                                else it.consumer(user.player!!)
+                                else B.postpone(5 * 20) { it.consumer(user.player!!) }
                             }
                             user.stat.games++
                             waitingBar.removeViewer(player.uniqueId)

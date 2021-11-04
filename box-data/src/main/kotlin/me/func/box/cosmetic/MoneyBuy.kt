@@ -17,7 +17,7 @@ enum class MoneyBuy(val money: Int, val realPrice: Int, val percent: Int, val ic
     }
 
     override fun getCode(): String {
-        TODO("Not yet implemented")
+        return icon
     }
 
     override fun getRare(): Rare {

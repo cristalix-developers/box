@@ -1,6 +1,7 @@
 package me.func.box.listener
 
 import clepto.bukkit.B
+import clepto.bukkit.Cycle
 import clepto.cristalix.Cristalix
 import dev.implario.bukkit.item.item
 import io.netty.buffer.Unpooled
@@ -17,18 +18,12 @@ import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.Firework
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.TNTPrimed
+import org.bukkit.entity.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockGrowEvent
-import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.FoodLevelChangeEvent
-import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.event.entity.*
 import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
@@ -216,6 +211,12 @@ class DefaultListener : Listener {
     }
 
     @EventHandler
+    fun EntitySpawnEvent.handle() {
+        if (entity is Boat)
+            entity.remove()
+    }
+
+    @EventHandler
     fun PlayerInteractEvent.handle() {
         if (item != null && item.getType() == Material.TNT && action == Action.LEFT_CLICK_AIR) {
             val cloned = item.clone()
@@ -301,8 +302,16 @@ class DefaultListener : Listener {
                     } else
                         user.bed = null
                     if (team.bed) {
+                        player.gameMode = GameMode.SPECTATOR
                         entity.teleport(team.location)
                         player.inventory.addItem(app.woodPickaxe)
+
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent("§eВозрождение через §f§l3 §eсекунды!"))
+
+                        B.postpone(60) {
+                            entity.teleport(team.location)
+                            player.gameMode = GameMode.SURVIVAL
+                        }
                     } else {
                         // Скрытие врагов
                         app.teams.filter { !it.players.contains(player.uniqueId) }
