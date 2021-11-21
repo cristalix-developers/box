@@ -18,6 +18,7 @@ enum class Sword(private val price: Int, private val rare: Rare, private val tit
     K(79, Rare.LEGENDARY, "Топор разрушения", 34),
     M(299, Rare.LEGENDARY, "Коса титана", 15),
     L(299, Rare.LEGENDARY, "Сусальный топорик", 54),
+    SNOW(299, Rare.LEGENDARY, "Меч ледяного титана", 13),
     ;
 
     override fun getPrice(): Int {

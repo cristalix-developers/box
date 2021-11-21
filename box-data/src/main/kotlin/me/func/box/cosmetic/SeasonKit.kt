@@ -11,10 +11,10 @@ import sun.audio.AudioPlayer.player
 
 object SeasonKit : Donate {
 
-    private val starter = Starter.SONYA
-    private val armor = Armor.NUCLEAR
-    private val sword = Sword.L
-    const val seasonCounter = 4
+    private val starter = Starter.SNOW
+    private val armor = Armor.SNOW
+    private val sword = Sword.SNOW
+    const val seasonCounter = 5
 
     override fun getPrice(): Int {
         return 149

@@ -10,6 +10,7 @@ import me.func.box.User
 import me.func.box.app
 import me.func.box.data.Status
 import me.func.box.listener.lucky.SuperSword
+import me.func.box.mod.ModHelper
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.*
@@ -105,18 +106,16 @@ class DefaultListener : Listener {
             }
             val starter = app.getUser(player)!!.stat.currentStarter
             player.sendMessage(" ")
-            player.sendMessage("§b―――――――――――――――――")
-            player.sendMessage("      §eБедроковая коробка    ")
             player.sendMessage("§7Добывайте §eкамень§7, обменивайте")
             player.sendMessage("§7его на §eинструменты и оружие§7,")
             player.sendMessage("§7сломайте вражеские §cкровати§7 и")
             player.sendMessage("§7убейте §cврагов§7!")
+            player.sendMessage(" ")
             player.sendMessage(
-                "§7Начальный набор: " +
+                "§eНабор: " +
                         if (starter == null || starter == Starter.NONE) "§cОтсутсвует"
                         else "§a${starter.getTitle()}"
             )
-            player.sendMessage("§b―――――――――――――――――")
             player.sendMessage(" ")
         } else {
             player.gameMode = GameMode.SPECTATOR
@@ -149,8 +148,10 @@ class DefaultListener : Listener {
             player.sendMessage(Formatting.fine("Вы уже привязаны к этой кровати или это кровать врага."))
             return
         }
+        val user = app.getUser(player)!!
+        ModHelper.glow(user, 42, 189, 102)
         player.sendMessage(Formatting.fine("Точка возраждения установлена!"))
-        app.getUser(player)!!.bed = bed.location
+        user.bed = bed.location
     }
 
     @EventHandler
@@ -237,19 +238,6 @@ class DefaultListener : Listener {
                 TextComponent(if (user.compassToPlayer) "§aКомпас нацелен на врагов" else "Компас указывает на кровать врага")
             )
         }
-        if (app.status == Status.STARTING && material == Material.WOOL) {
-            app.teams.filter {
-                !it.players.contains(player.uniqueId) && it.color.woolData.toByte() == player.itemInHand.getData().data
-            }.forEach { team ->
-                if (team.players.size >= app.slots / app.teams.size) {
-                    player.sendMessage(Formatting.error("Ошибка! Команда заполена."))
-                    return@forEach
-                }
-                app.teams.forEach { it.players.remove(player.uniqueId) }
-                team.players.add(player.uniqueId)
-                player.sendMessage(Formatting.fine("Вы выбрали команду: " + team.color.chatFormat + team.color.teamName))
-            }
-        }
     }
 
     @EventHandler
@@ -267,9 +255,11 @@ class DefaultListener : Listener {
         if (player.killer != null) {
             userKiller = app.getUser(player.killer)!!
             userKiller.tempKills++
+            ModHelper.glow(userKiller, 0, 0, 255)
         }
         val user = app.getUser(player)!!
         user.stat.deaths++
+        ModHelper.glow(user, 255, 0, 0)
 
         val isTitan = user.stat.currentStarter != null && user.stat.currentStarter == Starter.TITAN
 

@@ -17,6 +17,7 @@ import me.func.box.listener.*
 import me.func.box.map.Generator
 import me.func.box.map.MapLoader
 import me.func.box.map.TradeMenu
+import me.func.box.me.func.box.ModTransfer
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.minecraft.server.v1_12_R1.EnumItemSlot
 import org.bukkit.*
@@ -58,7 +59,7 @@ var sessionDurability = System.getProperty("TIME", "4000").toInt()
 
 class Box : JavaPlugin() {
 
-    private val statScope = Scope("boxl", Stat::class.java)
+    private val statScope = Scope("boxll", Stat::class.java)
 
     private lateinit var worldMeta: WorldMeta
     lateinit var spawn: Location
@@ -146,7 +147,15 @@ class Box : JavaPlugin() {
         userManager.isOptional = true
 
         // Регистрация обработчиков
-        B.events(BlockListener(), DefaultListener(), TradeMenu(), EnchantTable(), ShootBowListener(), FixAnvilRename())
+        B.events(
+            BlockListener(),
+            DefaultListener(),
+            TradeMenu(),
+            EnchantTable(),
+            ShootBowListener(),
+            FixAnvilRename(),
+            TeamChange
+        )
 
         // Скорборд команды
         val manager = Bukkit.getScoreboardManager()
@@ -181,7 +190,7 @@ class Box : JavaPlugin() {
                         // Смена статуса игры и остановка счетчика игроков
                         status = Status.GAME
                         gameCounter++
-                        // Заполение команд
+                        // Заполнение команд
                         Bukkit.getOnlinePlayers().forEach { player ->
                             player.inventory.clear()
                             player.openInventory.topInventory.clear()
@@ -189,10 +198,12 @@ class Box : JavaPlugin() {
                             player.inventory.addItem(woodPickaxe)
                             player.sendTitle("§eПоехали!", "Враги без ника")
                             val user = app.getUser(player)!!
-                            user.stat.currentStarter?.let {
-                                if (it == Starter.FUSE && slots > 20) player.sendMessage(Formatting.error("Данный стартовый набор недоступен в выбранном типе игры."))
-                                else B.postpone(5 * 20) { it.consumer(user.player!!) }
+                            val starter = user.stat.currentStarter
+                            if (starter != null && starter != Starter.NONE) {
+                                if (starter  == Starter.FUSE && slots > 20) player.sendMessage(Formatting.error("Данный стартовый набор недоступен в выбранном типе игры."))
+                                else B.postpone(5 * 20) { starter.consumer(user.player!!) }
                             }
+                            ModTransfer().integer(0).send("box:start", user)
                             user.stat.games++
                             waitingBar.removeViewer(player.uniqueId)
 
@@ -324,21 +335,24 @@ class Box : JavaPlugin() {
                                 else
                                     player.location
                             } else {
-                                val someone = teams.filter { !it.players.contains(player.uniqueId) }
-                                    .map {
+                                val teams = teams.filter { !it.players.contains(player.uniqueId) }
+                                val tempBeds = teams.map {
                                         it.players.minByOrNull { current ->
                                             val enemyBed =
-                                                app.getUser(current)!!.bed ?: return@minByOrNull 999999.0
+                                                app.getUser(current)?.bed ?: return@minByOrNull 999999.0
                                             enemyBed.distanceSquared(player.location)
                                         }
                                     }.minByOrNull { current ->
                                         if (current == null)
                                             return@minByOrNull 99999.0
-                                        val enemyBed = app.getUser(current)!!.bed ?: return@minByOrNull 999999.0
+                                        val enemyBed = app.getUser(current)?.bed ?: return@minByOrNull 999999.0
                                         enemyBed.distanceSquared(player.location)
                                     }
-                                if (someone != null)
-                                    Bukkit.getPlayer(someone).location
+                                val permanentBed = teams.firstOrNull { it.bed }
+                                if (tempBeds != null)
+                                    Bukkit.getPlayer(tempBeds).location
+                                else if (permanentBed != null)
+                                    permanentBed.location
                                 else
                                     player.location
                             }

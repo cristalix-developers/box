@@ -21,16 +21,11 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
             amount(2)
         }.build())
     }),
-    BLOCK_BREAK({
-        val block = it.player!!.location.subtract(0.0, 10.0, 0.0).block
-        if (block?.type != Material.BEDROCK)
-            block.breakNaturally(ItemStack(Material.AIR))
-    }),
     GIVE_EMERALD({
         val drop = listOf(
             ItemStack(Material.EMERALD_BLOCK),
-            ItemStack(org.bukkit.Material.GOLD_BLOCK),
-            ItemStack(org.bukkit.Material.DIAMOND_BLOCK)
+            ItemStack(Material.GOLD_BLOCK),
+            ItemStack(Material.DIAMOND_BLOCK)
         )
         val spawnPoint = it.player!!.location.clone().add(0.0, 0.4, 0.0)
         repeat(7) { time ->
@@ -117,6 +112,26 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
             type = Material.SNOW_BALL
             amount(16)
         }.build())
+    }),
+    ABSORPTION({
+        it.player!!.addPotionEffect(
+            org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.ABSORPTION,
+                30 * 20,
+                3
+            )
+        )
+        it.player!!.sendTitle("§bЭффект", "§eЖизни (30 секунд.)", 10, 35, 20)
+    }),
+    REGENERATION({
+        it.player!!.addPotionEffect(
+            org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.REGENERATION,
+                10 * 20,
+                3
+            )
+        )
+        it.player!!.sendTitle("§bЭффект", "§aВосстановление (10 секунд.)", 10, 35, 20)
     }),
     FAST_DIGGING({
         it.player!!.addPotionEffect(

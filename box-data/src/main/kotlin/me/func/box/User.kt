@@ -44,6 +44,8 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
     private var connection: PlayerConnection? = null
 
     fun sendPacket(packet: Packet<*>) {
+        if (player == null)
+            return
         if (connection == null)
             connection = (player as CraftPlayer).handle.playerConnection
         connection?.sendPacket(packet)

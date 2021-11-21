@@ -3,11 +3,12 @@ package me.func.box.donate
 import clepto.bukkit.B
 import dev.implario.bukkit.item.item
 import implario.ListUtils
-import me.func.box.ModTransfer
+import me.func.box.me.func.box.ModTransfer
 import me.func.box.User
 import me.func.box.app
 import me.func.box.cosmetic.Armor
 import me.func.box.cosmetic.Donate
+import me.func.box.cosmetic.Rare
 import me.func.box.cosmetic.Sword
 import org.bukkit.Material
 import org.bukkit.Sound
@@ -32,9 +33,7 @@ object Lootbox : Listener {
         type = Material.CLAY_BALL
     }.build())
 
-    private val dropList = Armor.values()
-        .map { it }
-        .filter { it != Armor.DRAK }
+    private val dropList = Armor.values().map { it }
         .plus(Sword.values().filter { it != Sword.NONE }.map { it })
 
     private val lootbox = ControlledInventory.builder()
@@ -43,7 +42,7 @@ object Lootbox : Listener {
         .columns(9)
         .provider(object : InventoryProvider {
             override fun init(player: Player, contents: InventoryContents) {
-                val user = app.getUser(player)!!
+                val user = app.getUser(player)
 
                 contents.setLayout(
                     "XXXXOXXXX",
@@ -79,16 +78,21 @@ object Lootbox : Listener {
 
         user.stat.money += moneyDrop
 
-        val drop = ListUtils.random(dropList) as Donate
+        var drop = ListUtils.random(dropList) as Donate
+
+        repeat(2) {
+            if (drop.getRare() == Rare.LEGENDARY)
+                drop = ListUtils.random(dropList) as Donate
+        }
 
         val item = if (drop is Sword) {
-            if (user.stat.swords == null) user.stat.swords = arrayListOf(drop)
+            if (user.stat.swords == null) user.stat.swords = arrayListOf(drop as Sword)
             else {
                 if (user.stat.swords!!.contains(drop)) {
                     user.player!!.sendMessage(Formatting.fine("У вас уже есть §b" + drop.getTitle() + "§f, замена на §e2000§f монет!"))
                     user.stat.money += 2000
                 } else
-                    user.stat.swords!!.add(drop)
+                    user.stat.swords!!.add(drop as Sword)
             }
             item {
                 nbt("weapons_other", drop.getCode())

@@ -4,6 +4,7 @@ import dev.implario.bukkit.item.item
 import me.func.box.User
 import me.func.box.cosmetic.Armor
 import me.func.box.cosmetic.BreakBedEffect
+import me.func.box.cosmetic.Donate
 import net.minecraft.server.v1_12_R1.ItemStack
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
@@ -17,12 +18,16 @@ enum class WeekRewards(val title: String, val icon: ItemStack, val give: (User) 
     THREE(
         "§dСообщ. о убийстве - Галактический",
         CraftItemStack.asNMSCopy(org.bukkit.inventory.ItemStack(Material.ENDER_PEARL)),
-        { me.func.box.cosmetic.KillMessage.GALACTIC.give(it) }
+        { me.func.box.reward.WeekRewards.Companion.withDuplicate(it, 1000, me.func.box.cosmetic.KillMessage.GALACTIC) { user, donate ->
+            user.stat.killMessages.contains(donate)
+        } }
     ),
     FOUR(
         "§dЭффект разрушения Колдунья",
         CraftItemStack.asNMSCopy(BreakBedEffect.SPELL_WITCH.getItemStack()),
-        { BreakBedEffect.SPELL_WITCH.give(it) }
+        { me.func.box.reward.WeekRewards.Companion.withDuplicate(it, 2000, BreakBedEffect.SPELL_WITCH) { user, donate ->
+            user.stat.breakBedEffects.contains(donate)
+        } }
     ),
     FIVE(
         "§bЛутбокс",
@@ -47,5 +52,12 @@ enum class WeekRewards(val title: String, val icon: ItemStack, val give: (User) 
             me.func.box.donate.Lootbox.open(it)
             it.giveMoney(5000)
         }
-    )
+    ),;
+
+    companion object {
+        fun withDuplicate(user: User, reward: Int, donate: Donate, contains: (User, Donate) -> Boolean) {
+            if (contains(user, donate)) user.giveMoney(reward)
+            else donate.give(user)
+        }
+    }
 }

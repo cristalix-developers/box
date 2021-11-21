@@ -12,6 +12,7 @@ import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.donate.DonateViewer
 import me.func.box.donate.Lootbox
 import me.func.box.reward.DailyRewardManager
+import net.minecraft.server.v1_12_R1.SoundEffects.id
 import org.bukkit.*
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -64,8 +65,8 @@ class App : JavaPlugin() {
         val info = IRealmService.get().currentRealmInfo
         info.status = RealmStatus.WAITING_FOR_PLAYERS
         info.maxPlayers = 1200
-        info.readableName = "Бедроковая коробка Лобби"
-        info.groupName = "Бедроковая коробка Лобби"
+        info.readableName = "Бедроковая коробка"
+        info.groupName = "Бедроковая коробка"
         info.isLobbyServer = true
         info.servicedServers = arrayOf("BOX4", "BOX8", "BOX5", "BOXE", "BOXS", "BOXN")
 
@@ -187,11 +188,25 @@ class App : JavaPlugin() {
 
         B.regCommand({ player, strings ->
             if (player.isOp) {
-                app.getUser(Bukkit.getPlayer(strings[0]))!!.stat.money = strings[1].toInt()
+                app.getUser(Bukkit.getPlayer(strings[0])).stat.money = strings[1].toInt()
                 "Деньги выданы"
             } else
                 null
         }, "money")
+        B.regCommand({ player, strings ->
+            if (player.isOp) {
+                app.getUser(Bukkit.getPlayer(strings[0])).stat.wins = strings[1].toInt()
+                "Победы изменены"
+            } else
+                null
+        }, "wins")
+        B.regCommand({ player, strings ->
+            if (player.isOp) {
+                app.getUser(Bukkit.getPlayer(strings[0])).stat.kills = strings[1].toInt()
+                "Убийства изменены"
+            } else
+                null
+        }, "kills")
     }
 
     private fun createTop(location: Location, string: String, title: String, key: String, function: (Stat) -> String) {

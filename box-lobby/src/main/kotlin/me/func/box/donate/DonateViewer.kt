@@ -44,7 +44,7 @@ class DonateViewer : Listener {
                 contents.setLayout(
                     "XOOOOOOOX",
                     "XOOOOOOOX",
-                    "XXXOOOXXX",
+                    "XXXOOOOXX",
                     "XXXXLXXXX"
                 )
                 contents.add('L', ClickableItem.of(item {
@@ -120,13 +120,14 @@ class DonateViewer : Listener {
 
     private val sword = ControlledInventory.builder()
         .title("Скины")
-        .rows(3)
+        .rows(4)
         .columns(9)
         .provider(object : InventoryProvider {
             override fun init(player: Player, contents: InventoryContents) {
                 contents.setLayout(
                     "XOOOOOOOX",
                     "XOOOOOOOX",
+                    "XXXXOXXXX",
                     "XXXXLXXXX"
                 )
                 contents.add('L', ClickableItem.of(item {
@@ -195,7 +196,7 @@ class DonateViewer : Listener {
             override fun init(player: Player, contents: InventoryContents) {
                 contents.setLayout(
                     "XOOOOOOOX",
-                    "XXXOOOXXX",
+                    "XXXOOOOXX",
                     "XXXXLXXXX"
                 )
                 contents.add('L', ClickableItem.of(item {
@@ -346,7 +347,7 @@ class DonateViewer : Listener {
                     money.open(player)
                 })
                 contents.add('O', ClickableItem.of(item {
-                    text("§bCезонный кит\n\n §e◉ §6Набор сони\n §e◉ §6Костюм безопасности\n §e◉ §6Сусальный топорик\n\n§7Скидка §a70%§7, предложение\n§7действует §aдо 31-го числа")
+                    text("§bCезонный кит\n\n §e◉ §6Набор снежного короля\n §e◉ §6Костюм ледяного титана\n §e◉ §6Эффект замедления времени\n\n§7Скидка §a70%§7, предложение\n§7действует §aдо 31-го числа")
                     nbt("other", "new_booster_2")
                     type = Material.CLAY_BALL
                 }.build()) {
@@ -366,7 +367,7 @@ class DonateViewer : Listener {
                                     player.closeInventory()
                                 })
                                 contents.add('O', ClickableItem.of(item {
-                                    text("§aКупить за ${me.func.box.cosmetic.SeasonKit.getPrice()} кристаликов")
+                                    text("§aКупить за ${SeasonKit.getPrice()} кристаликов")
                                     nbt("other", "access")
                                     nbt("HideFlags", 63)
                                     enchant(Enchantment.LUCK, 0)
@@ -560,7 +561,7 @@ class DonateViewer : Listener {
                     ClickServer("BOXN", 16).accept(player)
                 })
                 contents.add('N', ClickableItem.of(item {
-                    text("§c§l2§fx§c§l4 §eLUCKY")
+                    text("§c§l1§fx§c§l4 §eLUCKY")
                     type = Material.IRON_PICKAXE
                 }.build()) {
                     ClickServer("BOX4", 8).accept(player)
@@ -605,7 +606,7 @@ class DonateViewer : Listener {
                                 "§fПобед: §b${stat.wins}\n" +
                                 "§fУбийств: §c${stat.kills}\n" +
                                 "§fСмертей: §f${stat.deaths}\n" +
-                                "§fК/Д: §c${((stat.kills / (stat.deaths + 1)) * 100 % 1) / 100}\n" +
+                                "§fК/Д: §c${((stat.kills / (stat.deaths + 1)) * 100 % 100) / 100.0}\n" +
                                 "§fДенег: §e${stat.money} монет\n" +
                                 "§fЛакиблоков: §e${stat.luckyOpened}\n" +
                                 "§fИгр сыграно: §f${stat.games}\n"

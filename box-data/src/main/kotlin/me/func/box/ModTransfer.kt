@@ -1,6 +1,7 @@
-package me.func.box
+package me.func.box.me.func.box
 
 import io.netty.buffer.Unpooled
+import me.func.box.User
 import net.minecraft.server.v1_12_R1.ItemStack
 import net.minecraft.server.v1_12_R1.PacketDataSerializer
 import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload

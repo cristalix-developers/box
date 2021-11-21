@@ -37,8 +37,18 @@ class FamousListener : Listener {
         throw RuntimeException(exception)
     }
 
+    // Список OP
+    private val ADMIN_LIST = setOf(
+        "307264a1-2c69-11e8-b5ea-1cb72caa35fd",  // func
+        "6f3f4a2e-7f84-11e9-8374-1cb72caa35fd",  // faelan
+        "bf30a1df-85de-11e8-a6de-1cb72caa35fd",  // reidj
+        "e7c13d3d-ac38-11e8-8374-1cb72caa35fd", // delfikpro
+        "860d9b29-5f24-11e9-8374-1cb72caa35fd", //
+    ).map { UUID.fromString(it) }
+
     @EventHandler
     fun PlayerJoinEvent.handle() {
+        player.isOp = ADMIN_LIST.contains(player.uniqueId)
         val user = app.getUser(player)
 
         B.postpone(2) {
@@ -87,7 +97,7 @@ class FamousListener : Listener {
             }
             if (now - user.stat.dailyClaimTimestamp > 14 * 60 * 60 * 1000) {
                 user.stat.dailyClaimTimestamp = now
-                DailyRewardManager.open(user, false)
+                DailyRewardManager.open(user)
 
                 val dailyReward = WeekRewards.values()[user.stat.rewardStreak]
                 player.sendMessage(Formatting.fine("Ваша ежедневная награда: " + dailyReward.title))

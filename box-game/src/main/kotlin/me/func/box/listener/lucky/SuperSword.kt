@@ -66,9 +66,9 @@ enum class SuperSword(private val item: ItemStack, val onDamage: (attacker: User
         }.build(),
         { _, victim ->
             {
-                val underBlock = victim.player!!.location.clone().subtract(0.0, 1.0, 0.0).block
+                val underBlock = victim.player!!.location.block.getRelative(org.bukkit.block.BlockFace.DOWN)
                 if (underBlock.type == org.bukkit.Material.STONE)
-                    underBlock.type = org.bukkit.Material.AIR
+                    underBlock.setTypeAndDataFast(0, 0)
             }
         }),
     ;

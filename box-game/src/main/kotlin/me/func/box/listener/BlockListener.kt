@@ -5,6 +5,7 @@ import me.func.box.User
 import me.func.box.app
 import me.func.box.data.Status
 import me.func.box.map.LuckyGet
+import me.func.box.mod.ModHelper
 import net.minecraft.server.v1_12_R1.ItemStack
 import net.minecraft.server.v1_12_R1.NBTCompressedStreamTools
 import net.minecraft.server.v1_12_R1.NBTTagCompound
@@ -54,6 +55,7 @@ class BlockListener : Listener {
         if (block.type == Material.GOLD_BLOCK) {
             block.type = Material.AIR
             user.giveMoney(100)
+            ModHelper.glow(user, 255, 131, 237)
             cancel = true
             return
         } else if (block.type == Material.BED_BLOCK) {
@@ -75,6 +77,7 @@ class BlockListener : Listener {
                         }
                     }
 
+                    ModHelper.glow(user, 42, 189, 102)
                     B.bc(Formatting.fine(player.name + " сломал кровать команды " + it.color.chatColor + it.color.teamName))
                     it.players.forEach { uid ->
                         Bukkit.getPlayer(uid)?.playSound(player.location, "entity.enderdragon.ambient", 1f, 1f)
@@ -88,10 +91,12 @@ class BlockListener : Listener {
             if (bed.isNotEmpty()) {
                 if (block.drops.isNotEmpty())
                     player.inventory.addItem(block.drops.first())
-                app.getUser(bed[0])!!.bed = null
+                val victim = app.getUser(bed[0])!!
+                victim.bed = null
                 cancel = false
                 dropItems = false
                 block.drops.clear()
+                ModHelper.glow(victim, 255, 0, 0)
                 player.sendMessage(Formatting.fine("Вы сломали кровать!"))
                 bed[0].sendMessage(Formatting.error("Ваша кровать сломана!"))
             }
@@ -169,6 +174,7 @@ class BlockListener : Listener {
             val user = app.getUser(player)!!
             if (user.bed != null)
                 return
+            ModHelper.glow(user, 42, 189, 102)
             player.sendMessage(Formatting.fine("Вы установили личную кровать!"))
             user.bed = blockPlaced.location
         }
@@ -182,7 +188,8 @@ class BlockListener : Listener {
                         it.type == Material.BED_BLOCK ||
                         it.type == Material.GOLD_BLOCK ||
                         it.type == Material.CHEST ||
-                        it.type == Material.WORKBENCH
+                        it.type == Material.WORKBENCH ||
+                        it.hasMetadata("lucky")
             }
             if (entity.hasMetadata("shooter")) {
                 val shooter = Bukkit.getPlayer(UUID.fromString(entity.getMetadata("shooter")[0].asString()))
@@ -230,6 +237,7 @@ class BlockListener : Listener {
         if (app.isLuckyGame && beforeType == Material.STONE) {
             if (clone.block.hasMetadata("lucky")) {
                 LuckyGet.removeBlock(clone, UUID.fromString(clone.block.getMetadata("lucky")[0].asString()), user)
+                ModHelper.glow(user, 255, 131, 237)
             }
             BlockFace.values().forEach {
                 val nextBlock = clone.block.getRelative(it)
@@ -249,6 +257,7 @@ class BlockListener : Listener {
         stand.helmet = luckBlock
         stand.isInvulnerable = true
         stand.setGravity(false)
+        stand.isMarker = true
         stand.isVisible = false
         stand.setMetadata("lucky", FixedMetadataValue(app, true))
 
