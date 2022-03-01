@@ -229,10 +229,8 @@ class BlockListener : Listener {
         val type = clone.block.type
         if (type == Material.BEDROCK || type == Material.WOOD || type == Material.BED_BLOCK || type == Material.GOLD_BLOCK || type == Material.WORKBENCH)
             return
-        if (type == Material.EMERALD_ORE) {
-            val exp = clone.world.spawnEntity(clone, EntityType.EXPERIENCE_ORB) as ExperienceOrb
-            exp.experience = 5
-        }
+        if (type == Material.EMERALD_ORE)
+            player.giveExp(5)
         clone.block.drops.forEach { player.inventory.addItem(it) }
         val beforeType = clone.block.type
         clone.block.type = Material.AIR
