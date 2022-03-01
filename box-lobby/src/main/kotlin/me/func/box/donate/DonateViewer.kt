@@ -643,13 +643,7 @@ class DonateViewer : Listener {
 
     private val serversItem = item {
         type = Material.COMPASS
-        text("§bВыбор игры")
-    }.build()
-
-    private val randomItem = item {
-        type = Material.DIAMOND_SWORD
-        nbt("weapons_other", 41)
-        text("§eСлучайная игра")
+        text("§bБыстрая игра")
     }.build()
 
     private val paperItem = item {
@@ -660,21 +654,15 @@ class DonateViewer : Listener {
     @EventHandler
     fun PlayerJoinEvent.handle() {
         player.inventory.setItem(0, serversItem)
-        player.inventory.setItem(1, randomItem)
         player.inventory.setItem(4, menuItem)
         player.inventory.setItem(8, paperItem)
     }
 
     @EventHandler
     fun PlayerInteractEvent.handle() {
-        if (player.itemInHand.getType() == Material.COMPASS)
-            servers.open(player)
-        if (player.itemInHand.getType() == Material.DIAMOND_SWORD) {
-            val realm = ListUtils.random(ServerType.values())
-            player.sendMessage(Formatting.fine("Случайный сервер - " + realm.title))
-            player.sendMessage(Formatting.fine("Ожидайте 3 секунды..."))
-            player.sendTitle("§eПриятной игры", "§lУДАЧИ!")
-            B.postpone(60) { ClickServer(realm.name, realm.slot).accept(player) }
+        if (player.itemInHand.getType() == Material.COMPASS) {
+            val realm = ServerType.BOXS
+            ClickServer(realm.name, realm.slot).accept(player)
         }
         if (player.itemInHand.getType() == Material.EMERALD)
             menu.open(player)

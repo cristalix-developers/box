@@ -11,16 +11,18 @@ import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.donate.DonateViewer
 import me.func.box.donate.Lootbox
-import me.func.box.reward.DailyRewardManager
-import net.minecraft.server.v1_12_R1.SoundEffects.id
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.Particle
+import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.boards.bukkitapi.Boards
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.account.IAccountService
-import ru.cristalix.core.inventory.*
+import ru.cristalix.core.inventory.IInventoryService
+import ru.cristalix.core.inventory.InventoryService
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.party.IPartyService
 import ru.cristalix.core.party.PartyService
@@ -44,7 +46,7 @@ class App : JavaPlugin() {
     private lateinit var kensuke: Kensuke
     lateinit var spawn: Location
     lateinit var userManager: UserManager<User>
-
+    lateinit var online: Map<ServerType, ArmorStand>
     override fun onEnable() {
         B.plugin = this
         app = this
@@ -68,7 +70,7 @@ class App : JavaPlugin() {
         info.readableName = "Бедроковая коробка"
         info.groupName = "Бедроковая коробка"
         info.isLobbyServer = true
-        info.servicedServers = arrayOf("BOX4", "BOX8", "BOX5", "BOXE", "BOXS", "BOXN")
+        info.servicedServers = arrayOf("BOX4", "BOX8", "BOX5", "BOXE", "BOXS")
 
         // Регистрация сервисов
         val core = CoreApi.get()
@@ -88,6 +90,34 @@ class App : JavaPlugin() {
         createTop(Location(worldMeta.world, -266.5, 115.6, 28.0, -90f, 0f), "Побед", "Топ побед", "wins") {
             "" + it.wins
         }
+
+        online = ServerType.values().map { server ->
+            Npcs.spawn(
+                Npc.builder()
+                    .location(server.origin)
+                    .name(server.title)
+                    .behaviour(NpcBehaviour.STARE_AT_PLAYER)
+                    .skinUrl("https://webdata.c7x.dev/textures/skin/${server.skin}")
+                    .skinDigest(server.skin)
+                    .type(EntityType.PLAYER)
+                    .onClick { player ->
+                        val navigator = ClickServer(server.name, server.slot)
+                        navigator.accept(player)
+                    }.build()
+            )
+            val stand = worldMeta.world.spawnEntity(
+                server.origin.clone().add(0.0, 2.3, 0.0),
+                EntityType.ARMOR_STAND
+            ) as ArmorStand
+
+            stand.isMarker = true
+            stand.isVisible = false
+            stand.setGravity(false)
+            stand.isCustomNameVisible = true
+
+            server to stand
+        }.toMap()
+
 
         val location = Location(worldMeta.world, -258.0, 116.0, 28.5)
         val chest = Location(worldMeta.world, -249.5, 111.5, 26.6)
@@ -117,72 +147,26 @@ class App : JavaPlugin() {
             )
         }, 1, 1)
 
+        Bukkit.getScheduler().runTaskTimer(this, {
+            online.forEach { (type, stand) ->
+                stand.customName = "§b${IRealmService.get().getOnlineOnRealms(type.name)} игроков в игре"
+            }
+        }, 5, 10)
+
         Npcs.init(this)
-        Npcs.spawn(
-            Npc.builder()
-                .location(Location(worldMeta.world, -262.0, 112.0, 36.0, -152f, 0f))
-                .name(ServerType.BOX8.title)
-                .behaviour(NpcBehaviour.STARE_AT_PLAYER)
-                .skinUrl("https://webdata.c7x.dev/textures/skin/30719b68-2c69-11e8-b5ea-1cb72caa35fd")
-                .skinDigest("307264a1-2c6911e8b5ea1cb72caa35fd")
-                .type(EntityType.PLAYER)
-                .onClick { player ->
-                    val navigator = ClickServer("BOX8", 16)
-                    navigator.accept(player)
-                }.build()
-        )
-        Npcs.spawn(
-            Npc.builder()
-                .location(Location(worldMeta.world, -255.0, 112.0, 36.0, 162f, 0f))
-                .name(ServerType.BOX4.title)
-                .behaviour(NpcBehaviour.STARE_AT_PLAYER)
-                .skinUrl("https://webdata.c7x.dev/textures/skin/6f3f4a2e-7f84-11e9-8374-1cb72caa35fd")
-                .skinDigest("6f3f4a2e-7f8411e983741cb72caa35fd")
-                .type(EntityType.PLAYER)
-                .onClick { player ->
-                    val navigator = ClickServer("BOX4", 8)
-                    navigator.accept(player)
-                }.build()
-        )
-        Npcs.spawn(
-            Npc.builder()
-                .location(Location(worldMeta.world, -265.0, 112.0, 34.0, -125f, 0f))
-                .name(ServerType.BOX5.title)
-                .behaviour(NpcBehaviour.STARE_AT_PLAYER)
-                .skinUrl("https://webdata.c7x.dev/textures/skin/30392bb3-2c69-11e8-b5ea-1cb72caa35fd")
-                .skinDigest("30392bb3-2c6911e8b5ea1cb72caa35fd")
-                .type(EntityType.PLAYER)
-                .onClick { player ->
-                    val navigator = ClickServer("BOX5", 100)
-                    navigator.accept(player)
-                }.build()
-        )
-        Npcs.spawn(
-            Npc.builder()
-                .location(Location(worldMeta.world, -258.5, 112.0, 36.0, -174f, 0f))
-                .name(ServerType.BOXS.title)
-                .behaviour(NpcBehaviour.STARE_AT_PLAYER)
-                .skinUrl("https://webdata.c7x.dev/textures/skin/7f3fea26-be9f-11e9-80c4-1cb72caa35fd")
-                .skinDigest("7f3fea26-be9f11e980c41cb72caa35fd")
-                .type(EntityType.PLAYER)
-                .onClick { player ->
-                    val navigator = ClickServer("BOXS", 16)
-                    navigator.accept(player)
-                }.build()
-        )
-        Npcs.spawn(
-            Npc.builder()
-                .location(Location(worldMeta.world, -252.0, 112.0, 34.0, 137f, 0f))
-                .name(ServerType.BOXN.title)
-                .behaviour(NpcBehaviour.STARE_AT_PLAYER)
-                .skinUrl("https://webdata.c7x.dev/textures/skin/e7c13d3d-ac38-11e8-8374-1cb72caa35fd")
-                .skinDigest("e7c13d3d-ac3811e883741cb72caa35fd")
-                .type(EntityType.PLAYER)
-                .onClick { player ->
-                    val navigator = ClickServer("BOXN", 16)
-                    navigator.accept(player)
-                }.build()
-        )
+        //Npcs.spawn(
+        //    Npc.builder()
+        //        .location(Location(worldMeta.world, -252.0, 112.0, 34.0, 137f, 0f))
+        //        .name(ServerType.BOXN.title)
+        //        .behaviour(NpcBehaviour.STARE_AT_PLAYER)
+        //        .skinUrl("https://webdata.c7x.dev/textures/skin/e7c13d3d-ac38-11e8-8374-1cb72caa35fd")
+        //        .skinDigest("e7c13d3d-ac3811e883741cb72caa35fd")
+        //        .type(EntityType.PLAYER)
+        //        .onClick { player ->
+        //            val navigator = ClickServer("BOXN", 16)
+        //            navigator.accept(player)
+        //        }.build()
+        //)
 
         B.events(FamousListener(), GlobalListener(), Lootbox, DonateViewer())
 

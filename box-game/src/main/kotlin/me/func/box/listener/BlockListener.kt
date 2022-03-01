@@ -85,20 +85,22 @@ class BlockListener : Listener {
                     }
                     return
                 }
-            val bed = Bukkit.getOnlinePlayers().filter {
-                app.getUser(it)!!.bed != null && app.getUser(it)!!.bed!!.distanceSquared(it.location) < 4
+            val bed = Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }.filter {
+                it.bed != null && it.bed!!.distanceSquared(it.player?.location) < 5
             }
             if (bed.isNotEmpty()) {
                 if (block.drops.isNotEmpty())
                     player.inventory.addItem(block.drops.first())
-                val victim = app.getUser(bed[0])!!
-                victim.bed = null
+                bed.forEach {
+                    it.bed = null
+                    ModHelper.glow(it, 255, 0, 0)
+                    it.player?.sendMessage(Formatting.error("${player.displayName} сломал вашу кровать!"))
+                    it.player?.sendTitle("§cКровать уничтожена!", "§eВы больше не оживете")
+                }
                 cancel = false
                 dropItems = false
                 block.drops.clear()
-                ModHelper.glow(victim, 255, 0, 0)
                 player.sendMessage(Formatting.fine("Вы сломали кровать!"))
-                bed[0].sendMessage(Formatting.error("Ваша кровать сломана!"))
             }
             return
         }
