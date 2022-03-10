@@ -206,7 +206,7 @@ class App : JavaPlugin() {
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(
             this, {
-                kensuke.getLeaderboard(userManager, oldStatScope, key, 10).thenAccept {
+                kensuke.getLeaderboard(userManager, statScope, key, 10).thenAccept {
                     blocks.clearContent()
 
                     for (entry in it) {
