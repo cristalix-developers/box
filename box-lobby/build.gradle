@@ -1,36 +1,8 @@
-buildscript {
-  repositories {
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
-  }
-  dependencies {
-    classpath "org.hidetake:gradle-ssh-plugin:2.10.1"
-  }
-}
-
-plugins {
-    id 'dev.implario.mcgradle' version '1.0.4'
-}
-
-apply plugin: 'org.hidetake.ssh'
 apply plugin: 'org.jetbrains.kotlin.jvm'
-
-bukkitPlugin {
-    main = 'me.func.box.App'
-    depend << 'CoreAPI'
-}
 
 group = 'me.func'
 version = '1.0-SNAPSHOT'
 
-afterEvaluate {
-    jar {
-        archiveBaseName.set 'box-lobby'
-        from configurations.runtimeClasspath.collect { it.directory ? it : zipTree(it) }
-        duplicatesStrategy DuplicatesStrategy.EXCLUDE
-    }
-}
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -46,41 +18,31 @@ compileKotlin {
 }
 
 dependencies {
-    compileOnly group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.7'
-
     compileOnly 'cristalix:bukkit-core:21.01.30'
     compileOnly 'cristalix:dark-paper:21.02.03'
-
     compileOnly 'dev.xdark:feder:1.0-SNAPSHOT'
+
+    api 'me.func.animation-api:animation-api:live-SNAPSHOT'
 
     implementation 'clepto:clepto-bukkit:3.4.2'
     implementation 'clepto:clepto-cristalix:3.0.2'
     implementation 'dev.implario:kensuke-client-bukkit:2.1.10'
 
-    implementation 'dev.implario.bukkit:bukkit-tools:4.0.0'
     implementation 'dev.implario.bukkit:kotlin-api:1.0.0'
     implementation 'dev.implario.bukkit:dark-paper:1.0.0'
 
+    implementation 'dev.implario.bukkit:bukkit-tools:4.4.12'
     implementation 'ru.cristalix:boards-bukkit-api:3.0.0'
     implementation 'ru.cristalix:npcs-bukkit-api:3.0.5'
+
+
     implementation project(':box-data')
 }
 
-ssh.settings {
-     knownHosts = allowAnyHosts
-}
-
-task upload() {
-    doLast {
-        ssh.run {
-            session(remotes.webServer) {
-                put from: jar.getArchiveFile().get().getAsFile(), into: "/home/func/forest/resources-bin/prod"
-                execute 'netstat -tulpn | grep :10116 | grep --perl-regexp -o \"\\d+(?=/java)\" | xargs kill -TERM'
-            }
-        }
-    }
-}
-
 afterEvaluate {
-    tasks.upload.dependsOn(tasks.jar)
+    jar {
+        archiveBaseName.set 'box-lobby'
+        from configurations.runtimeClasspath.collect { it.directory ? it : zipTree(it) }
+        duplicatesStrategy DuplicatesStrategy.EXCLUDE
+    }
 }

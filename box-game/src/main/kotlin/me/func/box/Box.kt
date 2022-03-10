@@ -5,7 +5,10 @@ import clepto.cristalix.Cristalix
 import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.item.item
 import dev.implario.bukkit.platform.Platforms
-import dev.implario.kensuke.*
+import dev.implario.kensuke.Kensuke
+import dev.implario.kensuke.KensukeSession
+import dev.implario.kensuke.Scope
+import dev.implario.kensuke.UserManager
 import dev.implario.kensuke.impl.bukkit.BukkitKensuke
 import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
@@ -17,7 +20,7 @@ import me.func.box.listener.*
 import me.func.box.map.Generator
 import me.func.box.map.MapLoader
 import me.func.box.map.TradeMenu
-import me.func.box.me.func.box.ModTransfer
+import me.func.box.mod.ModTransfer
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.minecraft.server.v1_12_R1.EnumItemSlot
 import org.bukkit.*
@@ -59,7 +62,8 @@ var sessionDurability = System.getProperty("TIME", "4000").toInt()
 
 class Box : JavaPlugin() {
 
-    private val statScope = Scope("boxll", Stat::class.java)
+    private val oldStatScope = Scope("boxll", Stat::class.java)
+    private val statScope = Scope("box-new", Stat::class.java)
 
     private lateinit var worldMeta: WorldMeta
     lateinit var spawn: Location
@@ -97,8 +101,14 @@ class Box : JavaPlugin() {
         }.build()
 
         userManager = BukkitUserManager(
-            listOf(statScope),
-            { session: KensukeSession, context -> User(session, context.getData(statScope)) },
+            listOf(statScope, oldStatScope),
+            { session: KensukeSession, context ->
+                User(
+                    session,
+                    context.getData(statScope),
+                    context.getData(oldStatScope)
+                )
+            },
             { user, context -> context.store(statScope, user.stat) }
         )
 
@@ -200,7 +210,7 @@ class Box : JavaPlugin() {
                             val user = app.getUser(player)!!
                             val starter = user.stat.currentStarter
                             if (starter != null && starter != Starter.NONE) {
-                                if (starter  == Starter.FUSE && slots > 20) player.sendMessage(Formatting.error("Данный стартовый набор недоступен в выбранном типе игры."))
+                                if (starter == Starter.FUSE && slots > 20) player.sendMessage(Formatting.error("Данный стартовый набор недоступен в выбранном типе игры."))
                                 else B.postpone(5 * 20) { starter.consumer(user.player!!) }
                             }
                             ModTransfer().integer(0).send("box:start", user)
@@ -337,17 +347,17 @@ class Box : JavaPlugin() {
                             } else {
                                 val teams = teams.filter { !it.players.contains(player.uniqueId) }
                                 val tempBeds = teams.map {
-                                        it.players.minByOrNull { current ->
-                                            val enemyBed =
-                                                app.getUser(current)?.bed ?: return@minByOrNull 999999.0
-                                            enemyBed.distanceSquared(player.location)
-                                        }
-                                    }.minByOrNull { current ->
-                                        if (current == null)
-                                            return@minByOrNull 99999.0
-                                        val enemyBed = app.getUser(current)?.bed ?: return@minByOrNull 999999.0
+                                    it.players.minByOrNull { current ->
+                                        val enemyBed =
+                                            app.getUser(current)?.bed ?: return@minByOrNull 999999.0
                                         enemyBed.distanceSquared(player.location)
                                     }
+                                }.minByOrNull { current ->
+                                    if (current == null)
+                                        return@minByOrNull 99999.0
+                                    val enemyBed = app.getUser(current)?.bed ?: return@minByOrNull 999999.0
+                                    enemyBed.distanceSquared(player.location)
+                                }
                                 val permanentBed = teams.firstOrNull { it.bed }
                                 if (tempBeds != null)
                                     Bukkit.getPlayer(tempBeds).location
@@ -385,17 +395,18 @@ class Box : JavaPlugin() {
                             it.bed = true
                         }
                         getWorld().livingEntities.filter { it.hasMetadata("lucky") }.forEach { it.remove() }
-                        loadMap()
+                        Bukkit.unloadWorld(worldMeta.world, false)
                         time = 0
                         status = Status.STARTING
                         B.postpone(20) {
-                            val realm = IRealmService.get().currentRealmInfo
-                            realm.status = RealmStatus.WAITING_FOR_PLAYERS
-                            ISocketClient.get().write(RealmUpdatePackage(RealmUpdatePackage.UpdateType.UPDATE, realm))
                             Cristalix.transfer(Bukkit.getOnlinePlayers().map { it.uniqueId }, RealmId.of(hub))
 
-                            if (gameCounter == MAX_GAME_STREAK_COUNT)
+                            if (gameCounter == MAX_GAME_STREAK_COUNT) {
                                 Bukkit.shutdown()
+                            } else {
+                                loadMap()
+                                IRealmService.get().currentRealmInfo.status = RealmStatus.WAITING_FOR_PLAYERS
+                            }
                         }
                     }
                 }

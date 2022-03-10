@@ -1,32 +1,7 @@
-buildscript {
-  repositories {
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
-  }
-}
-
-plugins {
-    id 'dev.implario.mcgradle' version '1.0.4'
-}
-
 apply plugin: 'org.jetbrains.kotlin.jvm'
-
-bukkitPlugin {
-    main = 'me.func.box.Box'
-    depend << 'CoreAPI'
-}
 
 group = 'me.func'
 version = '1.0-SNAPSHOT'
-
-afterEvaluate {
-    jar {
-        archiveBaseName.set 'box'
-        from configurations.runtimeClasspath.collect { it.directory ? it : zipTree(it) }
-        duplicatesStrategy DuplicatesStrategy.EXCLUDE
-    }
-}
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -42,19 +17,27 @@ compileKotlin {
 }
 
 dependencies {
-    compileOnly group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.7'
-
     compileOnly 'cristalix:bukkit-core:21.01.30'
     compileOnly 'cristalix:dark-paper:21.02.03'
-
     compileOnly 'dev.xdark:feder:1.0-SNAPSHOT'
+
+    api 'me.func.animation-api:animation-api:live-SNAPSHOT'
 
     implementation 'clepto:clepto-bukkit:3.4.2'
     implementation 'clepto:clepto-cristalix:3.0.2'
-    implementation 'dev.implario:kensuke-client-bukkit:2.1.10'
 
-    implementation 'dev.implario.bukkit:bukkit-tools:4.0.0'
+    implementation 'dev.implario:kensuke-client-bukkit:2.1.10'
+    implementation 'dev.implario.bukkit:bukkit-tools:4.4.12'
     implementation 'dev.implario.bukkit:kotlin-api:1.0.0'
     implementation 'dev.implario.bukkit:dark-paper:1.0.0'
+
     implementation project(':box-data')
+}
+
+afterEvaluate {
+    jar {
+        archiveBaseName.set 'box'
+        from configurations.runtimeClasspath.collect { it.directory ? it : zipTree(it) }
+        duplicatesStrategy DuplicatesStrategy.EXCLUDE
+    }
 }

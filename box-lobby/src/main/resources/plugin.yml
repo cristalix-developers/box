@@ -1,0 +1,5 @@
+main: me.func.box.App
+name: BoxLobby
+version: 1.0.0
+depend:
+  - CoreAPI

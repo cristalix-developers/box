@@ -3,13 +3,13 @@ package me.func.box.donate
 import clepto.bukkit.B
 import dev.implario.bukkit.item.item
 import implario.ListUtils
-import me.func.box.me.func.box.ModTransfer
 import me.func.box.User
 import me.func.box.app
 import me.func.box.cosmetic.Armor
 import me.func.box.cosmetic.Donate
 import me.func.box.cosmetic.Rare
 import me.func.box.cosmetic.Sword
+import me.func.mod.conversation.ModTransfer
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
@@ -125,7 +125,7 @@ object Lootbox : Listener {
             .item(coin)
             .string("§e$moneyDrop монет")
             .string("")
-            .send("lootbox", user)
+            .send("lootbox", user.player)
     }
 
     @EventHandler

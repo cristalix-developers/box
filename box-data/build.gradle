@@ -4,19 +4,30 @@ compileKotlin {
     kotlinOptions.jvmTarget = '1.8'
 }
 
+repositories {
+    maven {
+        url 'https://repo.implario.dev/public/'
+    }
+    maven {
+        url 'https://repo.implario.dev/cristalix/'
+        credentials {
+            username = System.getenv("IMPLARIO_REPO_USER")
+            password = System.getenv("IMPLARIO_REPO_PASSWORD")
+        }
+    }
+    mavenCentral()
+    mavenLocal()
+}
+
 dependencies {
-    compileOnly group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.7'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.5.0'
 
     compileOnly 'cristalix:bukkit-core:21.01.30'
     compileOnly 'cristalix:dark-paper:21.02.03'
-
     compileOnly 'dev.xdark:feder:1.0-SNAPSHOT'
 
-    implementation 'clepto:clepto-bukkit:3.4.2'
-    implementation 'clepto:clepto-cristalix:3.0.2'
-    implementation 'dev.implario:kensuke-client-bukkit:2.1.10'
-
-    implementation 'dev.implario.bukkit:bukkit-tools:4.0.0'
     implementation 'dev.implario.bukkit:kotlin-api:1.0.0'
     implementation 'dev.implario.bukkit:dark-paper:1.0.0'
+    implementation 'dev.implario:kensuke-client-bukkit:2.1.10'
+    implementation 'dev.implario.bukkit:bukkit-tools:4.4.12'
 }

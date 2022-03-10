@@ -1,0 +1,5 @@
+main: me.func.box.Box
+name: BoxGame
+version: 1.0.0
+depend:
+  - CoreAPI

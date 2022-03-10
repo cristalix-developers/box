@@ -41,12 +41,15 @@ lateinit var app: App
 
 class App : JavaPlugin() {
 
-    private lateinit var statScope: Scope<Stat>
     lateinit var worldMeta: WorldMeta
     private lateinit var kensuke: Kensuke
     lateinit var spawn: Location
     lateinit var userManager: UserManager<User>
     lateinit var online: Map<ServerType, ArmorStand>
+
+    private var oldStatScope = Scope("boxll", Stat::class.java)
+    private val statScope = Scope("box-new", Stat::class.java)
+
     override fun onEnable() {
         B.plugin = this
         app = this
@@ -56,10 +59,9 @@ class App : JavaPlugin() {
         worldMeta = MapLoader().load("Event")!!
         spawn = worldMeta.getLabel("spawn").add(0.0, 3.0, 0.0).toCenterLocation()
 
-        statScope = Scope("boxll", Stat::class.java)
         userManager = BukkitUserManager(
-            listOf(statScope),
-            { session, context -> User(session, context.getData(statScope)) },
+            listOf(oldStatScope, statScope),
+            { session, context -> User(session, context.getData(statScope), context.getData(oldStatScope)) },
             { user, context -> context.store(statScope, user.stat) }
         )
 
@@ -204,7 +206,7 @@ class App : JavaPlugin() {
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(
             this, {
-                kensuke.getLeaderboard(userManager, statScope, key, 10).thenAccept {
+                kensuke.getLeaderboard(userManager, oldStatScope, key, 10).thenAccept {
                     blocks.clearContent()
 
                     for (entry in it) {

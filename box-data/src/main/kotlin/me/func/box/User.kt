@@ -1,6 +1,5 @@
 package me.func.box
 
-import clepto.bukkit.B
 import dev.implario.kensuke.KensukeSession
 import dev.implario.kensuke.impl.bukkit.IBukkitKensukeUser
 import me.func.box.cosmetic.BreakBedEffect
@@ -9,6 +8,7 @@ import me.func.box.cosmetic.Starter
 import me.func.box.cosmetic.Sword
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
+import net.minecraft.server.v1_12_R1.MinecraftServer
 import net.minecraft.server.v1_12_R1.Packet
 import net.minecraft.server.v1_12_R1.PlayerConnection
 import org.bukkit.Location
@@ -16,7 +16,7 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.entity.Player
 import java.util.*
 
-class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
+class User(session: KensukeSession, stat: Stat?, oldStat: Stat?) : IBukkitKensukeUser {
 
     var bed: Location? = null
     var tempKills = 0
@@ -32,15 +32,9 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
         }
     }
 
-    override fun getPlayer(): Player? {
-        return player
-    }
-
+    override fun getPlayer() = player
     private var session: KensukeSession
-    override fun getSession(): KensukeSession {
-        return session
-    }
-
+    override fun getSession() = session
     private var connection: PlayerConnection? = null
 
     fun sendPacket(packet: Packet<*>) {
@@ -53,7 +47,7 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
 
     fun giveMoney(toGive: Int) {
         player!!.sendMessage("§eПолучено $toGive монет.")
-        B.postpone(1) {
+        MinecraftServer.SERVER.postToNextTick {
             player!!.spigot().sendMessage(
                 ChatMessageType.ACTION_BAR,
                 TextComponent("§e§l+$toGive монет")
@@ -64,7 +58,12 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
 
     init {
         if (stat == null) {
-            this.stat = Stat(
+            this.stat = oldStat?.apply {
+                kills = 0
+                deaths = 0
+                wins = 0
+                games = 0
+            } ?: Stat(
                 UUID.fromString(session.userId), arrayListOf("hi"), "", 0, 0, 0, 0, 0, 0, 0, null, 500, mutableListOf(
                     Starter.NONE
                 ), Starter.NONE, mutableListOf(
