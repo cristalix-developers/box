@@ -8,7 +8,7 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
     GOLDEN_APPLE({
         it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
             type = Material.GOLDEN_APPLE
-        }.build())
+        })
     }),
     TNT_PRIMED({
         val tnt = it.player!!.world.spawn(it.player!!.location, org.bukkit.entity.TNTPrimed::class.java)
@@ -19,7 +19,7 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
         it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
             type = Material.TNT
             amount(2)
-        }.build())
+        })
     }),
     GIVE_EMERALD({
         val drop = listOf(
@@ -80,17 +80,17 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
         it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
             type = Material.ARROW
             amount(8)
-        }.build())
+        })
     }),
     THREADS_STICKS({
         it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
             type = Material.STICK
             amount(6)
-        }.build())
+        })
         it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
             type = Material.WEB
             amount(6)
-        }.build())
+        })
     }),
     WATER({
         it.player!!.location.block.type = Material.WATER
@@ -111,7 +111,7 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
         it.player!!.inventory.addItem(dev.implario.bukkit.item.item {
             type = Material.SNOW_BALL
             amount(16)
-        }.build())
+        })
     }),
     ABSORPTION({
         it.player!!.addPotionEffect(
@@ -176,7 +176,7 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
         } else {
             it.player!!.world.dropItemNaturally(it.player!!.location, dev.implario.bukkit.item.item {
                 type = Material.EMERALD_BLOCK
-            }.build())
+            })
         }
     }),
     GIVE_BOW({
@@ -184,7 +184,7 @@ enum class LuckEvent(val luckyConsumer: (User) -> Any) {
             type = Material.BOW
             enchant(org.bukkit.enchantments.Enchantment.LUCK, 1)
             text("§cTNT лук")
-        }.build())
+        })
     }),
     SWORD({ SuperSword.values().random().give(it) }), ;
 

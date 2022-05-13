@@ -1,10 +1,12 @@
 package me.func.box
 
 import clepto.bukkit.B
-import clepto.cristalix.Cristalix
-import clepto.cristalix.WorldMeta
+import clepto.cristalix.Cristalix.scoreboardService
+import clepto.cristalix.Cristalix.transfer
 import dev.implario.bukkit.item.item
 import dev.implario.bukkit.platform.Platforms
+import dev.implario.games5e.sdk.cristalix.MapLoader
+import dev.implario.games5e.sdk.cristalix.WorldMeta
 import dev.implario.kensuke.Kensuke
 import dev.implario.kensuke.KensukeSession
 import dev.implario.kensuke.Scope
@@ -18,7 +20,6 @@ import me.func.box.data.BoxTeam
 import me.func.box.data.Status
 import me.func.box.listener.*
 import me.func.box.map.Generator
-import me.func.box.map.MapLoader
 import me.func.box.map.TradeMenu
 import me.func.box.mod.ModTransfer
 import net.md_5.bungee.api.chat.ComponentBuilder
@@ -98,7 +99,7 @@ class Box : JavaPlugin() {
         woodPickaxe = item {
             type = Material.WOOD_PICKAXE
             nbt("Unbreakable", 1)
-        }.build()
+        }
 
         userManager = BukkitUserManager(
             listOf(statScope, oldStatScope),
@@ -128,7 +129,7 @@ class Box : JavaPlugin() {
         mob.customName = "Моб-антистресс"
         val bedrock = CraftItemStack.asNMSCopy(item {
             type = Material.BEDROCK
-        }.build())
+        })
         val handle = (mob as CraftLivingEntity).handle
         handle.setSlot(EnumItemSlot.HEAD, bedrock)
         handle.setSlot(EnumItemSlot.OFFHAND, bedrock)
@@ -223,7 +224,7 @@ class Box : JavaPlugin() {
                             // Скорборды
                             val address = UUID.randomUUID().toString()
                             val objective =
-                                Cristalix.scoreboardService().getPlayerObjective(player.uniqueId, address)
+                                scoreboardService().getPlayerObjective(player.uniqueId, address)
                             objective.displayName = "Бедроковая коробка"
                             val group = objective.startGroup("Игра")
                             teams.forEach {
@@ -238,7 +239,7 @@ class Box : JavaPlugin() {
                                     val pTime = sessionDurability + 10 - time
                                     "§7Авторестарт " + String.format("%02d:%02d", pTime / 60, pTime % 60)
                                 }
-                            Cristalix.scoreboardService().setCurrentObjective(player.uniqueId, address)
+                            scoreboardService().setCurrentObjective(player.uniqueId, address)
                         }
                         // Отпрака игроков по домам
                         B.postpone(1) {
@@ -399,7 +400,7 @@ class Box : JavaPlugin() {
                         time = 0
                         status = Status.STARTING
                         B.postpone(20) {
-                            Cristalix.transfer(Bukkit.getOnlinePlayers().map { it.uniqueId }, RealmId.of(hub))
+                            transfer(Bukkit.getOnlinePlayers().map { it.uniqueId }, RealmId.of(hub))
 
                             if (gameCounter == MAX_GAME_STREAK_COUNT) {
                                 Bukkit.shutdown()
@@ -468,7 +469,7 @@ class Box : JavaPlugin() {
     }
 
     private fun loadMap() {
-        worldMeta = MapLoader().load("prod")!!
+        worldMeta = WorldMeta(MapLoader.load("Box", "prod"))
         spawn = worldMeta.getLabel("spawn").add(0.0, 2.0, 0.0).toCenterLocation()
         zero = Location(worldMeta.world, 0.0, 20.0, 0.0)
         Generator.generateContentOfCube(Location(worldMeta.world, 0.0, 20.0, 0.0), size, size, size)

@@ -47,19 +47,19 @@ class TradeMenu : Listener {
                     helmet = item {
                         type = Material.DIAMOND_HELMET
                         nbt("armors", skin)
-                    }.build()
+                    }
                     chestplate = item {
                         type = Material.DIAMOND_CHESTPLATE
                         nbt("armors", skin)
-                    }.build()
+                    }
                     leggins = item {
                         type = Material.DIAMOND_LEGGINGS
                         nbt("armors", skin)
-                    }.build()
+                    }
                     boots = item {
                         type = Material.DIAMOND_BOOTS
                         nbt("armors", skin)
-                    }.build()
+                    }
                 }
 
                 contents.add('A', slot(player, ItemStack(Material.IRON_HELMET), Pair(Material.COBBLESTONE, 32)))
@@ -76,11 +76,11 @@ class TradeMenu : Listener {
                 contents.add('P', slot(player, item {
                     type = Material.IRON_PICKAXE
                     enchant(Enchantment.DIG_SPEED, 2)
-                }.build(), Pair(Material.COBBLESTONE, 40)))
+                }, Pair(Material.COBBLESTONE, 40)))
                 contents.add('P', slot(player, item {
                     type = Material.DIAMOND_PICKAXE
                     enchant(Enchantment.DIG_SPEED, 2)
-                }.build(), Pair(Material.GOLD_INGOT, 2)))
+                }, Pair(Material.GOLD_INGOT, 2)))
                 contents.add('P', slot(player, item {
                     type = Material.GOLD_PICKAXE
                     text("§eЗолотая кирка §l3x3")
@@ -90,7 +90,7 @@ class TradeMenu : Listener {
                     nbt("Unbreakable", 1)
                     nbt("simulators", "donate_pickaxe")
                     nbt("extra", "pickaxe")
-                }.build(), Pair(Material.EMERALD, 64), Pair(Material.GOLD_INGOT, 5)))
+                }, Pair(Material.EMERALD, 64), Pair(Material.GOLD_INGOT, 5)))
 
                 contents.add('O', slot(player, ItemStack(Material.IRON_SWORD), Pair(Material.COBBLESTONE, 64)))
 
@@ -100,14 +100,14 @@ class TradeMenu : Listener {
                     contents.add('O', slot(player, item {
                         type = Material.DIAMOND_SWORD
                         nbt("weapons_other", sword.getCode())
-                    }.build(), Pair(Material.COBBLESTONE, 128)))
+                    }, Pair(Material.COBBLESTONE, 128)))
                 contents.add('O', slot(player, item {
                     type = Material.IRON_SWORD
                     enchant(Enchantment.DAMAGE_ALL, 3)
                     nbt("Unbreakable", 1)
                     nbt("weapons", "bronze_warhammer")
                     nbt("extra", "hammer")
-                }.build(), Pair(Material.EMERALD, 128)))
+                }, Pair(Material.EMERALD, 128)))
                 contents.add('O', slot(player, ItemStack(Material.CHEST), Pair(Material.EMERALD, 10)))
                 contents.add('L', slot(player, ItemStack(Material.GOLD_INGOT), Pair(Material.COBBLESTONE, 48)))
                 contents.add('J', slot(player, ItemStack(Material.COMPASS), Pair(Material.EMERALD, 128)))

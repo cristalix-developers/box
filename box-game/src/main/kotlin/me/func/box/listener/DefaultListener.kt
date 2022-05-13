@@ -51,7 +51,7 @@ class DefaultListener : Listener {
         type = Material.CLAY_BALL
         nbt("other", "cancel")
         text("§cВернуться")
-    }.build()
+    }
 
     private var modList = try {
         File("./mods/").listFiles()!!
@@ -119,6 +119,9 @@ class DefaultListener : Listener {
             player.sendMessage(" ")
         } else {
             player.gameMode = GameMode.SPECTATOR
+            Bukkit.getOnlinePlayers().forEach {
+                it.hidePlayer(app, player)
+            }
         }
     }
 
@@ -326,7 +329,7 @@ class DefaultListener : Listener {
                         nmsGrove.setSlot(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(item {
                             type = Material.CLAY_BALL
                             nbt("other", "g4")
-                        }.build()))
+                        }))
 
                         team.players.remove(player.uniqueId)
                         Winner.tryGetWinner()
