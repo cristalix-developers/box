@@ -1,6 +1,8 @@
 package me.func.box.cosmetic
 
+import dev.implario.bukkit.item.item
 import me.func.box.User
+import java.awt.SystemColor.text
 
 enum class Sword(private val price: Int, private val rare: Rare, private val title: String, private val code: Int) :
     Donate {
@@ -38,21 +40,21 @@ enum class Sword(private val price: Int, private val rare: Rare, private val tit
     }
 
     fun getItem(current: Boolean, has: Boolean): org.bukkit.inventory.ItemStack {
-        return dev.implario.bukkit.item.item {
+        return item {
             text((if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть") + "\n§7Редкость: " + rare.color + rare.title + " \n§7Название: " + rare.color + title)
             nbt("weapons_other", code)
             if (current)
                 enchant(org.bukkit.enchantments.Enchantment.LUCK, 1)
             type = org.bukkit.Material.DIAMOND_SWORD
-        }.build()
+        }
     }
 
     fun getItem(): org.bukkit.inventory.ItemStack {
-        return dev.implario.bukkit.item.item {
+        return item {
             text(rare.color + rare.title + " §7" + title)
             nbt("weapons_other", code)
             type = org.bukkit.Material.DIAMOND_SWORD
-        }.build()
+        }
     }
 
     override fun give(user: User) {

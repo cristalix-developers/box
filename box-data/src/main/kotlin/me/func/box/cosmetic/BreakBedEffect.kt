@@ -58,7 +58,7 @@ enum class BreakBedEffect(
             type = itemStack.getType()
             amount = 1
             text((if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть") + "\n§7Редкость: " + rare.color + rare.title + " \n§7Название: " + rare.color + title)
-        }.build()
+        }
     }
 
     override fun give(user: User) {

@@ -22,13 +22,13 @@ enum class Starter(
         it.inventory.addItem(item {
             type = Material.STONE_PICKAXE
             text("Шахтёрская кирка")
-        }.build())
+        })
     }),
     WARRIOR("Воин", 15000, Rare.COMMON, Material.STONE_SWORD to 1, "§bКаменный меч", {
         it.inventory.addItem(item {
             type = Material.STONE_SWORD
             text("Меч воина")
-        }.build())
+        })
     }),
     DEFENDER(
         "Защитник", 15000, Rare.COMMON, Material.IRON_CHESTPLATE to 1, "§bЖелезный нагрудник\n" +
@@ -36,11 +36,11 @@ enum class Starter(
             it.inventory.addItem(item {
                 type = Material.IRON_CHESTPLATE
                 text("Нагрудник защитника")
-            }.build())
+            })
             it.inventory.addItem(item {
                 type = Material.LEATHER_BOOTS
                 text("Ботинки защитника")
-            }.build())
+            })
         }
     ),
     BLOCKER("Блокировщик", 30000, Rare.RARE, Material.ENDER_STONE to 32, "§b32 эндерняк", {
@@ -48,13 +48,13 @@ enum class Starter(
             type = Material.ENDER_STONE
             text("Защитный блок")
             amount(31)
-        }.build())
+        })
     }),
     HURRIED("Торопливый", 30000, Rare.RARE, Material.IRON_PICKAXE to 1, "§bЖелезная кирка", {
         val item = item {
             type = Material.IRON_PICKAXE
             text("Быстрая кирка")
-        }.build()
+        }
         item.durability = (item.durability + 1 - 50).toShort()
         it.inventory.addItem(item)
     }),
@@ -63,14 +63,14 @@ enum class Starter(
             type = Material.WEB
             text("Паутина лазутчика")
             amount(15)
-        }.build())
+        })
     }),
     FUSE("Взрыватель", 50000, Rare.LEGENDARY, Material.TNT to 10, "§bДинамит (10 штук)", {
         it.inventory.addItem(dev.implario.bukkit.item.item {
             type = Material.TNT
             text("Взрывчатка")
             amount(10)
-        }.build())
+        })
     }),
     TITAN(
         "Титан",
@@ -81,7 +81,7 @@ enum class Starter(
             it.inventory.addItem(item {
                 type = Material.ENDER_STONE
                 text("Эндерняк")
-            }.build())
+            })
         }
     ),
     SNOW(
@@ -93,7 +93,7 @@ enum class Starter(
             it.inventory.addItem(item {
                 type = Material.WOOD_SWORD
                 text("Деревянный меч")
-            }.build())
+            })
             it.addPotionEffect(org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SPEED, 20 * 60 * 2, 0))
         }
     ),
@@ -101,13 +101,13 @@ enum class Starter(
         it.inventory.addItem(item {
             type = Material.GOLDEN_APPLE
             text("Золотое яблоко")
-        }.build())
+        })
     }),
     SONYA("Соня", 999999, Rare.LEGENDARY, Material.BED to 1, "§bКровать", { user ->
         user.player!!.inventory.addItem(item {
             type = Material.BED
             text("Кровать")
-        }.build())
+        })
     });
 
     override fun getPrice(): Int {
@@ -131,7 +131,7 @@ enum class Starter(
             type = items.first
             amount = items.second
             text((if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть") + "\n§7Редкость: " + rare.color + rare.title + " \n§7Название: " + rare.color + title + "\n§7Вы получите: \n" + lore)
-        }.build()
+        }
     }
 
     fun getItem(): org.bukkit.inventory.ItemStack {
@@ -139,7 +139,7 @@ enum class Starter(
             text(rare.color + rare.title + " \n" + rare.color + title)
             type = items.first
             amount = items.second
-        }.build()
+        }
     }
 
     override fun give(user: User) {
