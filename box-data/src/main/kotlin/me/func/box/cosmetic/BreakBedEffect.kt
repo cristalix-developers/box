@@ -53,14 +53,6 @@ enum class BreakBedEffect(
         return particle
     }
 
-    fun getItem(current: Boolean, has: Boolean): ItemStack {
-        return dev.implario.bukkit.item.item {
-            type = itemStack.getType()
-            amount = 1
-            text((if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть") + "\n§7Редкость: " + rare.color + rare.title + " \n§7Название: " + rare.color + title)
-        }
-    }
-
     override fun give(user: User) {
         user.stat.breakBedEffects.add(this)
         user.stat.currentBreakBedEffect = this

@@ -17,105 +17,65 @@ import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
 
-class GlobalListener : Listener {
+object GlobalListener : Listener {
 
     @EventHandler
-    fun disable(event: FoodLevelChangeEvent) {
-        event.foodLevel = 20
-    }
+    fun  FoodLevelChangeEvent.handle() { foodLevel = 20 }
 
     @EventHandler
-    fun disable(event: BlockBreakEvent) {
-        event.isCancelled = true
-    }
+    fun BlockBreakEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: PlayerDropItemEvent) {
-        event.isCancelled = true
-    }
+    fun PlayerDropItemEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: EntityDamageEvent) {
-        event.isCancelled = true
-    }
+    fun EntityDamageEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: EntityDamageByEntityEvent) {
-        event.isCancelled = true
-    }
+    fun EntityDamageByEntityEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: InventoryDragEvent) {
-        event.isCancelled = true
-    }
+    fun InventoryDragEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: BlockPlaceEvent) {
-        event.isCancelled = true
-    }
+    fun BlockPlaceEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: CraftItemEvent) {
-        event.isCancelled = true
-    }
+    fun CraftItemEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: PlayerInteractEntityEvent) {
-        event.isCancelled = true
-    }
+    fun PlayerInteractEntityEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: BlockFadeEvent) {
-        event.isCancelled = true
-    }
+    fun BlockFadeEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: BlockSpreadEvent) {
-        event.isCancelled = true
-    }
+    fun BlockSpreadEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: BlockGrowEvent) {
-        event.isCancelled = true
-    }
+    fun BlockGrowEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: BlockFromToEvent) {
-        event.isCancelled = true
-    }
+    fun BlockFromToEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: HangingBreakByEntityEvent) {
-        event.isCancelled = true
-    }
+    fun HangingBreakByEntityEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: BlockBurnEvent) {
-        event.isCancelled = true
-    }
+    fun BlockBurnEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: EntityExplodeEvent) {
-        event.isCancelled = true
-    }
+    fun EntityExplodeEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: PlayerArmorStandManipulateEvent) {
-        event.isCancelled = true
-    }
+    fun PlayerArmorStandManipulateEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: PlayerAdvancementCriterionGrantEvent) {
-        event.isCancelled = true
-    }
+    fun PlayerAdvancementCriterionGrantEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: PlayerSwapHandItemsEvent) {
-        event.isCancelled = true
-    }
+    fun PlayerSwapHandItemsEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun disable(event: InventoryMoveItemEvent) {
-        event.isCancelled = true
-    }
+    fun InventoryMoveItemEvent.handle() { isCancelled = true }
 }

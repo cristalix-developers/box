@@ -11,6 +11,17 @@ import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.donate.DonateViewer
 import me.func.box.donate.Lootbox
+import me.func.mod.Anime
+import me.func.mod.Kit
+import me.func.mod.Npc
+import me.func.mod.Npc.location
+import me.func.mod.Npc.onClick
+import me.func.mod.data.Sprites
+import me.func.mod.selection.button
+import me.func.mod.selection.choicer
+import me.func.mod.util.command
+import me.func.mod.util.listener
+import me.func.protocol.npc.NpcBehaviour
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Particle
@@ -30,14 +41,35 @@ import ru.cristalix.core.realm.IRealmService
 import ru.cristalix.core.realm.RealmStatus
 import ru.cristalix.core.transfer.ITransferService
 import ru.cristalix.core.transfer.TransferService
-import ru.cristalix.npcs.data.NpcBehaviour
-import ru.cristalix.npcs.server.Npc
-import ru.cristalix.npcs.server.Npcs
 import java.util.*
 import kotlin.math.cos
 import kotlin.math.sin
 
 lateinit var app: App
+val compass = choicer {
+    title = "Бедроковая коробка"
+    description = "Находи чужие кровати и уничтожай врагов!"
+    buttons(
+        button {
+            texture = Sprites.SOLO.path()
+            title = "Solo"
+            description = "Онлайн: " + realmService.getOnlineOnRealms("BOX4")
+            onClick { it, _, _ -> ClickServer("BOX4", 4).accept(it) }
+        },
+        button {
+            texture = Sprites.SQUAD.path()
+            title = "Squad"
+            description = "Онлайн: " + realmService.getOnlineOnRealms("BOXS")
+            onClick { it, _, _ -> ClickServer("BOXS", 16).accept(it) }
+        },
+        button {
+            texture = Sprites.SPECIAL.path()
+            title = "Lucky"
+            description = "Онлайн: " + realmService.getOnlineOnRealms("BOX8")
+            onClick { it, _, _ -> ClickServer("BOX8", 16).accept(it) }
+        },
+    )
+}
 
 class App : JavaPlugin() {
 
@@ -46,6 +78,7 @@ class App : JavaPlugin() {
     lateinit var spawn: Location
     lateinit var userManager: UserManager<User>
     lateinit var online: Map<ServerType, ArmorStand>
+    lateinit var socketClient: ISocketClient
 
     private var oldStatScope = Scope("boxll", Stat::class.java)
     private val statScope = Scope("box-new", Stat::class.java)
@@ -54,6 +87,8 @@ class App : JavaPlugin() {
         B.plugin = this
         app = this
         Platforms.set(PlatformDarkPaper())
+
+        Anime.include(Kit.EXPERIMENTAL, Kit.NPC, Kit.STANDARD, Kit.LOOTBOX)
 
         // Загрузка карты
         worldMeta = MapLoader().load("Event")!!
@@ -77,6 +112,7 @@ class App : JavaPlugin() {
         // Регистрация сервисов
         val core = CoreApi.get()
 
+        socketClient = core.socketClient
         core.registerService(IPartyService::class.java, PartyService(ISocketClient.get()))
         core.registerService(ITransferService::class.java, TransferService(ISocketClient.get()))
         core.registerService(IInventoryService::class.java, InventoryService())
@@ -93,20 +129,18 @@ class App : JavaPlugin() {
             "" + it.wins
         }
 
-        online = ServerType.values().map { server ->
-            Npcs.spawn(
-                Npc.builder()
-                    .location(server.origin)
-                    .name(server.title)
-                    .behaviour(NpcBehaviour.STARE_AT_PLAYER)
-                    .skinUrl("https://webdata.c7x.dev/textures/skin/${server.skin}")
-                    .skinDigest(server.skin)
-                    .type(EntityType.PLAYER)
-                    .onClick { player ->
-                        val navigator = ClickServer(server.name, server.slot)
-                        navigator.accept(player)
-                    }.build()
-            )
+        online = ServerType.values().associateWith { server ->
+            Npc.npc {
+                location(server.origin)
+                name = server.title
+                behaviour = NpcBehaviour.STARE_AT_PLAYER
+                skinUrl = "https://webdata.c7x.dev/textures/skin/${server.skin}"
+                skinDigest = server.skin
+                onClick {
+                    val navigator = ClickServer(server.name, server.slot)
+                    navigator.accept(it.player)
+                }
+            }
             val stand = worldMeta.world.spawnEntity(
                 server.origin.clone().add(0.0, 2.3, 0.0),
                 EntityType.ARMOR_STAND
@@ -117,13 +151,14 @@ class App : JavaPlugin() {
             stand.setGravity(false)
             stand.isCustomNameVisible = true
 
-            server to stand
-        }.toMap()
+            stand
+        }
 
 
         val location = Location(worldMeta.world, -258.0, 116.0, 28.5)
         val chest = Location(worldMeta.world, -249.5, 111.5, 26.6)
         var counter = 0
+
         Bukkit.getScheduler().runTaskTimer(this, {
             counter += 15
             worldMeta.world.spawnParticle(
@@ -147,52 +182,44 @@ class App : JavaPlugin() {
                     cos(Math.toRadians(counter * 2 % 360.0)) * (1.1 + (counter % 100) / 300.0)
                 ), 1, 0.0, 0.0, 0.0, 0.05
             )
-        }, 1, 1)
-
-        Bukkit.getScheduler().runTaskTimer(this, {
             online.forEach { (type, stand) ->
-                stand.customName = "§b${IRealmService.get().getOnlineOnRealms(type.name)} игроков в игре"
+                val online = IRealmService.get().getOnlineOnRealms(type.name)
+                stand.customName = "§b$online игроков в игре"
+                val desc = "Онлайн: $online"
+                when (type) {
+                    ServerType.BOX4 -> compass.storage[0]
+                    ServerType.BOXS -> compass.storage[1]
+                    ServerType.BOX8 -> compass.storage[2]
+                    else -> null
+                }?.description = desc
             }
         }, 5, 10)
 
-        Npcs.init(this)
-        //Npcs.spawn(
-        //    Npc.builder()
-        //        .location(Location(worldMeta.world, -252.0, 112.0, 34.0, 137f, 0f))
-        //        .name(ServerType.BOXN.title)
-        //        .behaviour(NpcBehaviour.STARE_AT_PLAYER)
-        //        .skinUrl("https://webdata.c7x.dev/textures/skin/e7c13d3d-ac38-11e8-8374-1cb72caa35fd")
-        //        .skinDigest("e7c13d3d-ac3811e883741cb72caa35fd")
-        //        .type(EntityType.PLAYER)
-        //        .onClick { player ->
-        //            val navigator = ClickServer("BOXN", 16)
-        //            navigator.accept(player)
-        //        }.build()
-        //)
+        listener(FamousListener, GlobalListener, Lootbox, DonateViewer())
 
-        B.events(FamousListener(), GlobalListener(), Lootbox, DonateViewer())
+        fun register(name: String, apply: (Stat, Int) -> String) = command(name) { player, args ->
+            if (player.isOp) player.sendMessage(
+                apply(
+                    app.userManager.getUser(Bukkit.getPlayer(args[0]).uniqueId).stat,
+                    args[1].toInt()
+                )
+            )
+        }
 
-        B.regCommand({ player, strings ->
-            if (player.isOp) {
-                app.getUser(Bukkit.getPlayer(strings[0])).stat.money = strings[1].toInt()
-                "Деньги выданы"
-            } else
-                null
-        }, "money")
-        B.regCommand({ player, strings ->
-            if (player.isOp) {
-                app.getUser(Bukkit.getPlayer(strings[0])).stat.wins = strings[1].toInt()
-                "Победы изменены"
-            } else
-                null
-        }, "wins")
-        B.regCommand({ player, strings ->
-            if (player.isOp) {
-                app.getUser(Bukkit.getPlayer(strings[0])).stat.kills = strings[1].toInt()
-                "Убийства изменены"
-            } else
-                null
-        }, "kills")
+        register("money") { stat, value ->
+            stat.money = value
+            "Деньги выданы"
+        }
+
+        register("wins") { stat, value ->
+            stat.wins = value
+            "Победы изменены"
+        }
+
+        register("kills") { stat, value ->
+            stat.kills = value
+            "Убийства изменены"
+        }
     }
 
     private fun createTop(location: Location, string: String, title: String, key: String, function: (Stat) -> String) {

@@ -39,16 +39,6 @@ enum class Sword(private val price: Int, private val rare: Rare, private val tit
         return rare
     }
 
-    fun getItem(current: Boolean, has: Boolean): org.bukkit.inventory.ItemStack {
-        return item {
-            text((if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть") + "\n§7Редкость: " + rare.color + rare.title + " \n§7Название: " + rare.color + title)
-            nbt("weapons_other", code)
-            if (current)
-                enchant(org.bukkit.enchantments.Enchantment.LUCK, 1)
-            type = org.bukkit.Material.DIAMOND_SWORD
-        }
-    }
-
     fun getItem(): org.bukkit.inventory.ItemStack {
         return item {
             text(rare.color + rare.title + " §7" + title)

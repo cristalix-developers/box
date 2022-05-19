@@ -53,14 +53,6 @@ enum class KillMessage(
         return itemStack
     }
 
-    fun getItem(current: Boolean, has: Boolean): ItemStack {
-        return dev.implario.bukkit.item.item {
-            type = itemStack.getType()
-            amount = 1
-            text((if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть") + "\n§7Редкость: " + rare.color + rare.title + " \n§7Название: " + rare.color + title + "\n§7Пример: \n§dFunc ${getDescription()} reidj")
-        }
-    }
-
     override fun give(user: User) {
         user.stat.killMessages.add(this)
         user.stat.currentKillMessage = this

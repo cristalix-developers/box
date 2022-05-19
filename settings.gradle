@@ -1,7 +1,6 @@
 rootProject.name = 'box'
 include 'box-game'
 include 'box-lobby'
-include 'box-mod'
 include 'box-data'
 include 'box-runtime-mod'
 

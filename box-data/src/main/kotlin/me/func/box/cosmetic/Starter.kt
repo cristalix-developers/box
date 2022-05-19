@@ -126,14 +126,6 @@ enum class Starter(
         return name
     }
 
-    fun getItem(current: Boolean, has: Boolean): org.bukkit.inventory.ItemStack {
-        return item {
-            type = items.first
-            amount = items.second
-            text((if (current) "§aВЫБРАНО" else if (has) "§eВыбрать" else "§bПосмотреть") + "\n§7Редкость: " + rare.color + rare.title + " \n§7Название: " + rare.color + title + "\n§7Вы получите: \n" + lore)
-        }
-    }
-
     fun getItem(): org.bukkit.inventory.ItemStack {
         return item {
             text(rare.color + rare.title + " \n" + rare.color + title)

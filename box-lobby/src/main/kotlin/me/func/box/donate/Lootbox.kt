@@ -9,68 +9,47 @@ import me.func.box.cosmetic.Armor
 import me.func.box.cosmetic.Donate
 import me.func.box.cosmetic.Rare
 import me.func.box.cosmetic.Sword
+import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
+import me.func.mod.selection.button
+import me.func.mod.selection.selection
+import me.func.mod.util.after
+import me.func.mod.util.nbt
 import org.bukkit.Material
-import org.bukkit.Sound
-import org.bukkit.SoundCategory
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
-import org.bukkit.inventory.ItemStack
 import ru.cristalix.core.formatting.Formatting
-import ru.cristalix.core.inventory.ClickableItem
-import ru.cristalix.core.inventory.ControlledInventory
-import ru.cristalix.core.inventory.InventoryContents
-import ru.cristalix.core.inventory.InventoryProvider
 
 object Lootbox : Listener {
 
-    private val coin = CraftItemStack.asNMSCopy(item {
-        nbt("other", "coin4")
-        type = Material.CLAY_BALL
-    }.build())
-
-    private val dropList = Armor.values().map { it }
-        .plus(Sword.values().filter { it != Sword.NONE }.map { it })
-
-    private val lootbox = ControlledInventory.builder()
-        .title("Покупка ящика")
-        .rows(1)
-        .columns(9)
-        .provider(object : InventoryProvider {
-            override fun init(player: Player, contents: InventoryContents) {
-                val user = app.getUser(player)
-
-                contents.setLayout(
-                    "XXXXOXXXX",
-                )
-                contents.add('O', ClickableItem.of(item {
-                    text("§6Открыть ящик\n\n§7Цена: §e5`000 монет\n\n§7Выпадают монеты и костюм/меч\n§aЕсли предмет уже есть,\n§aвы получите монеты!")
-                    type = Material.ENDER_CHEST
-                }.build()) {
+    private val coin = item { type = Material.CLAY_BALL }.nbt("other", "coin4")
+    private val dropList = Armor.values().map { it }.plus(Sword.values().filter { it != Sword.NONE }.map { it })
+    private val lootboxMenu = selection {
+        title = "Покупка ящика"
+        rows = 3
+        columns = 3
+        storage = MutableList(9) {
+            button {
+                title = "§bЛутбокс"
+                description = "мечи, костюмы, монеты"
+                price = 5000
+                material(Material.ENDER_CHEST)
+                onClick { player, _, _ ->
+                    Anime.close(player)
+                    val user = app.getUser(player)
                     if (user.stat.money <= 5000) {
-                        player.sendMessage(Formatting.error("Недостаточно средств!"))
-                        player.closeInventory()
-                        return@of
+                        Anime.killboardMessage(player, Formatting.error("Недостаточно средств!"))
+                        return@onClick
                     }
-
                     user.stat.money -= 5000
-
                     open(user)
-
-                    contents.fillMask('X', ClickableItem.empty(ItemStack(Material.AIR)))
-                })
+                }
             }
-        }).build()
-
-    init {
-        B.regCommand({ player, _ ->
-            player.playSound(player.location, Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.MASTER, 1f, 2f)
-            null
-        }, "lootboxsound")
+        }
     }
 
     fun open(user: User) {
@@ -97,7 +76,7 @@ object Lootbox : Listener {
             item {
                 nbt("weapons_other", drop.getCode())
                 type = Material.DIAMOND_SWORD
-            }.build()
+            }
         } else {
             if (user.stat.skins == null) user.stat.skins = arrayListOf(drop.getCode())
             else {
@@ -110,12 +89,10 @@ object Lootbox : Listener {
             item {
                 nbt("armors", drop.getCode())
                 type = Material.DIAMOND_HELMET
-            }.build()
+            }
         }
 
         B.bc(Formatting.fine("§e" + user.name + " §fнашел ${drop.getRare().color + drop.getRare().title.toLowerCase()} предмет! ${drop.getRare().color}" + drop.getTitle()))
-
-        user.player!!.closeInventory()
 
         ModTransfer()
             .integer(2)
@@ -131,7 +108,14 @@ object Lootbox : Listener {
     @EventHandler
     fun InventoryOpenEvent.handle() {
         if (inventory.type == InventoryType.ENDER_CHEST) {
-            B.postpone(1) { lootbox.open(player as Player) }
+            isCancelled = true
+            after(2) {
+                val player = player as Player
+                val user = app.getUser(player)
+                lootboxMenu.apply {
+                    money = "Монет " + user.stat.money
+                }.open(player)
+            }
         }
     }
 }
