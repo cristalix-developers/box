@@ -66,7 +66,7 @@ enum class Starter(
         })
     }),
     FUSE("Взрыватель", 50000, Rare.LEGENDARY, Material.TNT to 10, "§bДинамит (10 штук)", {
-        it.inventory.addItem(dev.implario.bukkit.item.item {
+        it.inventory.addItem(item {
             type = Material.TNT
             text("Взрывчатка")
             amount(10)
@@ -140,6 +140,5 @@ enum class Starter(
         else
             user.stat.starters!!.add(this)
         user.stat.currentStarter = this
-        user.stat.money -= this.getPrice()
     }
 }
