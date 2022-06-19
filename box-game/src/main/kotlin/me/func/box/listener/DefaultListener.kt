@@ -188,7 +188,7 @@ class DefaultListener : Listener {
         }
         if (app.status == Status.STARTING && entityType != EntityType.PLAYER) {
             damage = 0.0
-            playDamageEffect(entity.location)
+            if (Math.random() < 0.1) playDamageEffect(entity.location)
         } else if (app.status == Status.STARTING) {
             cancelled = true
         } else if (entity is CraftPlayer && damager is CraftPlayer && (damager as CraftPlayer).itemInHand != null) {
@@ -257,7 +257,7 @@ class DefaultListener : Listener {
         var userKiller: User? = null
         if (player.killer != null) {
             userKiller = app.getUser(player.killer)!!
-            userKiller.tempKills++
+            if (userKiller.tempKills < 30) userKiller.tempKills++
             ModHelper.glow(userKiller, 0, 0, 255)
         }
         val user = app.getUser(player)!!
@@ -270,7 +270,7 @@ class DefaultListener : Listener {
             val itemsToGive = arrayListOf<ItemStack>()
             player.inventory.forEach {
                 if (it != null && it.getType() != Material.WOOD_PICKAXE) {
-                    if (isTitan && Math.random() < 0.05) itemsToGive.add(it)
+                    if (isTitan && Math.random() < 0.2) itemsToGive.add(it)
                     else player.world.dropItemNaturally(player.location, it)
                 }
             }

@@ -81,7 +81,7 @@ class App : JavaPlugin() {
     lateinit var socketClient: ISocketClient
 
     private var oldStatScope = Scope("boxll", Stat::class.java)
-    private val statScope = Scope("box-new", Stat::class.java)
+    private val statScope = Scope("box-newa", Stat::class.java)
 
     override fun onEnable() {
         B.plugin = this
@@ -243,7 +243,7 @@ class App : JavaPlugin() {
                         blocks.addContent(
                             UUID.fromString(entry.data.session.userId),
                             "" + entry.position,
-                            entry.data.stat.lastSeenName,
+                            entry.data?.stat?.lastSeenName,
                             "§d" + function(entry.data.stat)
                         )
                     }

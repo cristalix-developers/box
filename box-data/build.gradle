@@ -4,19 +4,9 @@ compileKotlin {
     kotlinOptions.jvmTarget = '1.8'
 }
 
-repositories {
-    maven {
-        url 'https://repo.c7x.ru/repository/maven-public/'
-        credentials {
-            username = System.getenv("CRI_REPO_LOGIN") ?: System.getenv("CRISTALIX_REPO_USERNAME")
-            password = System.getenv("CRI_REPO_PASSWORD") ?: System.getenv("CRISTALIX_REPO_PASSWORD")
-        }
-    }
-    mavenCentral()
-    mavenLocal()
-}
-
 dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.20'
+
     compileOnly 'cristalix:bukkit-core:21.01.30'
     compileOnly 'cristalix:dark-paper:21.02.03'
 

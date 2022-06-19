@@ -17,7 +17,7 @@ compileKotlin {
 }
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.21'
+    implementation project(':box-data')
 
     compileOnly 'cristalix:bukkit-core:21.01.30'
     compileOnly 'cristalix:dark-paper:21.02.03'
@@ -36,14 +36,10 @@ dependencies {
     implementation 'me.func:animation-api:live-SNAPSHOT'
     implementation 'cristalix:boards-bukkit-api:3.0.15'
     implementation 'dev.implario:kensuke-client-bukkit:2.1.10'
-
-    implementation project(':box-data')
 }
 
-afterEvaluate {
-    jar {
-        archiveBaseName.set 'box'
-        from configurations.runtimeClasspath.collect { it.directory ? it : zipTree(it) }
-        duplicatesStrategy DuplicatesStrategy.EXCLUDE
-    }
+jar {
+    archiveBaseName.set 'box'
+    from configurations.runtimeClasspath.collect { it.directory ? it : zipTree(it) }
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE
 }

@@ -14,24 +14,24 @@ enum class Starter(
     private val price: Int,
     private val rare: Rare,
     private val items: Pair<Material, Int>,
-    private val lore: String,
+    val lore: String,
     val consumer: (Player) -> Any
 ) : Donate {
     NONE("Отсутствует", 0, Rare.COMMON, Material.CLAY to 1, "", {}),
-    MINER("Шахтёр", 15000, Rare.COMMON, Material.STONE_PICKAXE to 1, "§bКаменная кирка", {
+    MINER("Шахтёр", 25000, Rare.COMMON, Material.STONE_PICKAXE to 1, "§bКаменная кирка", {
         it.inventory.addItem(item {
             type = Material.STONE_PICKAXE
             text("Шахтёрская кирка")
         })
     }),
-    WARRIOR("Воин", 15000, Rare.COMMON, Material.STONE_SWORD to 1, "§bКаменный меч", {
+    WARRIOR("Воин", 25000, Rare.COMMON, Material.STONE_SWORD to 1, "§bКаменный меч", {
         it.inventory.addItem(item {
             type = Material.STONE_SWORD
             text("Меч воина")
         })
     }),
     DEFENDER(
-        "Защитник", 15000, Rare.COMMON, Material.IRON_CHESTPLATE to 1, "§bЖелезный нагрудник\n" +
+        "Защитник", 25000, Rare.COMMON, Material.IRON_CHESTPLATE to 1, "§bЖелезный нагрудник\n" +
                 "§bКожаные ботинки", {
             it.inventory.addItem(item {
                 type = Material.IRON_CHESTPLATE
@@ -43,14 +43,14 @@ enum class Starter(
             })
         }
     ),
-    BLOCKER("Блокировщик", 30000, Rare.RARE, Material.ENDER_STONE to 32, "§b32 эндерняк", {
+    BLOCKER("Блокировщик", 25000, Rare.RARE, Material.ENDER_STONE to 32, "§b32 эндерняк", {
         it.inventory.addItem(item {
             type = Material.ENDER_STONE
             text("Защитный блок")
             amount(31)
         })
     }),
-    HURRIED("Торопливый", 30000, Rare.RARE, Material.IRON_PICKAXE to 1, "§bЖелезная кирка", {
+    HURRIED("Торопливый", 50000, Rare.RARE, Material.IRON_PICKAXE to 1, "§bЖелезная кирка", {
         val item = item {
             type = Material.IRON_PICKAXE
             text("Быстрая кирка")
@@ -58,14 +58,14 @@ enum class Starter(
         item.durability = (item.durability + 1 - 50).toShort()
         it.inventory.addItem(item)
     }),
-    SCOUT("Лазутчик", 30000, Rare.RARE, Material.WEB to 16, "§bПаутина (16 штук)", {
+    SCOUT("Лазутчик", 50000, Rare.RARE, Material.WEB to 16, "§bПаутина (16 штук)", {
         it.inventory.addItem(item {
             type = Material.WEB
             text("Паутина лазутчика")
             amount(15)
         })
     }),
-    FUSE("Взрыватель", 50000, Rare.LEGENDARY, Material.TNT to 10, "§bДинамит (10 штук)", {
+    FUSE("Взрыватель", 300000, Rare.LEGENDARY, Material.TNT to 10, "§bДинамит (10 штук)", {
         it.inventory.addItem(item {
             type = Material.TNT
             text("Взрывчатка")
@@ -74,10 +74,10 @@ enum class Starter(
     }),
     TITAN(
         "Титан",
-        50000,
+        150000,
         Rare.LEGENDARY,
         Material.ENDER_STONE to 1,
-        "§b1 эндерняк\n\n§a5% вещей остануться\n§aпосле смерти", {
+        "§b1 эндерняк\n\n§a20% вещей остануться\n§aпосле смерти", {
             it.inventory.addItem(item {
                 type = Material.ENDER_STONE
                 text("Эндерняк")
@@ -86,24 +86,24 @@ enum class Starter(
     ),
     SNOW(
         "Морозный король",
-        50000,
+        150000,
         Rare.LEGENDARY,
-        Material.WOOD_SWORD to 1,
-        "§bскорость I на 2 минуты\n\n§a1 деревянный меч", {
+        Material.IRON_SWORD to 1,
+        "§bскорость I на 20 минуты\n\n§a1 железный меч", {
             it.inventory.addItem(item {
-                type = Material.WOOD_SWORD
-                text("Деревянный меч")
+                type = Material.IRON_SWORD
+                text("Железный меч")
             })
-            it.addPotionEffect(org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SPEED, 20 * 60 * 2, 0))
+            it.addPotionEffect(org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SPEED, 20 * 60 * 20, 0))
         }
     ),
-    HEAL("Целитель", 999999, Rare.LEGENDARY, Material.GOLDEN_APPLE to 1, "§eЗолотое яблоко", {
+    HEAL("Целитель", 200000, Rare.LEGENDARY, Material.GOLDEN_APPLE to 1, "§eЗолотое яблоко", {
         it.inventory.addItem(item {
             type = Material.GOLDEN_APPLE
             text("Золотое яблоко")
         })
     }),
-    SONYA("Соня", 999999, Rare.LEGENDARY, Material.BED to 1, "§bКровать", { user ->
+    SONYA("Соня", 250000, Rare.LEGENDARY, Material.BED to 1, "§bКровать", { user ->
         user.player!!.inventory.addItem(item {
             type = Material.BED
             text("Кровать")

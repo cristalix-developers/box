@@ -63,6 +63,8 @@ class User(session: KensukeSession, stat: Stat?, oldStat: Stat?) : IBukkitKensuk
                 deaths = 0
                 wins = 0
                 games = 0
+                starters?.clear()
+                currentStarter = null
             } ?: Stat(
                 UUID.fromString(session.userId), arrayListOf("hi"), "", 0, 0, 0, 0, 0, 0, 0, null, 500, mutableListOf(
                     Starter.NONE

@@ -82,6 +82,7 @@ class DonateViewer : Listener {
                         is Sword -> stat.currentSword == pos
                         else -> false
                     }
+                    if (pos is Starter) hover = pos.lore
                     onClick { player, _, _ ->
                         if (current)
                             return@onClick
@@ -183,21 +184,22 @@ class DonateViewer : Listener {
     }
 
     private fun buy(player: Player, money: Int, donate: Donate) {
+        val user = app.getUser(player)
+
+        if (!user.session.isActive) {
+            Anime.killboardMessage(
+                player,
+                Formatting.error("Что-то пошло не так... Попробуйте перезайти")
+            )
+            return
+        }
         Confirmation("Купить §a${donate.getTitle()}\n§fза §b$money кристалик(а)") {
             ISocketClient.get().writeAndAwaitResponse<MoneyTransactionResponsePackage>(
                 MoneyTransactionRequestPackage(player.uniqueId, money, true, donate.getTitle())
             ).thenAccept {
-                val user = app.getUser(player)
                 if (it.errorMessage != null) {
                     Anime.killboardMessage(player, Formatting.error(it.errorMessage))
                     Glow.animate(player, 0.4, GlowColor.RED)
-                    return@thenAccept
-                }
-                if (!user.session.isActive) {
-                    Anime.killboardMessage(
-                        player,
-                        Formatting.error("Что-то пошло не так... Попробуйте перезайти")
-                    )
                     return@thenAccept
                 }
                 Anime.title(player, Formatting.fine("Успешно!"))

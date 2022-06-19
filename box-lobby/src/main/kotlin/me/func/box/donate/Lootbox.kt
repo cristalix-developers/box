@@ -5,10 +5,7 @@ import dev.implario.bukkit.item.item
 import implario.ListUtils
 import me.func.box.User
 import me.func.box.app
-import me.func.box.cosmetic.Armor
-import me.func.box.cosmetic.Donate
-import me.func.box.cosmetic.Rare
-import me.func.box.cosmetic.Sword
+import me.func.box.cosmetic.*
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.selection.button
@@ -27,7 +24,9 @@ import ru.cristalix.core.formatting.Formatting
 object Lootbox : Listener {
 
     private val coin = item { type = Material.CLAY_BALL }.nbt("other", "coin4")
-    private val dropList = Armor.values().map { it }.plus(Sword.values().filter { it != Sword.NONE }.map { it })
+    private val dropList = Armor.values().map { it }
+        .plus(BreakBedEffect.values().filter { it != BreakBedEffect.NONE }.map { it })
+        .plus(Sword.values().filter { it != Sword.NONE }.map { it })
     private val lootboxMenu = selection {
         title = "Покупка ящика"
         rows = 3

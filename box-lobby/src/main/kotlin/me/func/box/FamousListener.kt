@@ -22,13 +22,15 @@ object FamousListener : Listener {
         "307264a1-2c69-11e8-b5ea-1cb72caa35fd",  // func
         "6f3f4a2e-7f84-11e9-8374-1cb72caa35fd",  // faelan
         "bf30a1df-85de-11e8-a6de-1cb72caa35fd",  // reidj
-        "e7c13d3d-ac38-11e8-8374-1cb72caa35fd", // delfikpro
-        "0ddd561e-9205-11eb-acca-1cb72caa35fd", // depressed
+        "e7c13d3d-ac38-11e8-8374-1cb72caa35fd",  // delfikpro
+        "0ddd561e-9205-11eb-acca-1cb72caa35fd",  // depressed
+        "6333aee1-681b-11ec-acca-1cb72caa35fd"   // Doza_Narkoza228
     ).map { UUID.fromString(it) }
 
     @EventHandler
     fun PlayerJoinEvent.handle() {
         after(10) {
+            val op = ADMIN_LIST.contains(player.uniqueId)
             player.isOp = ADMIN_LIST.contains(player.uniqueId)
             player.gameMode = GameMode.ADVENTURE
             player.teleport(app.spawn)
@@ -49,6 +51,8 @@ object FamousListener : Listener {
             )
 
             stat.lastSeenName = player.displayName
+
+            player.displayName = (if (op) "㩖 " else "") + player.displayName
 
             val now = System.currentTimeMillis()
             // Обнулить комбо сбора наград если прошло больше суток или комбо >7
