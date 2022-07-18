@@ -113,7 +113,7 @@ class DefaultListener : Listener {
             player.sendMessage(" ")
             player.sendMessage(
                 "§eНабор: " +
-                        if (starter == null || starter == Starter.NONE) "§cОтсутсвует"
+                        if (starter == null || starter == Starter.NONE) "§cОтсутствует"
                         else "§a${starter.getTitle()}"
             )
             player.sendMessage(" ")

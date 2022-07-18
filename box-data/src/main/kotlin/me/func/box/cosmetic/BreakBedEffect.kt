@@ -17,7 +17,7 @@ enum class BreakBedEffect(
     private val title: String,
 ) : Donate {
     NONE(ItemStack(Material.BEDROCK), 0, null, Rare.COMMON, "Без эффекта"),
-    SPELL_INSTANT(ItemStack(Material.FIREWORK), 39, Particle.SPELL_INSTANT, Rare.COMMON, "Фейрверк"),
+    SPELL_INSTANT(ItemStack(Material.FIREWORK), 39, Particle.SPELL_INSTANT, Rare.COMMON, "Фейерверк"),
     WATER_DROP(ItemStack(Material.WATER_BUCKET), 39, Particle.DRIP_WATER, Rare.COMMON, "Капли воды"),
     VILLAGER_HAPPY(ItemStack(Material.LIME_GLAZED_TERRACOTTA), 39, Particle.VILLAGER_HAPPY, Rare.COMMON, "Счастливый житель"),
     VILLAGER_ANGRY(ItemStack(Material.NETHER_STALK), 99, Particle.VILLAGER_ANGRY, Rare.RARE, "Злой житель"),

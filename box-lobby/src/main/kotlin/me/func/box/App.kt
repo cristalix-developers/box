@@ -23,6 +23,7 @@ import me.func.mod.util.command
 import me.func.mod.util.listener
 import me.func.protocol.npc.NpcBehaviour
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.entity.ArmorStand
@@ -243,7 +244,7 @@ class App : JavaPlugin() {
                         blocks.addContent(
                             UUID.fromString(entry.data.session.userId),
                             "" + entry.position,
-                            entry.data?.stat?.lastSeenName,
+                            "§f" + ChatColor.stripColor(entry.data?.stat?.lastSeenName),
                             "§d" + function(entry.data.stat)
                         )
                     }
