@@ -367,6 +367,12 @@ class Box : JavaPlugin() {
                                 else
                                     player.location
                             }
+
+                            val locationStatus = if (player.compassTarget.y > player.y) "§a↑"
+                            else if (player.compassTarget.y < player.y) "§c↓"
+                            else "§6↕"
+
+                            Anime.title(player, locationStatus)
                         }
                     }
 
