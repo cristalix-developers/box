@@ -22,6 +22,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.ItemStack
@@ -246,6 +247,7 @@ class DonateViewer : Listener {
     @EventHandler
     fun PlayerInteractEvent.handle() {
         val type = player.itemInHand.getType()
+        if (action == Action.PHYSICAL) isCancelled = true
         if (type == Material.COMPASS) compass.open(player)
         else if (type == Material.EMERALD) all.open(player)
     }
