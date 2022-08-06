@@ -76,7 +76,7 @@ class Box : JavaPlugin() {
     val winMoney = System.getenv("WIN_REWARD").toInt()
     val finalMoney = System.getenv("FINAL_REWARD").toInt()
     val killMoney = System.getenv("KILL_REWARD").toInt()
-    private var size = System.getenv("SIZE").toInt()
+    public var size = System.getenv("SIZE").toInt()
     private var teamSize = System.getenv("TEAM").toInt()
     var status = Status.STARTING
     val hub = "BOXL-2"
