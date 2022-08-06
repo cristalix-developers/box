@@ -148,7 +148,7 @@ class DefaultListener : Listener {
         if (app.status == Status.STARTING)
             cancel = true
 
-        if(it.location.x > app.size && it.location.y > size && it.location.z > app.size){
+        if(it.location.x > app.size && it.location.y > app.size && it.location.z > app.size){
             it.setHealth(0)
         }
     }
