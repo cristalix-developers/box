@@ -22,7 +22,10 @@ import me.func.box.listener.*
 import me.func.box.map.Generator
 import me.func.box.map.TradeMenu
 import me.func.box.mod.ModTransfer
+import me.func.mod.Anime
+import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.ComponentBuilder
+import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.EnumItemSlot
 import org.bukkit.*
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity
@@ -368,11 +371,17 @@ class Box : JavaPlugin() {
                                     player.location
                             }
 
-                            val locationStatus = if (player.compassTarget.y > player.y) "§a↑"
-                            else if (player.compassTarget.y < player.y) "§c↓"
+                            val locationStatus = if (player.compassTarget.y > player.location.y) "§a↑"
+                            else if (player.compassTarget.y < player.location.y) "§c↓"
                             else "§6↕"
 
-                            Anime.title(player, locationStatus)
+                            if (player.itemInHand.getType() == Material.COMPASS) {
+                                val distance = player.compassTarget?.distance(player.location) ?: 9999.0
+                                player.spigot().sendMessage(
+                                    ChatMessageType.ACTION_BAR,
+                                    TextComponent("§aДо цели осталось: " + (if (distance > 1000.0) "ОШИБКА" else (distance.toInt().toString() + " " + locationStatus)))
+                                )
+                            }
                         }
                     }
 
