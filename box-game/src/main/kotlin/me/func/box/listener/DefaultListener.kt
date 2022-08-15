@@ -290,7 +290,9 @@ class DefaultListener : Listener {
                     val between = " §f" + (userKiller?.stat?.currentKillMessage?.getDescription() ?: "убит")
                     var message = "" + team.color.chatColor + player.name + between
                     if (player.killer != null) {
-                        userKiller?.giveMoney(app.killMoney)
+                        if (userKiller?.tempKills!! < 30) {
+                            userKiller.giveMoney(app.killMoney)
+                        }
                         message += " игроком " + player.killer.name
                     }
                     if (user.bed != null && user.bed!!.block.type == Material.BED_BLOCK) {
