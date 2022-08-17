@@ -10,6 +10,7 @@ import me.func.box.cosmetic.Starter
 import me.func.box.data.Status
 import me.func.box.listener.lucky.SuperSword
 import me.func.box.mod.ModHelper
+import me.func.mod.Anime
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.*
@@ -78,6 +79,7 @@ class DefaultListener : Listener {
                     )
                 )
             }
+            Anime.lockPersonalization(player)
         }
         player.addPotionEffect(visible, true)
         player.addPotionEffect(regen, true)
