@@ -109,7 +109,7 @@ class TradeMenu : Listener {
                 .replace("[", "")
                 .replace("]", "")
                 .replace(", ", "\n")}"
-            hover = buyItem.itemMeta.displayName
+            hover = "${buyItem.itemMeta.displayName}\nНажмите, чтобы купить!"
             onClick { player, _, _ ->
                 need.forEach {
                     if (!player.inventory.contains(it.first, it.second)) {
