@@ -26,7 +26,7 @@ dependencies {
     implementation 'dev.implario.bukkit:dark-paper:1.0.0'
     implementation 'implario:bukkit-worker-core:2.1.20'
     implementation 'dev.implario.bukkit:dark-paper:1.0.0'
-    implementation 'me.func:animation-api:0.0.11-SNAPSHOT'
+    implementation 'me.func:animation-api:0.1.21'
     implementation 'dev.implario:kensuke-client-bukkit:2.1.10'
     implementation 'ru.cristalix:boards-bukkit-api:3.0.15'
 
