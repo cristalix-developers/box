@@ -105,8 +105,11 @@ class TradeMenu : Listener {
     private fun slot(buyItem: ItemStack, vararg need: Pair<Material, Int>) : Button {
         return button {
             item = ItemStack(buyItem.getType())
-            title = buyItem.itemMeta.displayName
-            hover = "§fНужно: ${need.map { "§f${it.second} ${getName(it.first)}" }}"
+            title = "§fНужно:\n${need.map { "§f${it.second} ${getName(it.first)}" }.toString()
+                .replace("[", "")
+                .replace("]", "")
+                .replace(", ", "\n")}"
+            hover = buyItem.itemMeta.displayName
             onClick { player, _, _ ->
                 need.forEach {
                     if (!player.inventory.contains(it.first, it.second)) {
