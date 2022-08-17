@@ -103,7 +103,7 @@ class TradeMenu : Listener {
                     }, Pair(Material.COBBLESTONE, 128)))
                 contents.add('O', slot(player, item {
                     type = Material.IRON_SWORD
-                    enchant(Enchantment.DAMAGE_ALL, 3)
+                    enchant(Enchantment.DAMAGE_ALL, 4)
                     nbt("Unbreakable", 1)
                     nbt("weapons", "bronze_warhammer")
                     nbt("extra", "hammer")
