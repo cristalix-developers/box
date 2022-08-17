@@ -86,7 +86,7 @@ class BlockListener : Listener {
                     return
                 }
             val bed = Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }.filter {
-                it.bed != null && it.bed!!.distanceSquared(it.player?.location) < 5
+                it.bed != null && it.bed == block.location
             }
             if (bed.isNotEmpty()) {
                 if (block.drops.isNotEmpty())

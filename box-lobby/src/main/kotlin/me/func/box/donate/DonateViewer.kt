@@ -35,7 +35,6 @@ import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.network.packages.GetAccountBalancePackage
 import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage
 import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage
-import sun.audio.AudioPlayer.player
 import java.util.concurrent.TimeUnit
 
 class DonateViewer : Listener {
@@ -247,7 +246,10 @@ class DonateViewer : Listener {
     @EventHandler
     fun PlayerInteractEvent.handle() {
         val type = player.itemInHand.getType()
-        if (action == Action.PHYSICAL) isCancelled = true
+        if (action == Action.PHYSICAL) {
+            isCancelled = true
+            return
+        }
         if (type == Material.COMPASS) compass.open(player)
         else if (type == Material.EMERALD) all.open(player)
     }

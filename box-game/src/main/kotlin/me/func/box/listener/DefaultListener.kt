@@ -10,6 +10,7 @@ import me.func.box.cosmetic.Starter
 import me.func.box.data.Status
 import me.func.box.listener.lucky.SuperSword
 import me.func.box.mod.ModHelper
+import me.func.mod.Anime
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.*
@@ -24,6 +25,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockGrowEvent
 import org.bukkit.event.entity.*
+import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
@@ -78,6 +80,7 @@ class DefaultListener : Listener {
                     )
                 )
             }
+            Anime.lockPersonalization(player)
         }
         player.addPotionEffect(visible, true)
         player.addPotionEffect(regen, true)
@@ -143,11 +146,8 @@ class DefaultListener : Listener {
     }
 
     @EventHandler
-    fun PlayerMoveEvent.handle() {
-        if (app.status == Status.STARTING)
-            cancel = true
-        else if (to.x > app.size + 12 || to.y > app.size || to.z > app.size + 12 || to.x < -12 || to.z < -12)
-            player.health = 0.0
+    fun CraftItemEvent.handle() {
+        if(recipe.result.getType() == Material.ANVIL) isCancelled = true
     }
 
     @EventHandler
@@ -292,7 +292,9 @@ class DefaultListener : Listener {
                     val between = " §f" + (userKiller?.stat?.currentKillMessage?.getDescription() ?: "убит")
                     var message = "" + team.color.chatColor + player.name + between
                     if (player.killer != null) {
-                        userKiller?.giveMoney(app.killMoney)
+                        if (userKiller?.tempKills!! < 30) {
+                            userKiller.giveMoney(app.killMoney)
+                        }
                         message += " игроком " + player.killer.name
                     }
                     if (user.bed != null && user.bed!!.block.type == Material.BED_BLOCK) {
