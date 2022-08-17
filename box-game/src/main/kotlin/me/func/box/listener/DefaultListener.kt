@@ -25,6 +25,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockGrowEvent
 import org.bukkit.event.entity.*
+import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
@@ -142,6 +143,11 @@ class DefaultListener : Listener {
             }
         }
         Winner.tryGetWinner()
+    }
+
+    @EventHandler
+    fun CraftItemEvent.handle() {
+        if(recipe.result.getType() == Material.ANVIL) isCancelled = true
     }
 
     @EventHandler
