@@ -23,37 +23,37 @@ class TradeMenu : Listener {
         rows = 4
         columns = 4
         buttons(
-            test(item { type = Material.IRON_HELMET
+            slot(item { type = Material.IRON_HELMET
                 text("Железный шлем")}, Pair(Material.COBBLESTONE, 32)),
-            test(item { type = Material.DIAMOND_HELMET
+            slot(item { type = Material.DIAMOND_HELMET
                 text("Алмазный шлем")}, Pair(Material.GOLD_INGOT, 4)),
-            test(item { type = Material.STONE_PICKAXE
+            slot(item { type = Material.STONE_PICKAXE
                 text("Каменная кирка")}, Pair(Material.COBBLESTONE, 16)),
-            test(item { type = Material.IRON_SWORD
+            slot(item { type = Material.IRON_SWORD
                 text("Железный меч")}, Pair(Material.COBBLESTONE, 64)),
 
-            test(item { type = Material.IRON_CHESTPLATE
+            slot(item { type = Material.IRON_CHESTPLATE
                 text("Железный нагрудник")}, Pair(Material.COBBLESTONE, 32)),
-            test(item { type = Material.DIAMOND_CHESTPLATE
+            slot(item { type = Material.DIAMOND_CHESTPLATE
                 text("Алмазный нагрудник")}, Pair(Material.GOLD_INGOT, 4)),
-            test(item {
+            slot(item {
                 type = Material.IRON_PICKAXE
                 text("Железная кирка")
                 enchant(Enchantment.DIG_SPEED, 2)
             }, Pair(Material.COBBLESTONE, 40)),
-            test(item { type = Material.DIAMOND_SWORD
+            slot(item { type = Material.DIAMOND_SWORD
                 text("Алмазный меч")}, Pair(Material.COBBLESTONE, 128)),
 
-            test(item { type = Material.IRON_LEGGINGS
+            slot(item { type = Material.IRON_LEGGINGS
                 text("Железные поножи")}, Pair(Material.COBBLESTONE, 32)),
-            test(item { type = Material.DIAMOND_LEGGINGS
+            slot(item { type = Material.DIAMOND_LEGGINGS
                 text("Алмазные поножи")}, Pair(Material.GOLD_INGOT, 4)),
-            test(item {
+            slot(item {
                 type = Material.DIAMOND_PICKAXE
                 text("Алмазная кирка")
                 enchant(Enchantment.DIG_SPEED, 2)
             }, Pair(Material.GOLD_INGOT, 2)),
-            test(item {
+            slot(item {
                 type = Material.IRON_SWORD
                 text("Железный меч")
                 enchant(Enchantment.DAMAGE_ALL, 3)
@@ -62,11 +62,11 @@ class TradeMenu : Listener {
                 nbt("extra", "hammer")
             }, Pair(Material.EMERALD, 128)),
 
-            test(item { type = Material.IRON_BOOTS
+            slot(item { type = Material.IRON_BOOTS
                 text("Железные ботинки")}, Pair(Material.COBBLESTONE, 32)),
-            test(item { type = Material.DIAMOND_BOOTS
+            slot(item { type = Material.DIAMOND_BOOTS
                 text("Алмазные ботинки")}, Pair(Material.GOLD_INGOT, 4)),
-            test(item {
+            slot(item {
                 type = Material.GOLD_PICKAXE
                 text("§eЗолотая кирка §l3x3")
                 text("")
@@ -76,19 +76,19 @@ class TradeMenu : Listener {
                 nbt("simulators", "donate_pickaxe")
                 nbt("extra", "pickaxe")
             }, Pair(Material.EMERALD, 64), Pair(Material.GOLD_INGOT, 5)),
-            test(item { type = Material.GOLD_INGOT
+            slot(item { type = Material.GOLD_INGOT
                 text("Золотой слиток")}, Pair(Material.COBBLESTONE, 48)),
-            test(item { type = Material.CHEST
+            slot(item { type = Material.CHEST
                 text("Сундук")}, Pair(Material.EMERALD, 10)),
-            test(item { type = Material.COMPASS
+            slot(item { type = Material.COMPASS
                 text("Компас")}, Pair(Material.EMERALD, 128)),
-            test(item { type = Material.BED
+            slot(item { type = Material.BED
                 text("Кровать")}, Pair(Material.EMERALD, 192)),
-            test(item { type = Material.BOOKSHELF
+            slot(item { type = Material.BOOKSHELF
                 text("Книжная полка")}, Pair(Material.EMERALD, 12)),
-            test(item { type = Material.ENCHANTMENT_TABLE
+            slot(item { type = Material.ENCHANTMENT_TABLE
                 text("Чародейский стол")}, Pair(Material.EMERALD, 128)),
-            test(item { type = Material.TNT
+            slot(item { type = Material.TNT
                 text("ТНТ")}, Pair(Material.EMERALD, 12))
         )
     }
@@ -102,7 +102,7 @@ class TradeMenu : Listener {
         }
     }
 
-    private fun test(buyItem: ItemStack, vararg need: Pair<Material, Int>) : Button {
+    private fun slot(buyItem: ItemStack, vararg need: Pair<Material, Int>) : Button {
         return button {
             item = ItemStack(buyItem.getType())
             title = buyItem.itemMeta.displayName
