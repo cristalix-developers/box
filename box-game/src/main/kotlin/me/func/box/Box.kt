@@ -23,6 +23,7 @@ import me.func.box.map.Generator
 import me.func.box.map.TradeMenu
 import me.func.box.mod.ModTransfer
 import me.func.mod.Anime
+import me.func.mod.Kit
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TextComponent
@@ -65,7 +66,6 @@ const val MAX_GAME_STREAK_COUNT = 8
 var sessionDurability = System.getProperty("TIME", "4000").toInt()
 
 class Box : JavaPlugin() {
-
     private val oldStatScope = Scope("boxll", Stat::class.java)
     private val statScope = Scope("box-newa", Stat::class.java)
 
@@ -94,6 +94,7 @@ class Box : JavaPlugin() {
     var gameCounter = 0
 
     override fun onEnable() {
+        Anime.include(Kit.EXPERIMENTAL)
         B.plugin = this
         app = this
         EntityDataParameters.register()
@@ -103,7 +104,6 @@ class Box : JavaPlugin() {
             type = Material.WOOD_PICKAXE
             nbt("Unbreakable", 1)
         }
-
         userManager = BukkitUserManager(
             listOf(statScope, oldStatScope),
             { session: KensukeSession, context ->
@@ -159,7 +159,6 @@ class Box : JavaPlugin() {
         kensuke.addGlobalUserManager(userManager)
         kensuke.globalRealm = info.realmId.realmName
         userManager.isOptional = true
-
         // Регистрация обработчиков
         B.events(
             BlockListener(),
