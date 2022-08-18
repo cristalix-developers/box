@@ -284,7 +284,7 @@ class DefaultListener : Listener {
             if (player.openInventory != null && player.openInventory.topInventory != null)
                 player.openInventory.topInventory.clear()
             player.inventory.clear()
-            if (isTitan)
+            if (isTitan && player.killer != null)
                 itemsToGive.forEach { player.inventory.addItem(it) }
             player.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 255, false, false))
             app.teams.filter { it.players.contains(entity.uniqueId) }
