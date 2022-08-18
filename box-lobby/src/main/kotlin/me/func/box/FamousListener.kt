@@ -24,7 +24,7 @@ object FamousListener : Listener {
         "bf30a1df-85de-11e8-a6de-1cb72caa35fd",  // reidj
         "e7c13d3d-ac38-11e8-8374-1cb72caa35fd",  // delfikpro
         "0ddd561e-9205-11eb-acca-1cb72caa35fd",  // depressed
-        "6333aee1-681b-11ec-acca-1cb72caa35fd"   // Doza_Narkoza228
+        "48919a24-20bd-11ea-a54a-1cb72caa35fd"  // MrMaximus_
     ).map { UUID.fromString(it) }
 
     @EventHandler
