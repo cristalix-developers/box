@@ -41,14 +41,7 @@ object FamousListener : Listener {
             val user = app.getUser(player)
             val stat = user.stat
 
-            Anime.bottomRightMessage(
-                player,
-                "§fПобед §b${stat.wins}",
-                "§fУбийств §c${stat.kills}",
-                "§fСмертей §f${stat.deaths}",
-                "§fК/Д §c${((stat.kills / (stat.deaths + 1)) * 100 % 100) / 100.0}",
-                "§fИгр сыграно §f${stat.games}"
-            )
+            Anime.bottomRightMessage(player, "§fК/Д §c${((stat.kills / (stat.deaths + 1)) * 100 % 100) / 100.0}")
 
             stat.lastSeenName = player.displayName
 

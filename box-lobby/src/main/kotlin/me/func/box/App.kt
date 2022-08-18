@@ -2,6 +2,7 @@ package me.func.box
 
 import clepto.bukkit.B
 import clepto.cristalix.WorldMeta
+import dev.implario.bukkit.item.item
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.kensuke.Kensuke
 import dev.implario.kensuke.Scope
@@ -17,18 +18,17 @@ import me.func.mod.Npc
 import me.func.mod.Npc.location
 import me.func.mod.Npc.onClick
 import me.func.mod.data.Sprites
+import me.func.mod.selection.Choicer
 import me.func.mod.selection.button
 import me.func.mod.selection.choicer
 import me.func.mod.util.command
 import me.func.mod.util.listener
 import me.func.protocol.npc.NpcBehaviour
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
-import org.bukkit.Location
-import org.bukkit.Particle
+import org.bukkit.*
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.boards.bukkitapi.Boards
 import ru.cristalix.core.CoreApi
@@ -47,29 +47,64 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 lateinit var app: App
-val compass = choicer {
+val startGameMenu = choicer {
     title = "Бедроковая коробка"
     description = "Находи чужие кровати и уничтожай врагов!"
     buttons(
         button {
+            hint = "Играть!"
             texture = Sprites.SOLO.path()
             title = "Solo"
             description = "Онлайн: " + realmService.getOnlineOnRealms("BOX4")
             onClick { it, _, _ -> ClickServer("BOX4", 4).accept(it) }
         },
         button {
+            hint = "Играть!"
             texture = Sprites.SQUAD.path()
             title = "Squad"
             description = "Онлайн: " + realmService.getOnlineOnRealms("BOXS")
             onClick { it, _, _ -> ClickServer("BOXS", 16).accept(it) }
         },
         button {
+            hint = "Играть!"
             texture = Sprites.SPECIAL.path()
             title = "Lucky"
             description = "Онлайн: " + realmService.getOnlineOnRealms("BOX8")
             onClick { it, _, _ -> ClickServer("BOX8", 16).accept(it) }
         },
     )
+}
+fun statisticMenu(player: Player) {
+    val user = app.getUser(player)
+    val stat = user.stat
+
+    val menu = Choicer("Бедроковая коробка", "Общая статистика")
+    menu.add(
+        button {
+            description("§fПобед §b${stat.wins}")
+            item = item { type = Material.CLAY_BALL
+                nbt("other", "cup")}
+        })
+    menu.add(
+        button {
+            description("§fУбийств §c${stat.kills}")
+            item = item { type = Material.CLAY_BALL
+                nbt("other", "custom_sword")}
+        })
+    menu.add(
+        button {
+            description("§fСмертей §f${stat.deaths}")
+            item = item { type = Material.CLAY_BALL
+                nbt("other", "finale_kill")}
+        })
+    menu.add(
+        button {
+            description("§fИгр сыграно §f${stat.games}")
+            item = item { type = Material.CLAY_BALL
+                nbt("skyblock", "collections")}
+        })
+
+    menu.open(player)
 }
 
 class App : JavaPlugin() {
@@ -188,15 +223,15 @@ class App : JavaPlugin() {
                 stand.customName = "§b$online игроков в игре"
                 val desc = "Онлайн: $online"
                 when (type) {
-                    ServerType.BOX4 -> compass.storage[0]
-                    ServerType.BOXS -> compass.storage[1]
-                    ServerType.BOX8 -> compass.storage[2]
+                    ServerType.BOX4 -> startGameMenu.storage[0]
+                    ServerType.BOXS -> startGameMenu.storage[1]
+                    ServerType.BOX8 -> startGameMenu.storage[2]
                     else -> null
                 }?.description = desc
             }
         }, 5, 10)
 
-        listener(FamousListener, GlobalListener, Lootbox, DonateViewer())
+        listener(FamousListener, GlobalListener, Lootbox, DonateViewer(), LobbyListener())
 
         fun register(name: String, apply: (Stat, Int) -> String) = command(name) { player, args ->
             if (player.isOp) player.sendMessage(

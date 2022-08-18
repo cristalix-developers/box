@@ -2,7 +2,6 @@ package me.func.box.donate
 
 import dev.implario.bukkit.item.item
 import me.func.box.app
-import me.func.box.compass
 import me.func.box.cosmetic.*
 import me.func.mod.Anime
 import me.func.mod.Glow
@@ -20,17 +19,8 @@ import me.func.protocol.npc.NpcBehaviour
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.inventory.ItemStack
 import ru.cristalix.core.formatting.Formatting
-import ru.cristalix.core.inventory.ClickableItem
-import ru.cristalix.core.inventory.ControlledInventory
-import ru.cristalix.core.inventory.InventoryContents
-import ru.cristalix.core.inventory.InventoryProvider
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.network.packages.GetAccountBalancePackage
 import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage
@@ -118,7 +108,7 @@ class DonateViewer : Listener {
         }.open(player)
     }
 
-    private val all = selection {
+    val donateMenu = selection {
         title = "Персонализация"
         rows = 3
         columns = 3
@@ -221,36 +211,11 @@ class DonateViewer : Listener {
             skinDigest = "479cb4df-702411eaacca1cb72caa35fd"
             onClick {
                 Anime.close(it.player)
-                all.open(it.player)
+                donateMenu.open(it.player)
             }
         }
-        command("menu") { player, _ -> all.open(player) }
-        command("donate") { player, _ -> all.open(player) }
+        command("menu") { player, _ -> donateMenu.open(player) }
+        command("donate") { player, _ -> donateMenu.open(player) }
     }
 
-    private val menuItem = item {
-        type = Material.EMERALD
-        text("§aКосметика")
-    }
-    private val serversItem = item {
-        type = Material.COMPASS
-        text("§bБыстрая игра")
-    }
-
-    @EventHandler
-    fun PlayerJoinEvent.handle() {
-        player.inventory.setItem(0, serversItem)
-        player.inventory.setItem(4, menuItem)
-    }
-
-    @EventHandler
-    fun PlayerInteractEvent.handle() {
-        val type = player.itemInHand.getType()
-        if (action == Action.PHYSICAL) {
-            isCancelled = true
-            return
-        }
-        if (type == Material.COMPASS) compass.open(player)
-        else if (type == Material.EMERALD) all.open(player)
-    }
 }
