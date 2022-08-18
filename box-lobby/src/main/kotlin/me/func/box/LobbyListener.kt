@@ -2,7 +2,11 @@ package me.func.box
 
 import dev.implario.bukkit.item.item
 import me.func.box.donate.DonateViewer
+import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
+import me.func.protocol.Marker
+import me.func.protocol.MarkerSign
+import org.bukkit.Bukkit
 import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
@@ -39,6 +43,7 @@ class LobbyListener : Listener {
         nbt("other", "arrow_back")
     }
 
+    private val marker = Marker(-249.5, 112.6, 26.5, MarkerSign.WARNING)
     @EventHandler
     fun PlayerJoinEvent.handle() {
         player.inventory.clear()
@@ -47,6 +52,14 @@ class LobbyListener : Listener {
         player.inventory.setItem(2, donateItem)
         player.inventory.setItem(4, profileItem)
         player.inventory.setItem(8, hubItem)
+
+        val money = app.getUser(player).stat.money ?: 0
+        player.sendMessage("$money")
+        if (money >= 5000) {
+            Bukkit.getScheduler().runTaskLater(app, {
+                Anime.marker(player, marker)
+            }, 40)
+        }
     }
 
     @EventHandler
