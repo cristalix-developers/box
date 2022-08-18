@@ -147,12 +147,7 @@ class DefaultListener : Listener {
 
     @EventHandler
     fun CraftItemEvent.handle() {
-        if (recipe.result.getType() == Material.ANVIL) isCancelled = true
-    }
-    @EventHandler
-    fun PlayerMoveEvent.handle() {
-        if (to.x > app.size + 12 || to.y > app.size || to.z > app.size + 12 || to.x < -12 || to.z < -12)
-            player.health = 0.0
+        if(recipe.result.getType() == Material.ANVIL) isCancelled = true
     }
 
     @EventHandler
@@ -289,7 +284,7 @@ class DefaultListener : Listener {
             if (player.openInventory != null && player.openInventory.topInventory != null)
                 player.openInventory.topInventory.clear()
             player.inventory.clear()
-            if (isTitan)
+            if (isTitan && player.killer != null)
                 itemsToGive.forEach { player.inventory.addItem(it) }
             player.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 255, false, false))
             app.teams.filter { it.players.contains(entity.uniqueId) }
