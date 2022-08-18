@@ -146,8 +146,14 @@ class DefaultListener : Listener {
     }
 
     @EventHandler
+<<<<<<< Updated upstream
     fun CraftItemEvent.handle() {
         if(recipe.result.getType() == Material.ANVIL) isCancelled = true
+=======
+    fun PlayerMoveEvent.handle() {
+        if (to.x > app.size + 12 || to.y > app.size || to.z > app.size + 12 || to.x < -12 || to.z < -12)
+            player.health = 0.0
+>>>>>>> Stashed changes
     }
 
     @EventHandler
