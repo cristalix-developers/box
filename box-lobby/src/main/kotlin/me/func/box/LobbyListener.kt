@@ -64,7 +64,10 @@ class LobbyListener : Listener {
 
     @EventHandler
     fun PlayerInteractEvent.handle() {
-        if (action == Action.PHYSICAL) isCancelled = true
+        if (action == Action.PHYSICAL) {
+            isCancelled = true
+            return
+        }
 
         when (player.itemInHand) {
             navigationItem -> ModTransfer().send("func:navigator", player)
