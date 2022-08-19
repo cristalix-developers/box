@@ -53,7 +53,7 @@ class LobbyListener : Listener {
         player.inventory.setItem(4, profileItem)
         player.inventory.setItem(8, hubItem)
 
-        val money = app.getUser(player).stat.money
+        val money = app.getUser(player).stat.money ?: 0
         if (money >= 5000) {
             Bukkit.getScheduler().runTaskLater(app, {
                 Anime.marker(player, marker)
@@ -63,7 +63,10 @@ class LobbyListener : Listener {
 
     @EventHandler
     fun PlayerInteractEvent.handle() {
-        if (action == Action.PHYSICAL) isCancelled = true
+        if (action == Action.PHYSICAL) {
+            isCancelled = true
+            return
+        }
 
         when (player.itemInHand) {
             navigationItem -> ModTransfer().send("func:navigator", player)
