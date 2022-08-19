@@ -94,5 +94,11 @@ class App : KotlinMod() {
             waiting = false
             UIEngine.overlayContext.removeChild(box)
         }
+
+        registerHandler<KeyPress> {
+            if(Keyboard.isKeyDown(Keyboard.KEY_P)) {
+                isCancelled = true
+            }
+        }
     }
 }
