@@ -69,7 +69,7 @@ class LobbyListener : Listener {
         when (player.itemInHand) {
             navigationItem -> ModTransfer().send("func:navigator", player)
             startGameItem -> startGameMenu.open(player)
-            donateItem -> DonateViewer().donateMenu.open(player)
+            donateItem -> player.performCommand("donate")
             profileItem -> statisticMenu(player)
             hubItem -> ITransferService.get().transfer(player.uniqueId, RealmId.of("HUB"))
         }
