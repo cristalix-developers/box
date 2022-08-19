@@ -103,6 +103,14 @@ fun statisticMenu(player: Player) {
             item = item { type = Material.CLAY_BALL
                 nbt("skyblock", "collections")}
         })
+    menu.add(
+        button {
+            description("§fВаш баланс §f${stat.money}")
+            item = item {type = Material.CLAY_BALL
+                nbt("other", "coin5")
+            }
+        }
+    )
 
     menu.open(player)
 }
