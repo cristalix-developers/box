@@ -152,8 +152,8 @@ class Box : JavaPlugin() {
         info.status = RealmStatus.WAITING_FOR_PLAYERS
         info.extraSlots = 1
         info.maxPlayers = slots
-        info.readableName = "Коробка#$id v.3.4.5"
-        info.groupName = "Коробка#$id v.3.4.5"
+        info.readableName = "Коробка#$id v.3.4.6"
+        info.groupName = "Коробка#$id v.3.4.6"
 
         kensuke = BukkitKensuke.setup(this)
         kensuke.addGlobalUserManager(userManager)
