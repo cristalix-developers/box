@@ -54,7 +54,6 @@ class LobbyListener : Listener {
         player.inventory.setItem(8, hubItem)
 
         val money = app.getUser(player).stat.money ?: 0
-        player.sendMessage("$money")
         if (money >= 5000) {
             Bukkit.getScheduler().runTaskLater(app, {
                 Anime.marker(player, marker)
