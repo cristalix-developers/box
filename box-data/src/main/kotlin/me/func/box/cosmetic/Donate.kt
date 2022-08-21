@@ -1,6 +1,7 @@
 package me.func.box.cosmetic
 
 import me.func.box.User
+import org.bukkit.inventory.ItemStack
 
 interface Donate {
 
@@ -12,6 +13,7 @@ interface Donate {
 
     fun getRare(): Rare
 
-    fun give(user: User)
+    fun getIcon() : ItemStack
 
+    fun give(user: User)
 }

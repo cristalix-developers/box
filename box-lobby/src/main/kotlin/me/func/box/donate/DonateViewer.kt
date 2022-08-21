@@ -2,6 +2,7 @@ package me.func.box.donate
 
 import dev.implario.bukkit.item.item
 import me.func.box.app
+import me.func.box.battlepass.BattlePassManager
 import me.func.box.cosmetic.*
 import me.func.mod.Anime
 import me.func.mod.Glow
@@ -116,11 +117,20 @@ class DonateViewer : Listener {
 
         buttons(
             button {
+                title = "BattlePass"
+                description = "Забери награды!"
+                item = item { type = Material.DIAMOND_SWORD }
+                special = true
+                onClick { player, _, _ ->
+                    BattlePassManager.show(player)
+                }
+            },
+            button {
                 title = "Костюмы"
                 description = "скины на алмазную броню"
                 item = item { type = Material.DIAMOND_HELMET }.nbt("armors", "chicken")
                 onClick { player, _, _ ->
-                    temp(player, "Костюмы", true, *Armor.values()) { button, armor -> button.item(armor.getItem()) }
+                    temp(player, "Костюмы", true, *Armor.values()) { button, armor -> button.item(armor.getIcon()) }
                 }
             }, button {
                 title = "Послания"
@@ -132,7 +142,7 @@ class DonateViewer : Listener {
                         "Послания",
                         true,
                         *KillMessage.values()
-                    ) { button, message -> button.item(message.getItemStack()) }
+                    ) { button, message -> button.item(message.getIcon()) }
                 }
             }, button {
                 title = "Мечи"
@@ -167,7 +177,7 @@ class DonateViewer : Listener {
                         "Разрушения",
                         true,
                         *BreakBedEffect.values()
-                    ) { button, effect -> button.item(effect.getItemStack()) }
+                    ) { button, effect -> button.item(effect.getIcon()) }
                 }
             }
         )

@@ -127,6 +127,7 @@ class TradeMenu : Listener {
                     Material.GOLD_INGOT -> player.inventory.addItem(ItemStack(Material.GOLD_INGOT))
                     else -> player.inventory.addItem(buyItem)
                 }
+                app.getUser(player)?.buyItems = app.getUser(player)?.buyItems?.plus(1)!!
             }
         }
     }

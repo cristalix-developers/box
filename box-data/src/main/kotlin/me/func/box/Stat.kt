@@ -4,6 +4,9 @@ import me.func.box.cosmetic.BreakBedEffect
 import me.func.box.cosmetic.KillMessage
 import me.func.box.cosmetic.Starter
 import me.func.box.cosmetic.Sword
+import me.func.box.battlepass.quest.BattlePassQuest
+import me.func.box.battlepass.quest.QuestGenerator
+import me.func.protocol.battlepass.BattlePassUserData
 import java.util.*
 
 data class Stat(
@@ -32,4 +35,9 @@ data class Stat(
     var dailyClaimTimestamp: Long,
     var lastEnter: Long,
     var rewardStreak: Int,
-)
+
+    var progress: BattlePassUserData?,
+    var claimedRewards: MutableList<Int>?,
+    var data: List<BattlePassQuest>? = QuestGenerator.generate(),
+    var lastGenerationTime: Long = System.currentTimeMillis(),
+    )

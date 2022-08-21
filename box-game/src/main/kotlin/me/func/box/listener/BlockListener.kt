@@ -16,7 +16,6 @@ import org.bukkit.block.BlockFace
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
-import org.bukkit.entity.ExperienceOrb
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
@@ -83,6 +82,7 @@ class BlockListener : Listener {
                         Bukkit.getPlayer(uid)?.playSound(player.location, "entity.enderdragon.ambient", 1f, 1f)
                         Bukkit.getPlayer(uid)?.sendTitle("§cКровать уничтожена!", "§eВы больше не оживете")
                     }
+                    user.bedDestroy += 1
                     return
                 }
             val bed = Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }.filter {
@@ -108,6 +108,7 @@ class BlockListener : Listener {
         breakBlock(user, block.location, 0, 0, 0)
         block.drops.clear()
         dropItems = false
+        user.blockDestroy += 1
 
         if (player.itemInHand.hasItemMeta()) {
             val item = CraftItemStack.asNMSCopy(player.itemInHand)

@@ -6,6 +6,9 @@ import dev.implario.bukkit.item.item
 import io.netty.buffer.Unpooled
 import me.func.box.User
 import me.func.box.app
+import me.func.box.battlepass.BattlePassUtil
+import me.func.box.battlepass.quest.QuestType
+import me.func.box.battlepass.ServerType
 import me.func.box.cosmetic.Starter
 import me.func.box.data.Status
 import me.func.box.listener.lucky.SuperSword
@@ -456,12 +459,16 @@ object Winner {
                     )
                     meta.power = 0
                     firework.fireworkMeta = meta
+
+                    addStatWhenServerType(user, true)
                 }
             }
             Bukkit.getOnlinePlayers().forEach {
                 if (list[0].players.contains(it.uniqueId))
                     return@forEach
                 it.sendTitle("§cПОРАЖЕНИЕ", "§cвы проиграли")
+                addStatWhenServerType(app.getUser(it)!!, false)
+
             }
             app.status = Status.END
         }
@@ -469,5 +476,27 @@ object Winner {
             app.status = Status.END
             return
         }
+    }
+
+    private fun addStatWhenServerType(user: User, isWin: Boolean) {
+        when(app.serverType) {
+            ServerType.BOX1X4 -> addStats(user, isWin, ServerType.ANY, ServerType.BOX1X4)
+            ServerType.BOX4X4 -> addStats(user, isWin, ServerType.ANY, ServerType.BOX4X4)
+            ServerType.BOXLUCKY -> addStats(user, isWin, ServerType.ANY, ServerType.BOXLUCKY)
+            ServerType.ANY -> addStats(user, isWin, ServerType.ANY)
+        }
+    }
+
+    private fun addStats(user: User,  isWin: Boolean = true, vararg serverType: ServerType) {
+        serverType.forEach { type ->
+            if (isWin) BattlePassUtil.update(user, QuestType.WIN, 1, false, type)
+            BattlePassUtil.update(user, QuestType.PLAY, 1, false, type)
+            BattlePassUtil.update(user, QuestType.KILL, user.tempKills, false, type)
+            BattlePassUtil.update(user, QuestType.FINALKILL, user.finalKills, false, type)
+            BattlePassUtil.update(user, QuestType.BUYITEMS, user.buyItems, false, type)
+            BattlePassUtil.update(user, QuestType.BEDBREAK, user.bedDestroy, false, type)
+            BattlePassUtil.update(user, QuestType.BLOCKBREAK, user.blockDestroy, false, type)
+        }
+
     }
 }

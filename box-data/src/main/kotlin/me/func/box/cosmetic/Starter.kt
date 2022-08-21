@@ -4,6 +4,7 @@ import dev.implario.bukkit.item.item
 import me.func.box.User
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 
 /**
  * @author Рейдж 29.06.2021
@@ -126,13 +127,20 @@ enum class Starter(
         return name
     }
 
-    fun getItem(): org.bukkit.inventory.ItemStack {
+    fun getItem(): ItemStack {
         return item {
             text(rare.color + rare.title + " \n" + rare.color + title)
             type = items.first
             amount = items.second
         }
     }
+
+    override fun getIcon(): ItemStack = item {
+        type = items.first
+        text("${getRare().getColored()}§f начальный набор $title")
+        nbt("rare", rare.ordinal)
+    }
+
 
     override fun give(user: User) {
         if (user.stat.starters == null)
