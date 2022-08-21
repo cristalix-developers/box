@@ -460,27 +460,15 @@ object Winner {
                     meta.power = 0
                     firework.fireworkMeta = meta
 
-                    when(app.serverType) {
-                        ServerType.BOX1X4 -> {
-                            addStats(user)
-                            addStats(user, ServerType.ANY)
-                        }
-                        ServerType.BOX4X4 -> {
-                            addStats(user)
-                            addStats(user, ServerType.ANY)
-                        }
-                        ServerType.BOXLUCKY -> {
-                            addStats(user)
-                            addStats(user, ServerType.ANY)
-                        }
-                        ServerType.ANY -> addStats(user)
-                    }
+                    addStatWhenServerType(user, true)
                 }
             }
             Bukkit.getOnlinePlayers().forEach {
                 if (list[0].players.contains(it.uniqueId))
                     return@forEach
                 it.sendTitle("§cПОРАЖЕНИЕ", "§cвы проиграли")
+                addStatWhenServerType(app.getUser(it)!!, false)
+
             }
             app.status = Status.END
         }
@@ -490,14 +478,25 @@ object Winner {
         }
     }
 
-    private fun addStats(user: User, serverType: ServerType = app.serverType) {
-        BattlePassUtil.update(user, QuestType.WIN, 1, false, serverType)
-        BattlePassUtil.update(user, QuestType.PLAY, 1, false, serverType)
-        BattlePassUtil.update(user, QuestType.KILL, user.tempKills, false, serverType)
-        BattlePassUtil.update(user, QuestType.FINALKILL, user.finalKills, false, serverType)
-//        BattlePassUtil.update(user, QuestType.BUYITEMS, user.buyItemCount, false, serverType)
-//        BattlePassUtil.update(user, QuestType.BEDBREAK, user.bedBreakCount, false, serverType)
-//        BattlePassUtil.update(user, QuestType.BLOCKBREAK, user.blockBreakCount, false, serverType)
+    private fun addStatWhenServerType(user: User, isWin: Boolean) {
+        when(app.serverType) {
+            ServerType.BOX1X4 -> addStats(user, isWin, ServerType.ANY, ServerType.BOX1X4)
+            ServerType.BOX4X4 -> addStats(user, isWin, ServerType.ANY, ServerType.BOX4X4)
+            ServerType.BOXLUCKY -> addStats(user, isWin, ServerType.ANY, ServerType.BOXLUCKY)
+            ServerType.ANY -> addStats(user, isWin, ServerType.ANY)
+        }
+    }
+
+    private fun addStats(user: User,  isWin: Boolean = true, vararg serverType: ServerType) {
+        serverType.forEach { type ->
+            if (isWin) BattlePassUtil.update(user, QuestType.WIN, 1, false, type)
+            BattlePassUtil.update(user, QuestType.PLAY, 1, false, type)
+            BattlePassUtil.update(user, QuestType.KILL, user.tempKills, false, type)
+            BattlePassUtil.update(user, QuestType.FINALKILL, user.finalKills, false, type)
+            BattlePassUtil.update(user, QuestType.BUYITEMS, user.buyItems, false, type)
+            BattlePassUtil.update(user, QuestType.BEDBREAK, user.bedDestroy, false, type)
+            BattlePassUtil.update(user, QuestType.BLOCKBREAK, user.blockDestroy, false, type)
+        }
 
     }
 }

@@ -25,6 +25,9 @@ class User(session: KensukeSession, stat: Stat?, oldStat: Stat?) : IBukkitKensuk
     var compassToPlayer = true
     var finalKills = 0
     var lock = false
+    var bedDestroy = 0
+    var buyItems = 0
+    var blockDestroy = 0
 
     var stat: Stat
     private var player: Player? = null

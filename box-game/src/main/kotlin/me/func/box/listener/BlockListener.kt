@@ -82,6 +82,7 @@ class BlockListener : Listener {
                         Bukkit.getPlayer(uid)?.playSound(player.location, "entity.enderdragon.ambient", 1f, 1f)
                         Bukkit.getPlayer(uid)?.sendTitle("§cКровать уничтожена!", "§eВы больше не оживете")
                     }
+                    user.bedDestroy += 1
                     return
                 }
             val bed = Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }.filter {
@@ -107,6 +108,7 @@ class BlockListener : Listener {
         breakBlock(user, block.location, 0, 0, 0)
         block.drops.clear()
         dropItems = false
+        user.blockDestroy += 1
 
         if (player.itemInHand.hasItemMeta()) {
             val item = CraftItemStack.asNMSCopy(player.itemInHand)
