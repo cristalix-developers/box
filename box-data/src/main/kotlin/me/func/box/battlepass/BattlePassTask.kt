@@ -9,6 +9,7 @@ import ru.cristalix.core.microservice.MicroserviceBootstrap
 import ru.cristalix.core.network.Capability
 import ru.cristalix.core.network.CorePackage
 import ru.cristalix.core.network.ISocketClient
+import java.time.LocalDateTime
 import java.util.*
 
 fun main() {
@@ -47,6 +48,7 @@ data class BattlePassSendLog(
 
 data class Log(
     override val uuid: UUID = UUID.randomUUID(),
+    var time: LocalDateTime,
     var playerUUID: UUID,
     var typeLog: TypeLog,
     var message: String

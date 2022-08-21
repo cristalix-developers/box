@@ -1,6 +1,7 @@
 package me.func.box.battlepass
 
 import ru.cristalix.core.CoreApi
+import java.time.LocalDateTime
 import java.util.UUID
 
 object BattlePassLog {
@@ -9,6 +10,7 @@ object BattlePassLog {
         CoreApi.get().socketClient.write(BattlePassSendLog(
             Log(
                 UUID.randomUUID(),
+                LocalDateTime.now(),
                 uuidPlayer,
                 typeLog,
                 log
