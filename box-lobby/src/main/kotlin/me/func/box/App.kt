@@ -28,7 +28,6 @@ import org.bukkit.*
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.boards.bukkitapi.Boards
 import ru.cristalix.core.CoreApi
@@ -132,7 +131,7 @@ class App : JavaPlugin() {
         app = this
         Platforms.set(PlatformDarkPaper())
 
-        Anime.include(Kit.EXPERIMENTAL, Kit.NPC, Kit.STANDARD, Kit.LOOTBOX)
+        Anime.include(Kit.EXPERIMENTAL, Kit.NPC, Kit.STANDARD, Kit.LOOTBOX, Kit.BATTLEPASS)
 
         // Загрузка карты
         worldMeta = MapLoader().load("Event")!!
@@ -151,8 +150,9 @@ class App : JavaPlugin() {
         info.readableName = "Бедроковая коробка"
         info.groupName = "Бедроковая коробка"
         info.isLobbyServer = true
-        info.servicedServers = arrayOf("BOX4", "BOX8", "BOX5", "BOXE", "BOXS")
-
+        if (!info.realmId.realmName.contains("TEST")) {
+            info.servicedServers = arrayOf("BOX4", "BOX8", "BOX5", "BOXE", "BOXS")
+        }
         // Регистрация сервисов
         val core = CoreApi.get()
 

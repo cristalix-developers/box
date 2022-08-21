@@ -15,6 +15,7 @@ import dev.implario.kensuke.impl.bukkit.BukkitKensuke
 import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.bar.WaitingPlayers
+import me.func.box.battlepass.ServerType
 import me.func.box.cosmetic.Starter
 import me.func.box.data.BoxTeam
 import me.func.box.data.Status
@@ -74,6 +75,7 @@ class Box : JavaPlugin() {
     lateinit var userManager: UserManager<User>
     lateinit var zero: Location
     lateinit var kensuke: Kensuke
+    lateinit var serverType: ServerType
     var isLuckyGame = System.getenv("LUCKY").toInt() == 1
     var slots = System.getenv("SLOT").toInt()
     val winMoney = System.getenv("WIN_REWARD").toInt()
@@ -154,6 +156,16 @@ class Box : JavaPlugin() {
         info.maxPlayers = slots
         info.readableName = "Коробка#$id v.3.4.5"
         info.groupName = "Коробка#$id v.3.4.5"
+
+        // Получает тип вервета
+        with(info.readableName) {
+            when {
+                contains(ServerType.BOX1X4.address) -> serverType = ServerType.BOX1X4
+                contains(ServerType.BOX4X4.address) -> serverType = ServerType.BOX4X4
+                contains(ServerType.BOXLUCKY.address) -> serverType = ServerType.BOXLUCKY
+                else -> serverType = ServerType.ANY
+            }
+        }
 
         kensuke = BukkitKensuke.setup(this)
         kensuke.addGlobalUserManager(userManager)

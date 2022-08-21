@@ -6,6 +6,9 @@ import dev.implario.bukkit.item.item
 import io.netty.buffer.Unpooled
 import me.func.box.User
 import me.func.box.app
+import me.func.box.battlepass.BattlePassUtil
+import me.func.box.battlepass.quest.QuestType
+import me.func.box.battlepass.ServerType
 import me.func.box.cosmetic.Starter
 import me.func.box.data.Status
 import me.func.box.listener.lucky.SuperSword
@@ -456,6 +459,22 @@ object Winner {
                     )
                     meta.power = 0
                     firework.fireworkMeta = meta
+
+                    when(app.serverType) {
+                        ServerType.BOX1X4 -> {
+                            addStats(user)
+                            addStats(user, ServerType.ANY)
+                        }
+                        ServerType.BOX4X4 -> {
+                            addStats(user)
+                            addStats(user, ServerType.ANY)
+                        }
+                        ServerType.BOXLUCKY -> {
+                            addStats(user)
+                            addStats(user, ServerType.ANY)
+                        }
+                        ServerType.ANY -> addStats(user)
+                    }
                 }
             }
             Bukkit.getOnlinePlayers().forEach {
@@ -469,5 +488,16 @@ object Winner {
             app.status = Status.END
             return
         }
+    }
+
+    private fun addStats(user: User, serverType: ServerType = app.serverType) {
+        BattlePassUtil.update(user, QuestType.WIN, 1, false, serverType)
+        BattlePassUtil.update(user, QuestType.PLAY, 1, false, serverType)
+        BattlePassUtil.update(user, QuestType.KILL, user.tempKills, false, serverType)
+        BattlePassUtil.update(user, QuestType.FINALKILL, user.finalKills, false, serverType)
+//        BattlePassUtil.update(user, QuestType.BUYITEMS, user.buyItemCount, false, serverType)
+//        BattlePassUtil.update(user, QuestType.BEDBREAK, user.bedBreakCount, false, serverType)
+//        BattlePassUtil.update(user, QuestType.BLOCKBREAK, user.blockBreakCount, false, serverType)
+
     }
 }

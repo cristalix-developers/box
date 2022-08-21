@@ -5,10 +5,11 @@ compileKotlin {
 }
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.20'
+    api 'me.func:service-api:2.0.0-SNAPSHOT'
 
     compileOnly 'cristalix:bukkit-core:21.01.30'
     compileOnly 'cristalix:dark-paper:21.02.03'
+    compileOnly 'cristalix:microservice:20.11.04'
 
     implementation 'implario:bukkit-tools:4.4.12'
     implementation 'implario:kotlin-api:1.1.1'
@@ -20,4 +21,8 @@ dependencies {
 
     implementation 'me.func:animation-api:live-SNAPSHOT'
     implementation 'dev.implario:kensuke-client-bukkit:2.1.10'
+
+    implementation('org.mongodb:mongodb-driver-async:3.7.1')
+    implementation('org.mongodb:mongodb-driver:3.7.1')
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0")
 }

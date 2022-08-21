@@ -1,7 +1,6 @@
 package me.func.box
 
 import dev.implario.bukkit.item.item
-import me.func.box.donate.DonateViewer
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.protocol.Marker

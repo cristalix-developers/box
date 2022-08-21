@@ -6,6 +6,8 @@ import me.func.box.cosmetic.BreakBedEffect
 import me.func.box.cosmetic.KillMessage
 import me.func.box.cosmetic.Starter
 import me.func.box.cosmetic.Sword
+import me.func.box.battlepass.quest.QuestGenerator
+import me.func.protocol.battlepass.BattlePassUserData
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.MinecraftServer
@@ -80,7 +82,11 @@ class User(session: KensukeSession, stat: Stat?, oldStat: Stat?) : IBukkitKensuk
                 ),
                 0,
                 0,
-                0
+                0,
+                BattlePassUserData(999999, false),
+                mutableListOf<Int>(),
+                QuestGenerator.generate(),
+                System.currentTimeMillis()
             )
         } else {
             if (stat.currentStarter == null)
@@ -103,6 +109,14 @@ class User(session: KensukeSession, stat: Stat?, oldStat: Stat?) : IBukkitKensuk
             stat?.currentBreakBedEffect = BreakBedEffect.NONE
         if (stat?.breakBedEffects == null || stat.breakBedEffects.isEmpty())
             stat?.breakBedEffects = mutableListOf(BreakBedEffect.NONE)
+        if (stat?.progress == null)
+            stat?.progress = BattlePassUserData(0, false)
+        if (stat?.claimedRewards == null)
+            stat?.claimedRewards = mutableListOf()
+        if (stat?.data == null)
+            stat?.data = QuestGenerator.generate()
+        if (stat?.dailyClaimTimestamp == null)
+            stat?.dailyClaimTimestamp = System.currentTimeMillis()
         this.session = session
     }
 }

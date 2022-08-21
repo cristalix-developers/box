@@ -2,10 +2,16 @@ package me.func.box.cosmetic
 
 import dev.implario.bukkit.item.item
 import me.func.box.User
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 import java.awt.SystemColor.text
 
-enum class Sword(private val price: Int, private val rare: Rare, private val title: String, private val code: Int) :
-    Donate {
+enum class Sword(
+    private val price: Int,
+    private val rare: Rare,
+    private val title: String,
+    private val code: Int,
+    ): Donate {
 
     NONE(0, Rare.COMMON, "Алмазный меч", 0),
     A(29, Rare.COMMON, "Эндер меч", 1),
@@ -20,8 +26,7 @@ enum class Sword(private val price: Int, private val rare: Rare, private val tit
     K(79, Rare.LEGENDARY, "Топор разрушения", 34),
     M(299, Rare.LEGENDARY, "Коса титана", 15),
     L(299, Rare.LEGENDARY, "Сусальный топорик", 54),
-    SNOW(299, Rare.LEGENDARY, "Меч ледяного титана", 13),
-    ;
+    SNOW(299, Rare.LEGENDARY, "Меч ледяного титана", 13);
 
     override fun getPrice(): Int {
         return price
@@ -39,12 +44,17 @@ enum class Sword(private val price: Int, private val rare: Rare, private val tit
         return rare
     }
 
-    fun getItem(): org.bukkit.inventory.ItemStack {
-        return item {
-            text(rare.color + rare.title + " §7" + title)
-            nbt("weapons_other", code)
-            type = org.bukkit.Material.DIAMOND_SWORD
-        }
+    override fun getIcon(): ItemStack = item {
+        type = Material.DIAMOND_SWORD
+        text("${getRare().getColored()}§f меч $title")
+        nbt("weapons_other", code)
+        nbt("rare", rare.ordinal)
+    }
+
+    fun getItem(): ItemStack = item {
+        type = org.bukkit.Material.DIAMOND_SWORD
+        text(rare.color + rare.title + " §7" + title)
+        nbt("weapons_other", code)
     }
 
     override fun give(user: User) {

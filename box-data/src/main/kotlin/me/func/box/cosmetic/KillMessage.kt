@@ -1,5 +1,6 @@
 package me.func.box.cosmetic
 
+import dev.implario.bukkit.item.item
 import me.func.box.User
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -49,8 +50,12 @@ enum class KillMessage(
         return description
     }
 
-    fun getItemStack() : ItemStack {
-        return itemStack
+    override fun getIcon() : ItemStack {
+        return item {
+            type = itemStack.getType()
+            text("${getRare().getColored()}§f сообщение после смерти $title")
+            nbt("rare", rare.ordinal)
+        }
     }
 
     override fun give(user: User) {

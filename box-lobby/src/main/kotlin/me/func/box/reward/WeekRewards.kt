@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack
 
 enum class WeekRewards(val reward: DailyReward, val give: (User) -> Any) {
     ONE(DailyReward("§e250 монет", item { type = Material.GOLD_INGOT }), { it.giveMoney(250) }),
-    TWO(DailyReward("§aКостюм кактуса", Armor.CACTUS.getItem()), { it.stat.skins!!.add(Armor.CACTUS.getCode()) }),
+    TWO(DailyReward("§aКостюм кактуса", Armor.CACTUS.getIcon()), { it.stat.skins!!.add(Armor.CACTUS.getCode()) }),
     THREE(
         DailyReward("§dСообщ. о убийстве - Галактический", ItemStack(Material.ENDER_PEARL)),
         {
@@ -22,7 +22,7 @@ enum class WeekRewards(val reward: DailyReward, val give: (User) -> Any) {
             }
         }
     ),
-    FOUR(DailyReward("§dЭффект разрушения Колдунья", BreakBedEffect.SPELL_WITCH.getItemStack()), {
+    FOUR(DailyReward("§dЭффект разрушения Колдунья", BreakBedEffect.SPELL_WITCH.getIcon()), {
         withDuplicate(it, 2000, BreakBedEffect.SPELL_WITCH) { user, donate ->
             user.stat.breakBedEffects.contains(donate)
         }
