@@ -57,7 +57,7 @@ object BattlePassManager {
             BreakBedEffect.REDSTONE,
             BattlePassKit.MEDIUM,
             BattlePassKit.EPIC,
-            Sword.K
+            Sword.B
         ),
         listOf(
             BattlePassKit.MEDIUM,
@@ -67,13 +67,13 @@ object BattlePassManager {
             BattlePassKit.MEDIUM,
             KillMessage.BANANA,
             BattlePassKit.SMALL,
-            BreakBedEffect.NOTE,
+            BreakBedEffect.VILLAGER_ANGRY,
             BattlePassKit.EPIC,
             Sword.B
         ) to listOf(
             BattlePassKit.MEDIUM,
             BattlePassKit.EPIC,
-            Sword.H,
+            Sword.E,
             BattlePassKit.BIG,
             BattlePassKit.MEDIUM,
             BattlePassKit.BIG,
@@ -103,7 +103,7 @@ object BattlePassManager {
             BattlePassKit.MEDIUM,
             BreakBedEffect.REDSTONE,
             BattlePassKit.EPIC,
-            Sword.L
+            Sword.F
         ),
         listOf(
             BreakBedEffect.SPELL_WITCH,

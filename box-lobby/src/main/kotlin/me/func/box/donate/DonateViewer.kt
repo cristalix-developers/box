@@ -117,6 +117,15 @@ class DonateViewer : Listener {
 
         buttons(
             button {
+                title = "BattlePass"
+                description = "Забери награды!"
+                item = item { type = Material.DIAMOND_SWORD }
+                special = true
+                onClick { player, _, _ ->
+                    BattlePassManager.show(player)
+                }
+            },
+            button {
                 title = "Костюмы"
                 description = "скины на алмазную броню"
                 item = item { type = Material.DIAMOND_HELMET }.nbt("armors", "chicken")
@@ -169,14 +178,6 @@ class DonateViewer : Listener {
                         true,
                         *BreakBedEffect.values()
                     ) { button, effect -> button.item(effect.getIcon()) }
-                }
-            }, button {
-                title = "BattlePass"
-                description = "Купить"
-                item = item { type = Material.DIAMOND_SWORD }
-                special = true
-                onClick { player, _, _ ->
-                    BattlePassManager.show(player)
                 }
             }
         )
