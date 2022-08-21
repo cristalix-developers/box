@@ -10,7 +10,7 @@ import dev.implario.kensuke.UserManager
 import dev.implario.kensuke.impl.bukkit.BukkitKensuke
 import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
-import me.func.box.battlepass.main
+import me.func.battlepass.main
 import me.func.box.donate.DonateViewer
 import me.func.box.donate.Lootbox
 import me.func.mod.Anime

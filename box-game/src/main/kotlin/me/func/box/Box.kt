@@ -15,8 +15,7 @@ import dev.implario.kensuke.impl.bukkit.BukkitKensuke
 import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.bar.WaitingPlayers
-import me.func.box.battlepass.ServerType
-import me.func.box.battlepass.main
+import me.func.battlepass.main
 import me.func.box.cosmetic.Starter
 import me.func.box.data.BoxTeam
 import me.func.box.data.Status

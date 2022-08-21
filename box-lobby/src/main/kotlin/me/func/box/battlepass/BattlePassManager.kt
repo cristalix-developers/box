@@ -1,6 +1,9 @@
 package me.func.box.battlepass
 
 import dev.implario.bukkit.item.item
+import me.func.battlepass.BattlePassLog
+import me.func.battlepass.BattlePassUtil
+import me.func.battlepass.TypeLog
 import me.func.box.app
 import me.func.box.cosmetic.*
 import me.func.mod.Anime

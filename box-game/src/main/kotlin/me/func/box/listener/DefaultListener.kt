@@ -6,9 +6,9 @@ import dev.implario.bukkit.item.item
 import io.netty.buffer.Unpooled
 import me.func.box.User
 import me.func.box.app
-import me.func.box.battlepass.BattlePassUtil
+import me.func.battlepass.BattlePassUtil
 import me.func.box.battlepass.quest.QuestType
-import me.func.box.battlepass.ServerType
+import me.func.box.ServerType
 import me.func.box.cosmetic.Starter
 import me.func.box.data.Status
 import me.func.box.listener.lucky.SuperSword

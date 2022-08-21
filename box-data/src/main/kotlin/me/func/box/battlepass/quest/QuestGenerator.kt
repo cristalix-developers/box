@@ -1,6 +1,6 @@
 package me.func.box.battlepass.quest
 
-import me.func.box.battlepass.ServerType
+import me.func.box.ServerType
 
 object QuestGenerator {
 

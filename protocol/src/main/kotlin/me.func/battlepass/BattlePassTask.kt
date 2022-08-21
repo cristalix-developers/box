@@ -1,4 +1,4 @@
-package me.func.box.battlepass
+package me.func.battlepass
 
 import com.mongodb.client.model.Indexes.hashed
 import me.func.serviceapi.mongo.MongoAdapter

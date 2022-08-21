@@ -1,6 +1,7 @@
-package me.func.box.battlepass
+package me.func.battlepass
 
 import implario.humanize.Humanize
+import me.func.box.ServerType
 import me.func.box.User
 import me.func.box.battlepass.quest.QuestGenerator
 import me.func.box.battlepass.quest.QuestType

@@ -18,6 +18,7 @@ compileKotlin {
 
 dependencies {
     implementation project(':box-data')
+    implementation project(':protocol')
 
     compileOnly 'cristalix:bukkit-core:21.01.30'
     compileOnly 'cristalix:dark-paper:21.02.03'
