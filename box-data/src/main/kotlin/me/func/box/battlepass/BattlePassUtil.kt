@@ -9,7 +9,6 @@ import me.func.mod.Anime
 val BATTLEPASS_RECHARGE_HOURS = 12
 
 object BattlePassUtil {
-    
     @JvmStatic
     fun update(user: User, type: QuestType, value: Int, absolute: Boolean = false, serverType: ServerType) {
         user.let { data ->
@@ -22,14 +21,13 @@ object BattlePassUtil {
                 if (absolute) it.now = value
                 else it.now += value
 
-                //save(player.uniqueId)
-
                 if (it.goal <= it.now) {
                     Anime.topMessage(user.player!!, "§lЗадание выполнено! §6Награда: §b${it.exp} опыта §6баттлпасса")
+                    BattlePassLog.log(user.player!!.uniqueId, TypeLog.QUEST,
+                        "Игрок выполнил квест ${type.name}/${it.goal}. ServerType - ${serverType.name}, получил ${it.exp} опыта")
                     data.stat.progress!!.exp += it.exp
                 }
             }
-
         }
     }
 

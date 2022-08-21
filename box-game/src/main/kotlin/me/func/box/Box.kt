@@ -16,6 +16,7 @@ import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.bar.WaitingPlayers
 import me.func.box.battlepass.ServerType
+import me.func.box.battlepass.main
 import me.func.box.cosmetic.Starter
 import me.func.box.data.BoxTeam
 import me.func.box.data.Status
@@ -476,6 +477,8 @@ class Box : JavaPlugin() {
                 "Максимальное время игры изменено"
             }, "time"
         )
+
+        main() // mongoDB
     }
 
     fun getUser(player: Player): User? {

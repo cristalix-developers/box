@@ -255,6 +255,7 @@ object BattlePassManager {
                         (reward as Donate).give(data)
                         claimed.add(position)
                         Anime.killboardMessage(player, Formatting.fine("Награда: " + reward.getTitle()))
+                        BattlePassLog.log(player.uniqueId, TypeLog.REWARD, "Игрок собрал награду: ${reward.getTitle()}")
                     }
                 }
             }
@@ -272,7 +273,7 @@ object BattlePassManager {
         ).thenAccept {
             if (it.errorMessage.isNullOrEmpty()) {
                 successfully.accept(player)
-
+                BattlePassLog.log(player.uniqueId, TypeLog.BATTLEPASS, "Игрок купил BattlePass")
             } else {
                 Anime.killboardMessage(player, "Ошибка! " + it.errorMessage)
             }
