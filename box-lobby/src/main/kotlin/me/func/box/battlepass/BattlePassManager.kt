@@ -3,7 +3,7 @@ package me.func.box.battlepass
 import dev.implario.bukkit.item.item
 import me.func.battlepass.BattlePassLog
 import me.func.battlepass.BattlePassUtil
-import me.func.battlepass.TypeLog
+import me.func.protocol.ActionLog
 import me.func.box.app
 import me.func.box.cosmetic.*
 import me.func.mod.Anime
@@ -258,7 +258,7 @@ object BattlePassManager {
                         (reward as Donate).give(data)
                         claimed.add(position)
                         Anime.killboardMessage(player, Formatting.fine("Награда: " + reward.getTitle()))
-                        BattlePassLog.log(player.uniqueId, TypeLog.REWARD, "Игрок собрал награду: ${reward.getTitle()}")
+                        BattlePassLog.log(player.uniqueId, ActionLog.REWARD, "Игрок собрал награду: ${reward.getTitle()}")
                     }
                 }
             }
@@ -276,7 +276,7 @@ object BattlePassManager {
         ).thenAccept {
             if (it.errorMessage.isNullOrEmpty()) {
                 successfully.accept(player)
-                BattlePassLog.log(player.uniqueId, TypeLog.BATTLEPASS, "Игрок купил BattlePass")
+                BattlePassLog.log(player.uniqueId, ActionLog.BATTLEPASS, "Игрок купил BattlePass")
             } else {
                 Anime.killboardMessage(player, "Ошибка! " + it.errorMessage)
             }

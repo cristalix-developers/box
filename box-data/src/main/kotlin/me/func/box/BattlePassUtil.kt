@@ -1,4 +1,4 @@
-package me.func.battlepass
+package me.func.box
 
 import implario.humanize.Humanize
 import me.func.box.ServerType
@@ -6,13 +6,18 @@ import me.func.box.User
 import me.func.box.battlepass.quest.QuestGenerator
 import me.func.box.battlepass.quest.QuestType
 import me.func.mod.Anime
+import me.func.protocol.ActionLog
+import me.func.protocol.LogPacket
+import ru.cristalix.core.network.ISocketClient
 
-val BATTLEPASS_RECHARGE_HOURS = 12
+const val BATTLEPASS_RECHARGE_HOURS = 12
 
 object BattlePassUtil {
     @JvmStatic
     fun update(user: User, type: QuestType, value: Int, absolute: Boolean = false, serverType: ServerType) {
         user.let { data ->
+            val player = user.player ?: return
+
             data.stat.data?.find { it.server == serverType && it.questType == type }?.let {
                 if (it.goal <= it.now)
                     return
@@ -24,8 +29,11 @@ object BattlePassUtil {
 
                 if (it.goal <= it.now) {
                     Anime.topMessage(user.player!!, "§lЗадание выполнено! §6Награда: §b${it.exp} опыта §6баттлпасса")
-                    BattlePassLog.log(user.player!!.uniqueId, TypeLog.QUEST,
-                        "Игрок выполнил квест ${type.name}/${it.goal}. ServerType - ${serverType.name}, получил ${it.exp} опыта")
+                    ISocketClient.get().write(LogPacket(
+                        player.uniqueId,
+                        ActionLog.QUEST,
+                        "Игрок выполнил квест ${type.name}/${it.goal}, получил ${it.exp} опыта"
+                    ))
                     data.stat.progress!!.exp += it.exp
                 }
             }

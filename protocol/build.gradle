@@ -17,20 +17,7 @@ compileKotlin {
 }
 
 dependencies {
-    implementation project(':box-data')
-
-    api 'me.func:service-api:2.0.0-SNAPSHOT'
-
-    implementation('org.mongodb:mongodb-driver-async:3.7.1')
-    implementation('org.mongodb:mongodb-driver:3.7.1')
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0")
-
-    implementation 'implario:bukkit-tools:4.4.12'
-    implementation 'implario:kotlin-api:1.1.1'
-
     compileOnly 'cristalix:bukkit-core:21.01.30'
-    compileOnly 'cristalix:dark-paper:21.02.03'
     compileOnly 'cristalix:microservice:20.11.04'
-    implementation 'dev.implario.bukkit:dark-paper:1.0.0'
-    implementation 'implario:bukkit-worker-core:2.1.20'
+    compileOnly 'me.func:service-api:2.0.0-SNAPSHOT'
 }

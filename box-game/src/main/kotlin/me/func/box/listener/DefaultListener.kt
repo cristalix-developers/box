@@ -4,16 +4,19 @@ import clepto.bukkit.B
 import clepto.cristalix.Cristalix
 import dev.implario.bukkit.item.item
 import io.netty.buffer.Unpooled
+import me.func.box.BattlePassUtil
 import me.func.box.User
 import me.func.box.app
-import me.func.battlepass.BattlePassUtil
 import me.func.box.battlepass.quest.QuestType
 import me.func.box.ServerType
 import me.func.box.cosmetic.Starter
 import me.func.box.data.Status
 import me.func.box.listener.lucky.SuperSword
 import me.func.box.mod.ModHelper
+import me.func.box.mod.ModTransfer
 import me.func.mod.Anime
+import me.func.mod.conversation.ModLoader
+import me.func.mod.conversation.ModTransfer
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.*
@@ -46,7 +49,6 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import kotlin.math.min
 
-
 class DefaultListener : Listener {
 
     private val visible = PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 1, true)
@@ -57,16 +59,9 @@ class DefaultListener : Listener {
         text("§cВернуться")
     }
 
-    private var modList = try {
-        File("./mods/").listFiles()!!
-            .filter { it.name.contains("bundle") }
-            .map {
-                val buffer = Unpooled.buffer()
-                buffer.writeBytes(Mod.serialize(Mod(Files.readAllBytes(it.toPath()))))
-                buffer
-            }.toList()
-    } catch (exception: Exception) {
-        throw RuntimeException(exception)
+    init {
+        ModLoader.loadAll("mods")
+        ModLoader.onJoining("box-runtime-mod-bundle")
     }
 
     @EventHandler
@@ -75,14 +70,6 @@ class DefaultListener : Listener {
 
         B.postpone(1) {
             player.teleport(app.spawn)
-            modList.forEach {
-                app.getUser(player)!!.sendPacket(
-                    PacketPlayOutCustomPayload(
-                        DisplayChannels.MOD_CHANNEL,
-                        PacketDataSerializer(it.retainedSlice())
-                    )
-                )
-            }
             Anime.lockPersonalization(player)
         }
         player.addPotionEffect(visible, true)
@@ -90,13 +77,8 @@ class DefaultListener : Listener {
 
         player.inventory.clear()
 
-        (player as CraftPlayer).handle.playerConnection.sendPacket(
-            PacketPlayOutCustomPayload(
-                "xdark:pvp", PacketDataSerializer(
-                    Unpooled.wrappedBuffer("{\"renderSwordAsShield\": true}".toByteArray(StandardCharsets.UTF_8))
-                )
-            )
-        )
+        ModTransfer().byteArray("{\"renderSwordAsShield\": true}".toByteArray(StandardCharsets.UTF_8))
+            .send("xdark:pvp", player)
 
         if (app.status == Status.STARTING) {
             player.inventory.setItem(8, back)

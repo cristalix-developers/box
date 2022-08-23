@@ -3,6 +3,6 @@ include 'box-game'
 include 'box-lobby'
 include 'box-data'
 //include 'box-runtime-mod'
-include 'protocol'
+include 'service'
 include 'protocol'
 

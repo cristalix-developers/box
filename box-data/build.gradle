@@ -7,18 +7,15 @@ compileKotlin {
 dependencies {
     api 'me.func:service-api:2.0.0-SNAPSHOT'
 
+    compileOnly project(':protocol')
     compileOnly 'cristalix:bukkit-core:21.01.30'
     compileOnly 'cristalix:dark-paper:21.02.03'
     compileOnly 'cristalix:microservice:20.11.04'
-
-    implementation 'implario:bukkit-tools:4.4.12'
-    implementation 'implario:kotlin-api:1.1.1'
-    implementation 'dev.implario.bukkit:dark-paper:1.0.0'
-
-    implementation 'implario:bukkit-worker-core:2.1.20'
-
-    implementation 'dev.implario.bukkit:dark-paper:1.0.0'
-
-    implementation 'me.func:animation-api:live-SNAPSHOT'
-    implementation 'dev.implario:kensuke-client-bukkit:2.1.10'
+    compileOnly 'implario:bukkit-tools:4.4.12'
+    compileOnly 'implario:kotlin-api:1.1.1'
+    compileOnly 'dev.implario.bukkit:dark-paper:1.0.0'
+    compileOnly 'implario:bukkit-worker-core:2.1.20'
+    compileOnly 'dev.implario.bukkit:dark-paper:1.0.0'
+    compileOnly 'me.func:animation-api:live-SNAPSHOT'
+    compileOnly 'dev.implario:kensuke-client-bukkit:2.1.10'
 }
