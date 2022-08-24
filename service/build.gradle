@@ -35,3 +35,9 @@ dependencies {
     implementation 'dev.implario.bukkit:dark-paper:1.0.0'
     implementation 'implario:bukkit-worker-core:2.1.20'
 }
+
+jar {
+    archiveBaseName.set 'box'
+    from configurations.runtimeClasspath.collect { it.directory ? it : zipTree(it) }
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE
+}
