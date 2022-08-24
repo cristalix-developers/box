@@ -187,7 +187,6 @@ object BattlePassManager {
                             it,
                             Formatting.fine("§e${player.name} §fкупил §bПремиум §6BattlePass§f!")
                         )
-                        //Music.BONUS.sound(it)
                         it.sendMessage("")
                         it.sendMessage(Formatting.fine("§7Игрок §e${player.name} §7купил §bпремиум §6BattlePass§7!"))
                         it.sendMessage("")
@@ -216,7 +215,7 @@ object BattlePassManager {
             }
         }
         facade.tags.add("Выполняйте квесты - получайте призы!")
-        facade.tags.add("BattlePass завершится в 00.00.0000")
+        //facade.tags.add("BattlePass завершится в 00.00.0000")
         questStatusUpdater = Function<Player, List<String>> { player ->
             BattlePassUtil.getQuestLore(app.getUser(player))
         }

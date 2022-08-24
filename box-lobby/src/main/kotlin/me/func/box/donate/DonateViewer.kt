@@ -119,7 +119,10 @@ class DonateViewer : Listener {
             button {
                 title = "BattlePass"
                 description = "Забери награды!"
-                item = item { type = Material.DIAMOND_SWORD }
+                item = item {
+                    type = Material.CLAY_BALL
+                    nbt("other", "new_lvl_rare_close")
+                }
                 special = true
                 onClick { player, _, _ ->
                     BattlePassManager.show(player)

@@ -18,7 +18,7 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.entity.Player
 import java.util.*
 
-class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
+class User(session: KensukeSession, stat: Stat?, oldStat: Stat?, bpStat: Stat?) : IBukkitKensukeUser {
 
     var bed: Location? = null
     var tempKills = 0
@@ -63,7 +63,18 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
 
     init {
         if (stat == null) {
-            this.stat = Stat(
+            this.stat = oldStat?.apply {
+                kills = 0
+                deaths = 0
+                wins = 0
+                games = 0
+                starters?.clear()
+                currentStarter = null
+            }?.apply {
+                progress = BattlePassUserData(0, false)
+                claimedRewards = mutableListOf()
+                data = QuestGenerator.generate()
+            } ?: Stat(
                 UUID.fromString(session.userId), arrayListOf("hi"), "", 0, 0, 0, 0, 0, 0, 0, null, 500, mutableListOf(
                     Starter.NONE
                 ), Starter.NONE, mutableListOf(
@@ -84,7 +95,38 @@ class User(session: KensukeSession, stat: Stat?) : IBukkitKensukeUser {
                 QuestGenerator.generate(),
             )
         } else {
+            if (stat.currentStarter == null)
+                stat.currentStarter = Starter.NONE
+            if (stat.starters == null || stat.starters!!.isEmpty())
+                stat.starters = mutableListOf(Starter.NONE)
+            if (stat.currentSword == null)
+                stat.currentSword = Sword.NONE
+            if (stat.swords == null || stat.swords!!.isEmpty())
+                stat.swords = mutableListOf(Sword.NONE)
+            if (stat.data == null || stat.data!!.isEmpty())
+                stat.data = QuestGenerator.generate()
+            if (stat.progress == null)
+                stat.progress = BattlePassUserData(0, false)
+            if (stat.claimedRewards == null)
+                stat.claimedRewards = mutableListOf()
             this.stat = stat
+        }
+        if (this.stat.skins == null)
+            this.stat.skins = arrayListOf("hi")
+        if (stat?.currentKillMessage == null)
+            stat?.currentKillMessage = KillMessage.NONE
+        if (stat?.killMessages == null || stat.killMessages.isEmpty())
+            stat?.killMessages = mutableListOf(KillMessage.NONE)
+        if (stat?.currentBreakBedEffect == null)
+            stat?.currentBreakBedEffect = BreakBedEffect.NONE
+        if (stat?.breakBedEffects == null || stat.breakBedEffects.isEmpty())
+            stat?.breakBedEffects = mutableListOf(BreakBedEffect.NONE)
+        if (stat?.data == null || stat.data!!.isEmpty())
+            stat?.data = QuestGenerator.generate()
+        if (stat?.progress == null)
+            stat?.progress = BattlePassUserData(0, false)
+        if (stat?.claimedRewards == null) {
+            stat?.claimedRewards = mutableListOf()
         }
         this.session = session
     }

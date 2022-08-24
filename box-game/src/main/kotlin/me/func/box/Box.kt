@@ -67,8 +67,9 @@ const val MAX_GAME_STREAK_COUNT = 8
 var sessionDurability = System.getProperty("TIME", "4000").toInt()
 
 class Box : JavaPlugin() {
-    //private val oldStatScope = Scope("boxll", Stat::class.java)
-    private val statScope = Scope("bp-scope-test", Stat::class.java)
+    private val oldStatScope = Scope("boxll", Stat::class.java)
+    private val statScope = Scope("box-newa", Stat::class.java)
+    private val bpScope = Scope("bp-scope-test", Stat::class.java)
 
     private lateinit var worldMeta: WorldMeta
     lateinit var spawn: Location
@@ -107,11 +108,13 @@ class Box : JavaPlugin() {
             nbt("Unbreakable", 1)
         }
         userManager = BukkitUserManager(
-            listOf(statScope),
+            listOf(statScope, oldStatScope, bpScope),
             { session: KensukeSession, context ->
                 User(
                     session,
-                    context.getData(statScope)
+                    context.getData(statScope),
+                    context.getData(oldStatScope),
+                    context.getData(bpScope)
                 )
             },
             { user, context -> context.store(statScope, user.stat) }

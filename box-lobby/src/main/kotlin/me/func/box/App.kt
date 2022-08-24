@@ -122,9 +122,8 @@ class App : JavaPlugin() {
     lateinit var userManager: UserManager<User>
     lateinit var online: Map<ServerType, ArmorStand>
     lateinit var socketClient: ISocketClient
-
-//    private var oldStatScope = Scope("boxll", Stat::class.java)
-//    private val statScope = Scope("box-newa", Stat::class.java)
+    private var oldStatScope = Scope("boxll", Stat::class.java)
+    private val statScope = Scope("box-newa", Stat::class.java)
     private val bpScope = Scope("bp-scope-test", Stat::class.java)
 
     override fun onEnable() {
@@ -139,8 +138,8 @@ class App : JavaPlugin() {
         spawn = worldMeta.getLabel("spawn").add(0.0, 3.0, 0.0).toCenterLocation()
 
         userManager = BukkitUserManager(
-            listOf(bpScope),
-            { session, context -> User(session, context.getData(bpScope)) },
+            listOf(oldStatScope, statScope, bpScope),
+            { session, context -> User(session, context.getData(bpScope), context.getData(oldStatScope), context.getData(statScope)) },
             { user, context -> context.store(bpScope, user.stat) }
         )
 
