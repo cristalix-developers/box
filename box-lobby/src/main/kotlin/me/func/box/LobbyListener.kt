@@ -1,8 +1,6 @@
 package me.func.box
 
 import dev.implario.bukkit.item.item
-import me.func.box.quest.QuestType
-import me.func.box.quest.ServerType
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.protocol.Marker
@@ -60,8 +58,6 @@ class LobbyListener : Listener {
                 Anime.marker(player, marker)
             }, 40)
         }
-
-        BattlePassUtil.update(app.getUser(player), QuestType.BUYITEMS, 120, false, ServerType.ANY)
     }
 
     @EventHandler
