@@ -124,9 +124,8 @@ class App : JavaPlugin() {
     lateinit var userManager: UserManager<User>
     lateinit var online: Map<ServerType, ArmorStand>
     lateinit var socketClient: ISocketClient
-    private var oldStatScope = Scope("boxll", Stat::class.java)
-    private val statScope = Scope("box-newa", Stat::class.java)
-    private val bpScope = Scope("bp-scope-test", Stat::class.java)
+    private var oldStatScope = Scope("boxll-test", Stat::class.java)
+    private val statScope = Scope("box-newa-test", Stat::class.java)
 
     override fun onEnable() {
         B.plugin = this
@@ -140,9 +139,9 @@ class App : JavaPlugin() {
         spawn = worldMeta.getLabel("spawn").add(0.0, 3.0, 0.0).toCenterLocation()
 
         userManager = BukkitUserManager(
-            listOf(oldStatScope, statScope, bpScope),
-            { session, context -> User(session, context.getData(bpScope), context.getData(oldStatScope), context.getData(statScope)) },
-            { user, context -> context.store(bpScope, user.stat) }
+            listOf(oldStatScope, statScope),
+            { session, context -> User(session, context.getData(oldStatScope), context.getData(statScope)) },
+            { user, context -> context.store(statScope, user.stat) }
         )
 
         // Конфигурация реалма
@@ -299,7 +298,7 @@ class App : JavaPlugin() {
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(
             this, {
-                kensuke.getLeaderboard(userManager, bpScope, key, 10).thenAccept {
+                kensuke.getLeaderboard(userManager, statScope, key, 10).thenAccept {
                     blocks.clearContent()
 
                     for (entry in it) {
