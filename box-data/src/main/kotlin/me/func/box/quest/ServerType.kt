@@ -1,4 +1,4 @@
-package me.func.box
+package me.func.box.quest
 
 enum class ServerType(val title: String, val address: String) {
     BOX1X4("1x4", "BOX4"),

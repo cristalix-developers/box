@@ -1,4 +1,4 @@
-package me.func.box.battlepass.quest
+package me.func.box.quest
 
 enum class QuestType {
     KILL,

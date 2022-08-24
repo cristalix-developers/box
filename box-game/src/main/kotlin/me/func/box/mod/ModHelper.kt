@@ -1,6 +1,7 @@
 package me.func.box.mod
 
 import me.func.box.User
+import me.func.mod.conversation.ModTransfer
 
 object ModHelper {
 
@@ -9,6 +10,6 @@ object ModHelper {
             .integer(red)
             .integer(blue)
             .integer(green)
-            .send("func:glow", user)
+            .send("func:glow", user.player)
     }
 }

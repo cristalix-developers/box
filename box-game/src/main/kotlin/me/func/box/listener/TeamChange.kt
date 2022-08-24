@@ -4,7 +4,7 @@ import clepto.bukkit.B
 import me.func.box.User
 import me.func.box.app
 import me.func.box.data.Status
-import me.func.box.mod.ModTransfer
+import me.func.mod.conversation.ModTransfer
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
@@ -80,6 +80,6 @@ object TeamChange : Listener {
             }
         }
 
-        template.send("box:team", user)
+        template.send("box:team", user.player)
     }
 }

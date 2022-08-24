@@ -1,9 +1,7 @@
 package me.func.box.battlepass
 
 import dev.implario.bukkit.item.item
-import me.func.battlepass.BattlePassLog
-import me.func.battlepass.BattlePassUtil
-import me.func.protocol.ActionLog
+import me.func.box.BattlePassUtil
 import me.func.box.app
 import me.func.box.cosmetic.*
 import me.func.mod.Anime
@@ -13,6 +11,8 @@ import me.func.mod.battlepass.BattlePass.onBuyPage
 import me.func.mod.battlepass.BattlePass.sale
 import me.func.mod.battlepass.BattlePassPageAdvanced
 import me.func.mod.conversation.ModTransfer
+import me.func.protocol.ActionLog
+import me.func.protocol.LogPacket
 import me.func.protocol.battlepass.BattlePassUserData
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -258,7 +258,12 @@ object BattlePassManager {
                         (reward as Donate).give(data)
                         claimed.add(position)
                         Anime.killboardMessage(player, Formatting.fine("Награда: " + reward.getTitle()))
-                        BattlePassLog.log(player.uniqueId, ActionLog.REWARD, "Игрок собрал награду: ${reward.getTitle()}")
+                        ISocketClient.get().write(
+                            LogPacket(
+                                player.uniqueId,
+                                ActionLog.REWARD,
+                                "Игрок собрал награду: ${reward.getTitle()}"
+                            ))
                     }
                 }
             }
@@ -276,7 +281,12 @@ object BattlePassManager {
         ).thenAccept {
             if (it.errorMessage.isNullOrEmpty()) {
                 successfully.accept(player)
-                BattlePassLog.log(player.uniqueId, ActionLog.BATTLEPASS, "Игрок купил BattlePass")
+                ISocketClient.get().write(
+                    LogPacket(
+                        player.uniqueId,
+                        ActionLog.BATTLEPASS,
+                        "Игрок купил BattlePass"
+                    ))
             } else {
                 Anime.killboardMessage(player, "Ошибка! " + it.errorMessage)
             }
@@ -290,7 +300,7 @@ object BattlePassManager {
         var progress = user.stat.progress
 
         if (progress == null)
-            progress = BattlePassUserData(5, false)
+            progress = BattlePassUserData(0, false)
 
         ModTransfer(battlePass.uuid.toString()).apply {
             integer(user.stat.claimedRewards?.size ?: 0)
@@ -298,5 +308,6 @@ object BattlePassManager {
         }.send("bp:claimed", player)
 
         BattlePass.show(player, battlePass, progress)
+
     }
 }

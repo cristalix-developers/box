@@ -1,10 +1,9 @@
 package me.func.box
 
 import implario.humanize.Humanize
-import me.func.box.ServerType
-import me.func.box.User
-import me.func.box.battlepass.quest.QuestGenerator
-import me.func.box.battlepass.quest.QuestType
+import me.func.box.quest.QuestGenerator
+import me.func.box.quest.QuestType
+import me.func.box.quest.ServerType
 import me.func.mod.Anime
 import me.func.protocol.ActionLog
 import me.func.protocol.LogPacket
@@ -18,7 +17,7 @@ object BattlePassUtil {
         user.let { data ->
             val player = user.player ?: return
 
-            data.stat.data?.find { it.server == serverType && it.questType == type }?.let {
+            data.stat.data?.find { it.serverType == serverType && it.questType == type }?.let {
                 if (it.goal <= it.now)
                     return
                 if ((data.stat.data?.indexOf(it) ?: 0) > 5 && data.stat.progress?.advanced != true)

@@ -3,25 +3,23 @@ package me.func.box.listener
 import clepto.bukkit.B
 import clepto.cristalix.Cristalix
 import dev.implario.bukkit.item.item
-import io.netty.buffer.Unpooled
 import me.func.box.BattlePassUtil
 import me.func.box.User
 import me.func.box.app
-import me.func.box.battlepass.quest.QuestType
-import me.func.box.ServerType
 import me.func.box.cosmetic.Starter
 import me.func.box.data.Status
 import me.func.box.listener.lucky.SuperSword
 import me.func.box.mod.ModHelper
-import me.func.box.mod.ModTransfer
+import me.func.box.quest.QuestType
+import me.func.box.quest.ServerType
 import me.func.mod.Anime
 import me.func.mod.conversation.ModLoader
-import me.func.mod.conversation.ModTransfer
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
-import net.minecraft.server.v1_12_R1.*
+import net.minecraft.server.v1_12_R1.EnumItemSlot
+import net.minecraft.server.v1_12_R1.EnumParticle
+import net.minecraft.server.v1_12_R1.PacketPlayOutWorldParticles
 import org.bukkit.*
-import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
@@ -37,16 +35,11 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import ru.cristalix.core.display.DisplayChannels
-import ru.cristalix.core.display.messages.Mod
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.item.Items
 import ru.cristalix.core.realm.IRealmService
 import ru.cristalix.core.realm.RealmId
 import ru.cristalix.core.realm.RealmStatus
-import java.io.File
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
 import kotlin.math.min
 
 class DefaultListener : Listener {
@@ -61,7 +54,7 @@ class DefaultListener : Listener {
 
     init {
         ModLoader.loadAll("mods")
-        ModLoader.onJoining("box-runtime-mod-bundle")
+        // ModLoader.onJoining("box-runtime-mod-bundle")
     }
 
     @EventHandler
@@ -77,8 +70,7 @@ class DefaultListener : Listener {
 
         player.inventory.clear()
 
-        ModTransfer().byteArray("{\"renderSwordAsShield\": true}".toByteArray(StandardCharsets.UTF_8))
-            .send("xdark:pvp", player)
+        //ModTransfer().byteArray("{\"renderSwordAsShield\": true}".toByteArray(StandardCharsets.UTF_8)).send("xdark:pvp", player)
 
         if (app.status == Status.STARTING) {
             player.inventory.setItem(8, back)

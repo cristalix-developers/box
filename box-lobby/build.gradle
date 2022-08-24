@@ -1,4 +1,4 @@
-apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'kotlin'
 
 group = 'me.func'
 version = '1.0-SNAPSHOT'
@@ -18,8 +18,11 @@ compileKotlin {
 }
 
 dependencies {
-    compileOnly 'cristalix:bukkit-core:21.01.30'
-    compileOnly 'cristalix:dark-paper:21.02.03'
+    implementation project(':box-data')
+    implementation project(':protocol')
+
+    implementation 'cristalix:bukkit-core:21.01.30'
+    implementation 'cristalix:dark-paper:21.02.03'
 
     implementation 'implario:bukkit-tools:4.4.12'
     implementation 'implario:kotlin-api:1.1.1'
@@ -33,9 +36,6 @@ dependencies {
 
     implementation 'clepto:clepto-bukkit:3.4.2'
     implementation 'clepto:clepto-cristalix:3.0.2'
-
-    implementation project(':box-data')
-    implementation project(':protocol')
 }
 
 afterEvaluate {

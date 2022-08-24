@@ -10,7 +10,6 @@ import dev.implario.kensuke.UserManager
 import dev.implario.kensuke.impl.bukkit.BukkitKensuke
 import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
-import me.func.battlepass.main
 import me.func.box.donate.DonateViewer
 import me.func.box.donate.Lootbox
 import me.func.mod.Anime
@@ -124,8 +123,9 @@ class App : JavaPlugin() {
     lateinit var online: Map<ServerType, ArmorStand>
     lateinit var socketClient: ISocketClient
 
-    private var oldStatScope = Scope("boxll", Stat::class.java)
-    private val statScope = Scope("box-newa", Stat::class.java)
+//    private var oldStatScope = Scope("boxll", Stat::class.java)
+//    private val statScope = Scope("box-newa", Stat::class.java)
+    private val bpScope = Scope("bp-scope-test", Stat::class.java)
 
     override fun onEnable() {
         B.plugin = this
@@ -139,9 +139,9 @@ class App : JavaPlugin() {
         spawn = worldMeta.getLabel("spawn").add(0.0, 3.0, 0.0).toCenterLocation()
 
         userManager = BukkitUserManager(
-            listOf(oldStatScope, statScope),
-            { session, context -> User(session, context.getData(statScope), context.getData(oldStatScope)) },
-            { user, context -> context.store(statScope, user.stat) }
+            listOf(bpScope),
+            { session, context -> User(session, context.getData(bpScope)) },
+            { user, context -> context.store(bpScope, user.stat) }
         )
 
         // Конфигурация реалма
@@ -265,8 +265,6 @@ class App : JavaPlugin() {
             stat.kills = value
             "Убийства изменены"
         }
-
-        main() // mongoDB
     }
 
     private fun createTop(location: Location, string: String, title: String, key: String, function: (Stat) -> String) {
@@ -280,7 +278,7 @@ class App : JavaPlugin() {
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(
             this, {
-                kensuke.getLeaderboard(userManager, statScope, key, 10).thenAccept {
+                kensuke.getLeaderboard(userManager, bpScope, key, 10).thenAccept {
                     blocks.clearContent()
 
                     for (entry in it) {

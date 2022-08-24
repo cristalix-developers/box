@@ -15,16 +15,16 @@ import dev.implario.kensuke.impl.bukkit.BukkitKensuke
 import dev.implario.kensuke.impl.bukkit.BukkitUserManager
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import me.func.box.bar.WaitingPlayers
-import me.func.battlepass.main
 import me.func.box.cosmetic.Starter
 import me.func.box.data.BoxTeam
 import me.func.box.data.Status
 import me.func.box.listener.*
 import me.func.box.map.Generator
 import me.func.box.map.TradeMenu
-import me.func.box.mod.ModTransfer
+import me.func.box.quest.ServerType
 import me.func.mod.Anime
 import me.func.mod.Kit
+import me.func.mod.conversation.ModTransfer
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TextComponent
@@ -67,8 +67,8 @@ const val MAX_GAME_STREAK_COUNT = 8
 var sessionDurability = System.getProperty("TIME", "4000").toInt()
 
 class Box : JavaPlugin() {
-    private val oldStatScope = Scope("boxll", Stat::class.java)
-    private val statScope = Scope("box-newa", Stat::class.java)
+    //private val oldStatScope = Scope("boxll", Stat::class.java)
+    private val statScope = Scope("bp-scope-test", Stat::class.java)
 
     private lateinit var worldMeta: WorldMeta
     lateinit var spawn: Location
@@ -81,7 +81,7 @@ class Box : JavaPlugin() {
     val winMoney = System.getenv("WIN_REWARD").toInt()
     val finalMoney = System.getenv("FINAL_REWARD").toInt()
     val killMoney = System.getenv("KILL_REWARD").toInt()
-    public var size = System.getenv("SIZE").toInt()
+    var size = System.getenv("SIZE").toInt()
     private var teamSize = System.getenv("TEAM").toInt()
     var status = Status.STARTING
     val hub = "BOXL-2"
@@ -107,12 +107,11 @@ class Box : JavaPlugin() {
             nbt("Unbreakable", 1)
         }
         userManager = BukkitUserManager(
-            listOf(statScope, oldStatScope),
+            listOf(statScope),
             { session: KensukeSession, context ->
                 User(
                     session,
-                    context.getData(statScope),
-                    context.getData(oldStatScope)
+                    context.getData(statScope)
                 )
             },
             { user, context -> context.store(statScope, user.stat) }
@@ -228,7 +227,7 @@ class Box : JavaPlugin() {
                                 if (starter == Starter.FUSE && slots > 20) player.sendMessage(Formatting.error("Данный стартовый набор недоступен в выбранном типе игры."))
                                 else B.postpone(5 * 20) { starter.consumer(user.player!!) }
                             }
-                            ModTransfer().integer(0).send("box:start", user)
+                            ModTransfer().integer(0).send("box:start", user.player)
                             user.stat.games++
                             waitingBar.removeViewer(player.uniqueId)
 
@@ -476,8 +475,6 @@ class Box : JavaPlugin() {
                 "Максимальное время игры изменено"
             }, "time"
         )
-
-        main() // mongoDB
     }
 
     fun getUser(player: Player): User? {

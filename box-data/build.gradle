@@ -1,4 +1,4 @@
-apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'kotlin'
 
 compileKotlin {
     kotlinOptions.jvmTarget = '1.8'

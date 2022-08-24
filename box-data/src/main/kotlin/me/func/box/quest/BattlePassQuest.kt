@@ -1,11 +1,9 @@
-package me.func.box.battlepass.quest
-
-import me.func.box.ServerType
+package me.func.box.quest
 
 data class BattlePassQuest(
     val condition: String,
+    val serverType: ServerType,
     val questType: QuestType,
-    val server: ServerType,
     val goal: Int,
     var now: Int = 0,
     var exp: Int = 0,
