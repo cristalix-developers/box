@@ -67,8 +67,8 @@ const val MAX_GAME_STREAK_COUNT = 8
 var sessionDurability = System.getProperty("TIME", "4000").toInt()
 
 class Box : JavaPlugin() {
-    private val oldStatScope = Scope("boxll-test", Stat::class.java)
-    private val statScope = Scope("box-newa-test", Stat::class.java)
+    private val oldStatScope = Scope("boxll", Stat::class.java)
+    private val statScope = Scope("box-newa", Stat::class.java)
 
     private lateinit var worldMeta: WorldMeta
     lateinit var spawn: Location

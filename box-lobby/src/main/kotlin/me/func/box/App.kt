@@ -124,8 +124,8 @@ class App : JavaPlugin() {
     lateinit var userManager: UserManager<User>
     lateinit var online: Map<ServerType, ArmorStand>
     lateinit var socketClient: ISocketClient
-    private var oldStatScope = Scope("boxll-test", Stat::class.java)
-    private val statScope = Scope("box-newa-test", Stat::class.java)
+    private var oldStatScope = Scope("boxll", Stat::class.java)
+    private val statScope = Scope("box-newa", Stat::class.java)
 
     override fun onEnable() {
         B.plugin = this
