@@ -3,7 +3,7 @@ package me.func.battlepass
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Indexes.hashed
 import com.mongodb.client.model.Sorts
-import me.func.protocol.GetLastLogs
+import me.func.protocol.GetLogPacket
 import me.func.protocol.LogPacket
 import me.func.serviceapi.mongo.MongoAdapter
 import me.func.serviceapi.runListener
@@ -36,6 +36,10 @@ fun main() {
             Capability.builder()
                 .className(LogPacket::class.java.name)
                 .notification(true)
+                .build(),
+            Capability.builder()
+                .className(GetLogPacket::class.java.name)
+                .notification(true)
                 .build()
         )
 
@@ -63,7 +67,7 @@ fun main() {
                 })
         }
 
-        runListener<GetLastLogs> { realm, pckg ->
+        runListener<GetLogPacket> { realm, pckg ->
             getLastLogs(pckg.player, pckg.count) { lastLog ->
                 println("Send last ${pckg.count} logs to ${pckg.player} from ${realm.realmName}")
                 forward(realm, pckg.apply { logs = lastLog })

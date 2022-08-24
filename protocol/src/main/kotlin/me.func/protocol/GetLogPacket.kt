@@ -3,7 +3,7 @@ package me.func.protocol
 import ru.cristalix.core.network.CorePackage
 import java.util.*
 
-data class GetLastLogs(
+data class GetLogPacket(
     var player: UUID, // to
     var count: Int, // to
     var logs: List<LogPacket> //

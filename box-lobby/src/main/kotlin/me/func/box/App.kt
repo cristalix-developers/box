@@ -23,7 +23,7 @@ import me.func.mod.selection.button
 import me.func.mod.selection.choicer
 import me.func.mod.util.command
 import me.func.mod.util.listener
-import me.func.protocol.GetLastLogs
+import me.func.protocol.GetLogPacket
 import me.func.protocol.npc.NpcBehaviour
 import org.bukkit.*
 import org.bukkit.entity.ArmorStand
@@ -277,7 +277,7 @@ class App : JavaPlugin() {
         }
 
         registerGetLogsCmd("getlastlogs") { sender, uuid, value ->
-            socketClient.writeAndAwaitResponse<GetLastLogs>(GetLastLogs(uuid, value)).thenAccept {
+            socketClient.writeAndAwaitResponse<GetLogPacket>(GetLogPacket(uuid, value)).thenAccept {
                 it.logs.forEach {
                     sender.sendMessage(it.data)
                 }
