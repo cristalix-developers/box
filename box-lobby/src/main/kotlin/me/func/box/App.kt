@@ -23,6 +23,7 @@ import me.func.mod.selection.button
 import me.func.mod.selection.choicer
 import me.func.mod.util.command
 import me.func.mod.util.listener
+import me.func.protocol.GetLastLogs
 import me.func.protocol.npc.NpcBehaviour
 import org.bukkit.*
 import org.bukkit.entity.ArmorStand
@@ -42,6 +43,7 @@ import ru.cristalix.core.realm.RealmStatus
 import ru.cristalix.core.transfer.ITransferService
 import ru.cristalix.core.transfer.TransferService
 import java.util.*
+import java.util.concurrent.CompletableFuture
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -264,6 +266,26 @@ class App : JavaPlugin() {
             stat.kills = value
             "Убийства изменены"
         }
+
+        fun registerGetLogsCmd(name: String, apply: (Player, UUID, Int) -> CompletableFuture<Void>) = command(name) { player, args ->
+            if (player.isOp) {
+                apply(
+                    player,
+                    Bukkit.getPlayer(args[0]).uniqueId,
+                    args[1].toInt()
+                )
+            }
+        }
+
+        registerGetLogsCmd("getlastlogs") { sender, uuid, value ->
+            socketClient.writeAndAwaitResponse<GetLastLogs>(GetLastLogs(uuid, value)).thenAccept {
+                it.logs.forEach {
+                    sender.sendMessage(it.data)
+                }
+            }
+        }
+
+
     }
 
     private fun createTop(location: Location, string: String, title: String, key: String, function: (Stat) -> String) {
