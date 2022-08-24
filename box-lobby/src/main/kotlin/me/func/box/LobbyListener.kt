@@ -58,6 +58,9 @@ class LobbyListener : Listener {
                 Anime.marker(player, marker)
             }, 40)
         }
+
+        if (app.getUser(player).stat.progress?.advanced == true)
+            player.displayName = "&e* ${player.displayName}"
     }
 
     @EventHandler

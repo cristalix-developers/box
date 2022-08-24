@@ -2,7 +2,6 @@ package me.func.box
 
 import clepto.bukkit.B
 import clepto.cristalix.WorldMeta
-import dev.implario.bukkit.item.item
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.kensuke.Kensuke
 import dev.implario.kensuke.Scope
@@ -17,15 +16,12 @@ import me.func.mod.Kit
 import me.func.mod.Npc
 import me.func.mod.Npc.location
 import me.func.mod.Npc.onClick
-import me.func.mod.data.Sprites
-import me.func.mod.selection.Choicer
-import me.func.mod.selection.button
-import me.func.mod.selection.choicer
-import me.func.mod.util.command
 import me.func.mod.util.listener
-import me.func.protocol.GetLogPacket
 import me.func.protocol.npc.NpcBehaviour
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.Location
+import org.bukkit.Particle
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -43,78 +39,10 @@ import ru.cristalix.core.realm.RealmStatus
 import ru.cristalix.core.transfer.ITransferService
 import ru.cristalix.core.transfer.TransferService
 import java.util.*
-import java.util.concurrent.CompletableFuture
 import kotlin.math.cos
 import kotlin.math.sin
 
 lateinit var app: App
-val startGameMenu = choicer {
-    title = "Бедроковая коробка"
-    description = "Находи чужие кровати и уничтожай врагов!"
-    buttons(
-        button {
-            hint = "Играть!"
-            texture = Sprites.SOLO.path()
-            title = "Solo"
-            description = "Онлайн: " + realmService.getOnlineOnRealms("BOX4")
-            onClick { it, _, _ -> ClickServer("BOX4", 4).accept(it) }
-        },
-        button {
-            hint = "Играть!"
-            texture = Sprites.SQUAD.path()
-            title = "Squad"
-            description = "Онлайн: " + realmService.getOnlineOnRealms("BOXS")
-            onClick { it, _, _ -> ClickServer("BOXS", 16).accept(it) }
-        },
-        button {
-            hint = "Играть!"
-            texture = Sprites.SPECIAL.path()
-            title = "Lucky"
-            description = "Онлайн: " + realmService.getOnlineOnRealms("BOX8")
-            onClick { it, _, _ -> ClickServer("BOX8", 16).accept(it) }
-        },
-    )
-}
-fun statisticMenu(player: Player) {
-    val user = app.getUser(player)
-    val stat = user.stat
-
-    val menu = Choicer("Бедроковая коробка", "Общая статистика")
-    menu.add(
-        button {
-            description("§fПобед §b${stat.wins}")
-            item = item { type = Material.CLAY_BALL
-                nbt("other", "cup")}
-        })
-    menu.add(
-        button {
-            description("§fУбийств §c${stat.kills}")
-            item = item { type = Material.CLAY_BALL
-                nbt("other", "custom_sword")}
-        })
-    menu.add(
-        button {
-            description("§fСмертей §f${stat.deaths}")
-            item = item { type = Material.CLAY_BALL
-                nbt("other", "finale_kill")}
-        })
-    menu.add(
-        button {
-            description("§fИгр сыграно §f${stat.games}")
-            item = item { type = Material.CLAY_BALL
-                nbt("skyblock", "collections")}
-        })
-    menu.add(
-        button {
-            description("§fВаш баланс §f${stat.money}")
-            item = item {type = Material.CLAY_BALL
-                nbt("other", "coin5")
-            }
-        }
-    )
-
-    menu.open(player)
-}
 
 class App : JavaPlugin() {
 
@@ -242,49 +170,7 @@ class App : JavaPlugin() {
 
         listener(FamousListener, GlobalListener, Lootbox, DonateViewer(), LobbyListener())
 
-        fun register(name: String, apply: (Stat, Int) -> String) = command(name) { player, args ->
-            if (player.isOp) player.sendMessage(
-                apply(
-                    app.userManager.getUser(Bukkit.getPlayer(args[0]).uniqueId).stat,
-                    args[1].toInt()
-                )
-            )
-        }
-
-        register("money") { stat, value ->
-            stat.money = value
-            "Деньги выданы"
-        }
-
-        register("wins") { stat, value ->
-            stat.wins = value
-            "Победы изменены"
-        }
-
-        register("kills") { stat, value ->
-            stat.kills = value
-            "Убийства изменены"
-        }
-
-        fun registerGetLogsCmd(name: String, apply: (Player, UUID, Int) -> CompletableFuture<Void>) = command(name) { player, args ->
-            if (player.isOp) {
-                apply(
-                    player,
-                    Bukkit.getPlayer(args[0]).uniqueId,
-                    args[1].toInt()
-                )
-            }
-        }
-
-        registerGetLogsCmd("getlastlogs") { sender, uuid, value ->
-            socketClient.writeAndAwaitResponse<GetLogPacket>(GetLogPacket(uuid, value)).thenAccept {
-                it.logs.forEach {
-                    sender.sendMessage(it.data)
-                }
-            }
-        }
-
-
+        UserCommands
     }
 
     private fun createTop(location: Location, string: String, title: String, key: String, function: (Stat) -> String) {

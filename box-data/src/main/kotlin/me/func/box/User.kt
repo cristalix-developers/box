@@ -70,7 +70,6 @@ class User(session: KensukeSession, stat: Stat?, oldStat: Stat?) : IBukkitKensuk
                 games = 0
                 starters?.clear()
                 currentStarter = null
-            }?.apply {
                 progress = BattlePassUserData(0, false)
                 claimedRewards = mutableListOf()
                 data = QuestGenerator.generate()

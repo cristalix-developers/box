@@ -182,6 +182,14 @@ object BattlePassManager {
                 ) {
                     data.stat.progress!!.advanced = true
                     Anime.itemTitle(player, premium, "§bУспешно", "Собирайте награды!", 3.5)
+
+                    ISocketClient.get().write(
+                        LogPacket(
+                            player.uniqueId,
+                            ActionLog.BATTLEPASS,
+                            "Игрок купил BattlePass"
+                        ))
+
                     Bukkit.getOnlinePlayers().forEach {
                         Anime.topMessage(
                             it,
@@ -199,10 +207,18 @@ object BattlePassManager {
             player.closeInventory()
 
             app.getUser(player).stat.progress?.let { data ->
-                pages.firstOrNull { 0 == cost }
+                pages.firstOrNull { it.skipPrice == cost }
                     ?.let { page ->
                         buy(player, cost, "Пропуск уровня аркадного BattlePass.") {
                             data.exp += page.requiredExp
+
+                            ISocketClient.get().write(
+                                LogPacket(
+                                    player.uniqueId,
+                                    ActionLog.BATTLEPASS,
+                                    "Игрок пропустил уровень BattlePass"
+                                ))
+
                             Anime.itemTitle(player, premium, "§bУспешно", "Новый уровень", 2.6)
                             Bukkit.getOnlinePlayers().forEach {
                                 Anime.topMessage(
@@ -280,12 +296,6 @@ object BattlePassManager {
         ).thenAccept {
             if (it.errorMessage.isNullOrEmpty()) {
                 successfully.accept(player)
-                ISocketClient.get().write(
-                    LogPacket(
-                        player.uniqueId,
-                        ActionLog.BATTLEPASS,
-                        "Игрок купил BattlePass"
-                    ))
             } else {
                 Anime.killboardMessage(player, "Ошибка! " + it.errorMessage)
             }
