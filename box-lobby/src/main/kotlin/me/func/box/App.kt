@@ -140,7 +140,7 @@ class App : JavaPlugin() {
 
         userManager = BukkitUserManager(
             listOf(oldStatScope, statScope),
-            { session, context -> User(session, context.getData(oldStatScope), context.getData(statScope)) },
+            { session, context -> User(session, context.getData(statScope), context.getData(oldStatScope)) },
             { user, context -> context.store(statScope, user.stat) }
         )
 
