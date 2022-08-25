@@ -158,7 +158,7 @@ class Box : JavaPlugin() {
         info.readableName = "Коробка#$id v.3.4.6"
 
         // Получает тип вервета
-        with(info.readableName) {
+        with(info.realmId.realmName) {
             when {
                 contains(ServerType.BOX1X4.address) -> serverType = ServerType.BOX1X4
                 contains(ServerType.BOX4X4.address) -> serverType = ServerType.BOX4X4
