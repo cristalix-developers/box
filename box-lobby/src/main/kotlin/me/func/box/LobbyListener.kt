@@ -60,7 +60,7 @@ class LobbyListener : Listener {
         }
 
         if (app.getUser(player).stat.progress?.advanced == true)
-            player.displayName = "${player.displayName} &e*"
+            player.displayName = "${player.displayName} §6*"
     }
 
     @EventHandler

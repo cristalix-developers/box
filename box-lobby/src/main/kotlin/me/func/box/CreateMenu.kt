@@ -82,6 +82,19 @@ fun statisticMenu(player: Player) {
             }
         }
     )
+    menu.add(
+        button {
+            hover = "Нажми!"
+            description("§fВаши логи")
+            item = dev.implario.bukkit.item.item {
+                type = Material.CLAY_BALL
+                nbt("skyblock", "collections")
+            }
+            onClick { player, _, _ ->
+                player.performCommand("/logs")
+            }
+        }
+    )
 
     menu.open(player)
 }

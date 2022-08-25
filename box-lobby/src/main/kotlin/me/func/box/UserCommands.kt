@@ -6,6 +6,7 @@ import me.func.mod.util.command
 import me.func.protocol.GetLogPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import java.text.SimpleDateFormat
 import java.util.*
 
 object UserCommands {
@@ -44,18 +45,24 @@ object UserCommands {
             "Опыт батлпасса выдан"
         }
 
+        fun getDateTime(timestamp: Long): String? {
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            val date = Date(timestamp * 1000)
+            return sdf.format(date)
+        }
+
         fun openLogMenu(sender: Player, uuid: UUID, count: Int) {
-            app.socketClient.writeAndAwaitResponse<GetLogPacket>(GetLogPacket(uuid, 50)).thenAccept {
+            app.socketClient.writeAndAwaitResponse<GetLogPacket>(GetLogPacket(uuid, count)).thenAccept {
                 val selection = Selection(
                     title = "Логи",
                     rows = 3,
                     columns = 3,
                 )
-                it.logs.forEach {
+                it.logs.reversed().forEach {
                     selection.add(
                         button {
                             title = it.action.name
-                            description = "${it.data}\n${it.timestamp}"
+                            description = "${it.data}\n${getDateTime(it.timestamp)}"
                         })
                 }
                 selection.open(sender)

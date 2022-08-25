@@ -215,7 +215,7 @@ object BattlePassManager {
                             ISocketClient.get().write(
                                 LogPacket(
                                     player.uniqueId,
-                                    ActionLog.BATTLEPASS,
+                                    ActionLog.SKIPLEVEL,
                                     "Игрок пропустил уровень BattlePass"
                                 ))
 
