@@ -1,6 +1,5 @@
 package me.func.box
 
-import dev.implario.bukkit.item.item
 import me.func.mod.selection.Selection
 import me.func.mod.selection.button
 import me.func.mod.util.command
@@ -10,6 +9,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -49,11 +49,7 @@ object UserCommands {
             "Опыт батлпасса выдан"
         }
 
-        fun getDateTime(timestamp: Long): String? {
-            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-            val date = Date(timestamp * 1000)
-            return sdf.format(date)
-        }
+        fun getDateTime(timestamp: Long) = Date(timestamp).toString()
 
         fun getMaterial(type: ActionLog): ItemStack {
             return when (type) {
@@ -64,47 +60,31 @@ object UserCommands {
             }
         }
 
+        // Нужно добавить КЕШ
         fun openLogMenu(sender: Player, uuid: UUID, count: Int) {
             app.socketClient.writeAndAwaitResponse<GetLogPacket>(GetLogPacket(uuid, count)).thenAccept {
                 val selection = Selection(
                     title = "Логи",
-                    rows = 3,
-                    columns = 3,
+                    rows = 5,
+                    columns = 1,
                 )
                 it.logs.reversed().forEach {
                     selection.add(
                         button {
+                            hint = ""
                             item = getMaterial(it.action)
                             title = it.action.name
-                            description = "${it.data}\n${getDateTime(it.timestamp)}"
+                            description = "${it.data}§7, время: ${getDateTime(it.timestamp)}"
                         })
                 }
                 selection.open(sender)
             }
         }
 
-        fun registerGetLogsCmd(name: String, apply: (Player, UUID, Int) -> Unit) = command(name) { player, args ->
-            if (player.isOp) {
-                apply(
-                    player,
-                    Bukkit.getPlayer(args[0]).uniqueId,
-                    args[1].toInt()
-                )
-            }
+        command("getlastlogs") { player, args ->
+            if (player.isOp) openLogMenu(player, Bukkit.getPlayer(args[0]).uniqueId, args[1].toInt())
         }
 
-        registerGetLogsCmd("getlastlogs") { sender, uuid, value ->
-            openLogMenu(sender, uuid, value)
-        }
-
-        fun logs(name: String, apply: (Player) -> Unit) = command(name) { player, args ->
-            apply(
-                player
-            )
-        }
-
-        logs("logs") { player ->
-            openLogMenu(player, player.uniqueId, 50)
-        }
+        command("logs") { player, args -> openLogMenu(player, player.uniqueId, 50) }
     }
 }

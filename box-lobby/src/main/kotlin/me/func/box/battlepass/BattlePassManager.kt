@@ -33,11 +33,6 @@ object BattlePassManager {
         nbt("other", "achievements_many")
     }
 
-    private val classic = item {
-        type = Material.CLAY_BALL
-        nbt("other", "achievements_many_lock")
-    }
-
     val rewards = listOf(
         listOf(
             BattlePassKit.SMALL,
