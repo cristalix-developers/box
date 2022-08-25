@@ -3,6 +3,9 @@ package me.func.battlepass
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Indexes.hashed
 import com.mongodb.client.model.Sorts
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import me.func.protocol.GetLogPacket
 import me.func.protocol.LogPacket
 import me.func.serviceapi.mongo.MongoAdapter
@@ -44,8 +47,10 @@ fun main() {
         )
 
         runListener<LogPacket> { realm, pckg ->
-            mongo.save(pckg)
-            println("Log ${pckg.uuidPlayer}: ${pckg.action.name} - ${pckg.data}, from ${realm.realmName}")
+            CoroutineScope(Dispatchers.IO).launch {
+                mongo.save(pckg)
+                println("Log ${pckg.uuidPlayer}: ${pckg.action.name} - ${pckg.data}, from ${realm.realmName}")
+            }
         }
 
         fun getLastLogs(player: UUID, total: Int, accept: (List<LogPacket>) -> Unit) {
@@ -68,9 +73,11 @@ fun main() {
         }
 
         runListener<GetLogPacket> { realm, pckg ->
-            getLastLogs(pckg.player, pckg.count) { lastLog ->
-                println("Send last ${pckg.count} logs to ${pckg.player} from ${realm.realmName}")
-                forward(realm, pckg.apply { logs = lastLog })
+            CoroutineScope(Dispatchers.IO).launch {
+                getLastLogs(pckg.player, pckg.count) { lastLog ->
+                    println("Send last ${pckg.count} logs to ${pckg.player} from ${realm.realmName}")
+                    forward(realm, pckg.apply { logs = lastLog })
+                }
             }
         }
     }
