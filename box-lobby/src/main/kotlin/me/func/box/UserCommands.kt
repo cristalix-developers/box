@@ -1,11 +1,15 @@
 package me.func.box
 
+import dev.implario.bukkit.item.item
 import me.func.mod.selection.Selection
 import me.func.mod.selection.button
 import me.func.mod.util.command
+import me.func.protocol.ActionLog
 import me.func.protocol.GetLogPacket
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -51,6 +55,15 @@ object UserCommands {
             return sdf.format(date)
         }
 
+        fun getMaterial(type: ActionLog): ItemStack {
+            return when (type) {
+                ActionLog.QUEST -> ItemStack(Material.PAPER)
+                ActionLog.BATTLEPASS -> ItemStack(Material.DIAMOND)
+                ActionLog.REWARD -> ItemStack(Material.GOLDEN_APPLE)
+                ActionLog.SKIPLEVEL -> ItemStack(Material.APPLE)
+            }
+        }
+
         fun openLogMenu(sender: Player, uuid: UUID, count: Int) {
             app.socketClient.writeAndAwaitResponse<GetLogPacket>(GetLogPacket(uuid, count)).thenAccept {
                 val selection = Selection(
@@ -61,6 +74,7 @@ object UserCommands {
                 it.logs.reversed().forEach {
                     selection.add(
                         button {
+                            item = getMaterial(it.action)
                             title = it.action.name
                             description = "${it.data}\n${getDateTime(it.timestamp)}"
                         })

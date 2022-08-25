@@ -14,9 +14,9 @@ data class LogPacket(
     val timestamp: Long = System.currentTimeMillis()
 ): CorePackage(), Unique
 
-enum class ActionLog(val item: Material) {
-    BATTLEPASS(Material.DIAMOND),
-    SKIPLEVEL(Material.GOLD_INGOT),
-    QUEST(Material.PAPER),
-    REWARD(Material.GOLDEN_APPLE),
+enum class ActionLog {
+    BATTLEPASS,
+    SKIPLEVEL,
+    QUEST,
+    REWARD,
 }
