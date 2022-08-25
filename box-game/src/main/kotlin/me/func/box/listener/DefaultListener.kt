@@ -32,6 +32,7 @@ import org.bukkit.event.entity.*
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
+import org.bukkit.material.Button
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -124,7 +125,13 @@ class DefaultListener : Listener {
 
     @EventHandler
     fun CraftItemEvent.handle() {
-        if(recipe.result.getType() == Material.ANVIL) isCancelled = true
+        if(recipe.result.getType() == Material.ANVIL ||
+                recipe.result.getType() == Material.GOLD_BLOCK ||
+                recipe.result.getType() == Material.FENCE ||
+                recipe.result.getType() == Material.FENCE_GATE ||
+                recipe.result.getType() == Material.LAPIS_BLOCK ||
+                recipe.result.getType() == Material.FURNACE ||
+                recipe.result.getType() == Material.WOOD_BUTTON) isCancelled = true
     }
 
     @EventHandler

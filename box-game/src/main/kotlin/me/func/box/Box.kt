@@ -154,8 +154,8 @@ class Box : JavaPlugin() {
         info.status = RealmStatus.WAITING_FOR_PLAYERS
         info.extraSlots = 1
         info.maxPlayers = slots
-        info.readableName = "Коробка#$id v.3.4.5"
-        info.groupName = "Коробка#$id v.3.4.5"
+        info.groupName = "Коробка#$id v.3.4.6"
+        info.readableName = "Коробка#$id v.3.4.6"
 
         // Получает тип вервета
         with(info.readableName) {

@@ -1,8 +1,11 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.6.0' apply false
+    id 'org.jetbrains.kotlin.jvm' version '1.6.21' apply false
 }
 
 allprojects {
+    apply plugin: 'java-library'
+    group 'ru.cristalix'
+    version '1.0-SNAPSHOT'
     repositories {
         maven {
             url 'https://repo.c7x.ru/repository/maven-public/'
@@ -12,6 +15,5 @@ allprojects {
             }
         }
         mavenCentral()
-        mavenLocal()
     }
 }

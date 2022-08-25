@@ -1,6 +1,7 @@
-import com.sun.jmx.snmp.EnumRowStatus.active
+import dev.xdark.clientapi.event.input.KeyPress
 import dev.xdark.clientapi.event.render.*
 import dev.xdark.feder.NetUtil
+import org.lwjgl.input.Keyboard
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.*
@@ -93,6 +94,12 @@ class App : KotlinMod() {
         registerChannel("box:start") {
             waiting = false
             UIEngine.overlayContext.removeChild(box)
+        }
+
+        registerHandler<KeyPress> {
+            if (Keyboard.isKeyDown(Keyboard.KEY_P)) {
+                isCancelled = true
+            }
         }
     }
 }
