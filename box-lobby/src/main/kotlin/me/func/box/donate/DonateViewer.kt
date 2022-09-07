@@ -27,7 +27,6 @@ import ru.cristalix.core.network.packages.GetAccountBalancePackage
 import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage
 import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage
 import java.util.concurrent.TimeUnit
-
 class DonateViewer : Listener {
     fun <T : Donate> temp(
         player: Player,

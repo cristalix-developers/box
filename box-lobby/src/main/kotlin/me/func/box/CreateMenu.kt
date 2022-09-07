@@ -7,7 +7,6 @@ import me.func.mod.selection.choicer
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
-
 val startGameMenu = choicer {
     title = "Бедроковая коробка"
     description = "Находи чужие кровати и уничтожай врагов!"

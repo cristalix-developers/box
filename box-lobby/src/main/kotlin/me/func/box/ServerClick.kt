@@ -14,7 +14,6 @@ import ru.cristalix.core.transfer.ITransferService
 import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.function.Consumer
-
 class ClickServer(private val server: String, private val maxPlayers: Int) : Consumer<Player> {
 
     @Throws(ExecutionException::class, InterruptedException::class)

@@ -148,6 +148,52 @@ object BattlePassManager {
             BreakBedEffect.SLIME,
             BattlePassKit.EPIC,
             Sword.J
+        ),
+        listOf(
+            BattlePassKit.MEDIUM,
+            BattlePassKit.MEDIUM,
+            BattlePassKit.SMALL,
+            BattlePassKit.SMALL,
+            BattlePassKit.MEDIUM,
+            BattlePassKit.MEDIUM,
+            BattlePassKit.SMALL,
+            Starter.DEFENDER,
+            BattlePassKit.EPIC,
+            Sword.B
+        ) to listOf(
+            BattlePassKit.EPIC,
+            BattlePassKit.MEDIUM,
+            Starter.BLOCKER,
+            BattlePassKit.MEDIUM,
+            BattlePassKit.MEDIUM,
+            BattlePassKit.BIG,
+            BattlePassKit.MEDIUM,
+            BreakBedEffect.SLIME,
+            BattlePassKit.EPIC,
+            Sword.M
+        ),
+        listOf(
+            BattlePassKit.MEDIUM,
+            BattlePassKit.MEDIUM,
+            BattlePassKit.SMALL,
+            BattlePassKit.SMALL,
+            BattlePassKit.MEDIUM,
+            BattlePassKit.MEDIUM,
+            BreakBedEffect.REDSTONE,
+            BattlePassKit.MEDIUM,
+            BattlePassKit.EPIC,
+            Sword.B
+        ) to listOf(
+            BattlePassKit.EPIC,
+            KillMessage.COMPUTER,
+            BattlePassKit.MEDIUM,
+            Starter.MINER,
+            BattlePassKit.MEDIUM,
+            BattlePassKit.MEDIUM,
+            BattlePassKit.BIG,
+            BreakBedEffect.VILLAGER_ANGRY,
+            BattlePassKit.EPIC,
+            Sword.M
         )
     )
 

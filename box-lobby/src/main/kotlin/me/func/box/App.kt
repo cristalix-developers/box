@@ -16,6 +16,7 @@ import me.func.mod.Kit
 import me.func.mod.Npc
 import me.func.mod.Npc.location
 import me.func.mod.Npc.onClick
+import me.func.mod.conversation.ModLoader
 import me.func.mod.util.listener
 import me.func.protocol.npc.NpcBehaviour
 import org.bukkit.Bukkit
