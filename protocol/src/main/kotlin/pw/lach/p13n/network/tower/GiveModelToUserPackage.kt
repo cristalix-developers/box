@@ -1,4 +1,4 @@
-package me.func.box
+package pw.lach.p13n.network.tower
 
 import ru.cristalix.core.network.CorePackage
 import java.util.*

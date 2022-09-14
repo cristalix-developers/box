@@ -25,7 +25,8 @@ object FamousListener : Listener {
         "e7c13d3d-ac38-11e8-8374-1cb72caa35fd",  // delfikpro
         "0ddd561e-9205-11eb-acca-1cb72caa35fd",  // depressed
         "48919a24-20bd-11ea-a54a-1cb72caa35fd",  // MrMaximus_
-        "26fe8226-a215-11e8-b884-1cb72caa35fd"   // DerbY
+        "26fe8226-a215-11e8-b884-1cb72caa35fd",   // DerbY
+        "b7fa1de3-a464-11e8-8374-1cb72caa35fd" //R1DD1
     ).map { UUID.fromString(it) }
 
     @EventHandler

@@ -7,10 +7,8 @@ import me.func.protocol.ActionLog
 import me.func.protocol.GetLogPacket
 import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.command.CommandExecutor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import ru.cristalix.core.CoreApi
 import java.util.*
 
 object UserCommands {
@@ -22,13 +20,6 @@ object UserCommands {
                     args[1].toInt()
                 )
             )
-        }
-
-        fun registerPers(command: String, on: (Player, Array<String>) -> Unit) {
-            app.getCommand(command).setExecutor(CommandExecutor { sender, _, _, args ->
-                if (sender is Player) on(sender, args)
-                return@CommandExecutor true
-            })
         }
 
         register("money") { stat, value ->
@@ -54,15 +45,6 @@ object UserCommands {
         register("exp") { stat, value ->
             stat.progress?.exp = value
             "Опыт батлпасса выдан"
-        }
-
-        registerPers("pers") { _, args ->
-            CoreApi.get().socketClient.write(
-                GiveModelToUserPackage(
-                    UUID.fromString(args[0]),
-                    UUID.fromString(args[1])
-                )
-            )
         }
 
         fun getDateTime(timestamp: Long) = Date(timestamp).toString()

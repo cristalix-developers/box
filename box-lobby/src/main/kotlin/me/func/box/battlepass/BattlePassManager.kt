@@ -2,6 +2,7 @@ package me.func.box.battlepass
 
 import dev.implario.bukkit.item.item
 import me.func.box.BattlePassUtil
+import me.func.box.User
 import me.func.box.app
 import me.func.box.cosmetic.*
 import me.func.mod.Anime
@@ -12,15 +13,19 @@ import me.func.mod.battlepass.BattlePass.sale
 import me.func.mod.battlepass.BattlePassPageAdvanced
 import me.func.mod.conversation.ModTransfer
 import me.func.protocol.ActionLog
+import me.func.protocol.DropRare
 import me.func.protocol.LogPacket
 import me.func.protocol.battlepass.BattlePassUserData
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import pw.lach.p13n.network.tower.GiveModelToUserPackage
+import ru.cristalix.core.CoreApi
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage
 import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage
+import java.util.*
 import java.util.function.Consumer
 import java.util.function.Function
 
@@ -31,6 +36,20 @@ object BattlePassManager {
     private val premium = item {
         type = Material.CLAY_BALL
         nbt("other", "achievements_many")
+    }
+
+    private val premiumPers = item {
+        type = Material.CLAY_BALL
+        text("§6Персонализация премиальный беброкич")
+        nbt("p13nModelId", "0de94acf-61b2-4dd8-b015-b7bb552321ab")
+        nbt("rare", DropRare.LEGENDARY.ordinal)
+    }
+
+    private val classicPers = item {
+        type = Material.CLAY_BALL
+        text("§bПерсонализация беброкич")
+        nbt("p13nModelId", "ebfa2220-f39d-44e3-b71c-60de39b15c70")
+        nbt("rare", DropRare.LEGENDARY.ordinal)
     }
 
     val rewards = listOf(
@@ -182,7 +201,20 @@ object BattlePassManager {
             BreakBedEffect.REDSTONE,
             BattlePassKit.MEDIUM,
             BattlePassKit.EPIC,
-            Sword.B
+            object : Donate{
+                override fun getIcon() = classicPers
+                override fun getPrice() = 999
+                override fun getRare() = Rare.LEGENDARY
+                override fun getTitle() = classicPers.itemMeta.displayName
+                override fun getCode(): String = ""
+                override fun give(user: User) {
+                    CoreApi.get().socketClient.write(
+                        GiveModelToUserPackage(
+                            user.stat.id, UUID.fromString("ebfa2220-f39d-44e3-b71c-60de39b15c70")
+                        )
+                    )
+                }
+            }
         ) to listOf(
             BattlePassKit.EPIC,
             KillMessage.COMPUTER,
@@ -193,7 +225,20 @@ object BattlePassManager {
             BattlePassKit.BIG,
             BreakBedEffect.VILLAGER_ANGRY,
             BattlePassKit.EPIC,
-            Sword.M
+            object : Donate{
+                override fun getIcon() = premiumPers
+                override fun getPrice() = 999
+                override fun getRare() = Rare.LEGENDARY
+                override fun getTitle() = premiumPers.itemMeta.displayName
+                override fun getCode(): String = ""
+                override fun give(user: User) {
+                    CoreApi.get().socketClient.write(
+                      GiveModelToUserPackage(
+                          user.stat.id, UUID.fromString("0de94acf-61b2-4dd8-b015-b7bb552321ab")
+                      )
+                    )
+                }
+            }
         )
     )
 
