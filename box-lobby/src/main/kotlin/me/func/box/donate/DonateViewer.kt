@@ -5,18 +5,19 @@ import me.func.box.app
 import me.func.box.battlepass.BattlePassManager
 import me.func.box.cosmetic.*
 import me.func.mod.Anime
-import me.func.mod.Glow
-import me.func.mod.Npc
-import me.func.mod.Npc.location
-import me.func.mod.Npc.onClick
-import me.func.mod.selection.Button
-import me.func.mod.selection.Confirmation
-import me.func.mod.selection.button
-import me.func.mod.selection.selection
+import me.func.mod.reactive.ReactiveButton
+import me.func.mod.ui.Glow
+import me.func.mod.ui.menu.button
+import me.func.mod.ui.menu.confirmation.Confirmation
+import me.func.mod.ui.menu.selection
 import me.func.mod.util.command
 import me.func.mod.util.nbt
-import me.func.protocol.GlowColor
-import me.func.protocol.npc.NpcBehaviour
+import me.func.mod.world.Npc
+import me.func.mod.world.Npc.location
+import me.func.mod.world.Npc.onClick
+import me.func.protocol.data.color.GlowColor
+import me.func.protocol.ui.menu.Button
+import me.func.protocol.world.npc.NpcBehaviour
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -27,13 +28,14 @@ import ru.cristalix.core.network.packages.GetAccountBalancePackage
 import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage
 import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage
 import java.util.concurrent.TimeUnit
+
 class DonateViewer : Listener {
     fun <T : Donate> temp(
         player: Player,
         name: String,
         isDonate: Boolean,
         vararg donate: T,
-        converter: (Button, T) -> Button = { button, _ -> button }
+        converter: (ReactiveButton, T) -> ReactiveButton = { button, _ -> button }
     ) {
         selection {
             val user = app.getUser(player)

@@ -1,6 +1,5 @@
 package me.func.box.donate
 
-import clepto.bukkit.B
 import dev.implario.bukkit.item.item
 import implario.ListUtils
 import me.func.box.User
@@ -8,10 +7,11 @@ import me.func.box.app
 import me.func.box.cosmetic.*
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
-import me.func.mod.selection.button
-import me.func.mod.selection.selection
+import me.func.mod.ui.menu.button
+import me.func.mod.ui.menu.selection
 import me.func.mod.util.after
 import me.func.mod.util.nbt
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
@@ -91,7 +91,9 @@ object Lootbox : Listener {
             }
         }
 
-        B.bc(Formatting.fine("§e" + user.name + " §fнашел ${drop.getRare().color + drop.getRare().title.toLowerCase()} предмет! ${drop.getRare().color}" + drop.getTitle()))
+        Bukkit.getOnlinePlayers().forEach {
+            Formatting.fine("§e" + user.name + " §fнашел ${drop.getRare().color + drop.getRare().title.toLowerCase()} предмет! ${drop.getRare().color}" + drop.getTitle())
+        }
 
         ModTransfer()
             .integer(2)

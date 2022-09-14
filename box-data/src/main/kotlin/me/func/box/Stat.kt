@@ -5,7 +5,7 @@ import me.func.box.cosmetic.KillMessage
 import me.func.box.cosmetic.Starter
 import me.func.box.cosmetic.Sword
 import me.func.box.quest.BattlePassQuest
-import me.func.protocol.battlepass.BattlePassUserData
+import me.func.protocol.ui.battlepass.BattlePassUserData
 import java.util.*
 
 data class Stat(

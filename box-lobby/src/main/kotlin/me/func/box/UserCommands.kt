@@ -1,7 +1,7 @@
 package me.func.box
 
-import me.func.mod.selection.Selection
-import me.func.mod.selection.button
+import me.func.mod.ui.menu.button
+import me.func.mod.ui.menu.selection.Selection
 import me.func.mod.util.command
 import me.func.protocol.ActionLog
 import me.func.protocol.GetLogPacket
@@ -83,6 +83,6 @@ object UserCommands {
             if (player.isOp) openLogMenu(player, Bukkit.getPlayer(args[0]).uniqueId, args[1].toInt())
         }
 
-        command("logs") { player, args -> openLogMenu(player, player.uniqueId, 50) }
+        command("logs") { player, _ -> openLogMenu(player, player.uniqueId, 50) }
     }
 }

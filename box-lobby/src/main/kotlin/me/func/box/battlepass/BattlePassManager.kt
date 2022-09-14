@@ -1,21 +1,23 @@
 package me.func.box.battlepass
 
+import com.mojang.brigadier.arguments.IntegerArgumentType.integer
 import dev.implario.bukkit.item.item
+import io.netty.handler.codec.smtp.SmtpRequests.data
 import me.func.box.BattlePassUtil
 import me.func.box.User
 import me.func.box.app
 import me.func.box.cosmetic.*
 import me.func.mod.Anime
-import me.func.mod.battlepass.BattlePass
-import me.func.mod.battlepass.BattlePass.onBuyAdvanced
-import me.func.mod.battlepass.BattlePass.onBuyPage
-import me.func.mod.battlepass.BattlePass.sale
-import me.func.mod.battlepass.BattlePassPageAdvanced
 import me.func.mod.conversation.ModTransfer
+import me.func.mod.ui.battlepass.BattlePass
+import me.func.mod.ui.battlepass.BattlePass.onBuyAdvanced
+import me.func.mod.ui.battlepass.BattlePass.onBuyPage
+import me.func.mod.ui.battlepass.BattlePass.sale
+import me.func.mod.ui.battlepass.BattlePassPageAdvanced
 import me.func.protocol.ActionLog
-import me.func.protocol.DropRare
 import me.func.protocol.LogPacket
-import me.func.protocol.battlepass.BattlePassUserData
+import me.func.protocol.data.rare.DropRare
+import me.func.protocol.ui.battlepass.BattlePassUserData
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -247,8 +249,8 @@ object BattlePassManager {
             BattlePassPageAdvanced(
                 100 + 25 * index,
                 10 + index * 10,
-                drop.first.map { (it as Donate).getIcon() },
-                drop.second.map { (it as Donate).getIcon() }
+                drop.first.map { it.getIcon() },
+                drop.second.map { it.getIcon() }
             )
         }.toMutableList()
         sale(0.0)
@@ -394,8 +396,7 @@ object BattlePassManager {
         val user = app.getUser(player)
         var progress = user.stat.progress
 
-        if (progress == null)
-            progress = BattlePassUserData(0, false)
+        if (progress == null) progress = BattlePassUserData(0, false)
 
         ModTransfer(battlePass.uuid.toString()).apply {
             integer(user.stat.claimedRewards?.size ?: 0)
@@ -403,6 +404,5 @@ object BattlePassManager {
         }.send("bp:claimed", player)
 
         BattlePass.show(player, battlePass, progress)
-
     }
 }

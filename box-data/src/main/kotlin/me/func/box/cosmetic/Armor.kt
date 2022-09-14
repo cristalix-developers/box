@@ -2,7 +2,6 @@ package me.func.box.cosmetic
 
 import dev.implario.bukkit.item.item
 import me.func.box.User
-import me.func.protocol.DropRare
 import org.bukkit.inventory.ItemStack
 
 enum class Armor(

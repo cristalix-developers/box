@@ -3,7 +3,7 @@ package me.func.box
 import me.func.box.reward.WeekRewards
 import me.func.mod.Anime
 import me.func.mod.util.after
-import me.func.protocol.Indicators
+import me.func.protocol.ui.indicator.Indicators
 import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

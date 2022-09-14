@@ -3,8 +3,8 @@ package me.func.box
 import dev.implario.bukkit.item.item
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
-import me.func.protocol.Marker
-import me.func.protocol.MarkerSign
+import me.func.protocol.world.marker.Marker
+import me.func.protocol.world.marker.MarkerSign
 import org.bukkit.Bukkit
 import org.bukkit.Color
 import org.bukkit.Material

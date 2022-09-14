@@ -7,7 +7,7 @@ import me.func.box.cosmetic.KillMessage
 import me.func.box.cosmetic.Starter
 import me.func.box.cosmetic.Sword
 import me.func.box.quest.QuestGenerator
-import me.func.protocol.battlepass.BattlePassUserData
+import me.func.protocol.ui.battlepass.BattlePassUserData
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.MinecraftServer

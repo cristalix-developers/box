@@ -1,7 +1,5 @@
 package me.func.box
 
-import clepto.bukkit.B
-import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.kensuke.Kensuke
 import dev.implario.kensuke.Scope
@@ -13,12 +11,13 @@ import me.func.box.donate.DonateViewer
 import me.func.box.donate.Lootbox
 import me.func.mod.Anime
 import me.func.mod.Kit
-import me.func.mod.Npc
-import me.func.mod.Npc.location
-import me.func.mod.Npc.onClick
-import me.func.mod.conversation.ModLoader
 import me.func.mod.util.listener
-import me.func.protocol.npc.NpcBehaviour
+import me.func.mod.world.Npc
+import me.func.mod.world.Npc.location
+import me.func.mod.world.Npc.onClick
+import me.func.protocol.world.npc.NpcBehaviour
+import me.func.world.MapLoader
+import me.func.world.WorldMeta
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
@@ -57,15 +56,14 @@ class App : JavaPlugin() {
     private val statScope = Scope("box-newa", Stat::class.java)
 
     override fun onEnable() {
-        B.plugin = this
         app = this
         Platforms.set(PlatformDarkPaper())
 
         Anime.include(Kit.EXPERIMENTAL, Kit.NPC, Kit.STANDARD, Kit.LOOTBOX, Kit.BATTLEPASS)
 
         // Загрузка карты
-        worldMeta = MapLoader().load("Event")!!
-        spawn = worldMeta.getLabel("spawn").add(0.0, 3.0, 0.0).toCenterLocation()
+        worldMeta = MapLoader.load("LOBB", "Event")
+        spawn = worldMeta.label("spawn", 0.0, 3.0, 0.0)?.toCenterLocation() ?: return
 
         userManager = BukkitUserManager(
             listOf(oldStatScope, statScope),

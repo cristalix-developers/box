@@ -1,6 +1,6 @@
 package me.func.box
 
-import clepto.bukkit.B
+import me.func.mod.util.after
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.entity.Player
@@ -14,6 +14,7 @@ import ru.cristalix.core.transfer.ITransferService
 import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.function.Consumer
+
 class ClickServer(private val server: String, private val maxPlayers: Int) : Consumer<Player> {
 
     @Throws(ExecutionException::class, InterruptedException::class)
@@ -97,10 +98,10 @@ class ClickServer(private val server: String, private val maxPlayers: Int) : Con
         val user = app.getUser(player)
         if (user.lock)
             return
-        B.postpone(3) {
+        after(3) {
             try {
                 user.lock = true
-                B.postpone(10) { user.lock = false }
+                after(10) { user.lock = false }
                 sendToServer(player)
             } catch (e: ExecutionException) {
                 e.printStackTrace()

@@ -1,11 +1,12 @@
 package me.func.box.reward
 
 import dev.implario.bukkit.item.item
+import io.netty.handler.codec.smtp.SmtpRequests.data
 import me.func.box.User
 import me.func.box.cosmetic.Armor
 import me.func.box.cosmetic.BreakBedEffect
 import me.func.box.cosmetic.Donate
-import me.func.mod.data.DailyReward
+import me.func.mod.conversation.data.DailyReward
 import me.func.mod.util.nbt
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment

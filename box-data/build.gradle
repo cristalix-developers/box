@@ -16,6 +16,6 @@ dependencies {
     compileOnly 'dev.implario.bukkit:dark-paper:1.0.0'
     compileOnly 'implario:bukkit-worker-core:2.1.20'
     compileOnly 'dev.implario.bukkit:dark-paper:1.0.0'
-    compileOnly 'me.func:animation-api:2.5.6'
     compileOnly 'dev.implario:kensuke-client-bukkit:2.1.10'
+    compileOnly 'me.func:animation-api:3.0.3'
 }
