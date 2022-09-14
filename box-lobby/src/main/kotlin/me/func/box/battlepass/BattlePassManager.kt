@@ -65,7 +65,7 @@ object BattlePassManager {
             BattlePassKit.EPIC,
             Sword.E
         ) to listOf(
-            BattlePassKit.EPIC,
+            BattlePassKit.BIG,
             BattlePassKit.MEDIUM,
             KillMessage.GALACTIC,
             BattlePassKit.MEDIUM,
@@ -73,7 +73,7 @@ object BattlePassManager {
             BattlePassKit.BIG,
             BreakBedEffect.REDSTONE,
             BattlePassKit.MEDIUM,
-            BattlePassKit.EPIC,
+            BattlePassKit.MEDIUM,
             Sword.B
         ),
         listOf(
@@ -93,10 +93,10 @@ object BattlePassManager {
             Sword.E,
             BattlePassKit.BIG,
             BattlePassKit.MEDIUM,
-            BattlePassKit.BIG,
+            BattlePassKit.MEDIUM,
             BattlePassKit.MEDIUM,
             BreakBedEffect.REDSTONE,
-            BattlePassKit.EPIC,
+            BattlePassKit.MEDIUM,
             Sword.G
         ),
         listOf(
@@ -119,7 +119,7 @@ object BattlePassManager {
             BattlePassKit.BIG,
             BattlePassKit.MEDIUM,
             BreakBedEffect.REDSTONE,
-            BattlePassKit.EPIC,
+            BattlePassKit.MEDIUM,
             Sword.F
         ),
         listOf(
@@ -134,7 +134,7 @@ object BattlePassManager {
             Starter.DEFENDER,
             BattlePassKit.EPIC,
         ) to listOf(
-            BattlePassKit.EPIC,
+            BattlePassKit.BIG,
             KillMessage.COMPUTER,
             BattlePassKit.MEDIUM,
             Starter.MINER,
@@ -142,7 +142,7 @@ object BattlePassManager {
             BattlePassKit.MEDIUM,
             BattlePassKit.BIG,
             BreakBedEffect.VILLAGER_ANGRY,
-            BattlePassKit.EPIC,
+            BattlePassKit.MEDIUM,
             Sword.M
         ),
         listOf(
@@ -157,7 +157,7 @@ object BattlePassManager {
             BattlePassKit.EPIC,
             Sword.C
         ) to listOf(
-            BattlePassKit.EPIC,
+            BattlePassKit.MEDIUM,
             BattlePassKit.MEDIUM,
             Starter.BLOCKER,
             BattlePassKit.MEDIUM,
@@ -165,7 +165,7 @@ object BattlePassManager {
             BattlePassKit.BIG,
             BattlePassKit.MEDIUM,
             BreakBedEffect.SLIME,
-            BattlePassKit.EPIC,
+            BattlePassKit.MEDIUM,
             Sword.J
         ),
         listOf(
@@ -180,7 +180,7 @@ object BattlePassManager {
             BattlePassKit.EPIC,
             Sword.B
         ) to listOf(
-            BattlePassKit.EPIC,
+            BattlePassKit.BIG,
             BattlePassKit.MEDIUM,
             Starter.BLOCKER,
             BattlePassKit.MEDIUM,
@@ -216,7 +216,7 @@ object BattlePassManager {
                 }
             }
         ) to listOf(
-            BattlePassKit.EPIC,
+            BattlePassKit.MEDIUM,
             KillMessage.COMPUTER,
             BattlePassKit.MEDIUM,
             Starter.MINER,
