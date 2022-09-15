@@ -3,9 +3,9 @@ package me.func.box.map
 import dev.implario.bukkit.item.item
 import me.func.box.app
 import me.func.box.cosmetic.Sword
-import me.func.mod.selection.Button
-import me.func.mod.selection.button
-import me.func.mod.selection.selection
+import me.func.mod.reactive.ReactiveButton
+import me.func.mod.ui.menu.button
+import me.func.mod.ui.menu.selection
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.EntityType
@@ -102,7 +102,7 @@ class TradeMenu : Listener {
         }
     }
 
-    private fun slot(buyItem: ItemStack, vararg need: Pair<Material, Int>) : Button {
+    private fun slot(buyItem: ItemStack, vararg need: Pair<Material, Int>) : ReactiveButton {
         return button {
             item = ItemStack(buyItem.getType())
             title = "§fНужно:\n${need.map { "§f${it.second} ${getName(it.first)}" }.toString()

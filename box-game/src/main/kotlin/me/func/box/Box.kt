@@ -1,8 +1,6 @@
 package me.func.box
 
 import clepto.bukkit.B
-import clepto.cristalix.Cristalix.scoreboardService
-import clepto.cristalix.Cristalix.transfer
 import dev.implario.bukkit.item.item
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.games5e.sdk.cristalix.MapLoader
@@ -25,11 +23,14 @@ import me.func.box.quest.ServerType
 import me.func.mod.Anime
 import me.func.mod.Kit
 import me.func.mod.conversation.ModTransfer
+import me.func.mod.util.after
+import me.func.mod.util.listener
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_12_R1.EnumItemSlot
 import org.bukkit.*
+import org.bukkit.Bukkit.getWorld
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.entity.EntityType
@@ -52,6 +53,8 @@ import ru.cristalix.core.party.PartyService
 import ru.cristalix.core.realm.IRealmService
 import ru.cristalix.core.realm.RealmId
 import ru.cristalix.core.realm.RealmStatus
+import ru.cristalix.core.scoreboard.IScoreboardService
+import ru.cristalix.core.scoreboard.ScoreboardService
 import ru.cristalix.core.tab.ITabService
 import ru.cristalix.core.tab.TabTextComponent
 import ru.cristalix.core.text.TextFormat
@@ -96,9 +99,11 @@ class Box : JavaPlugin() {
     var gameCounter = 0
 
     override fun onEnable() {
-        Anime.include(Kit.EXPERIMENTAL)
-        B.plugin = this
+        Anime.include(Kit.EXPERIMENTAL, Kit.STANDARD)
         app = this
+
+        B.plugin = this
+
         EntityDataParameters.register()
         teams = teams.dropLast(teams.size - teamSize)
         Platforms.set(PlatformDarkPaper())
@@ -172,7 +177,7 @@ class Box : JavaPlugin() {
         kensuke.globalRealm = info.realmId.realmName
         userManager.isOptional = true
         // Регистрация обработчиков
-        B.events(
+        listener(
             BlockListener(),
             DefaultListener(),
             TradeMenu(),
@@ -226,7 +231,7 @@ class Box : JavaPlugin() {
                             val starter = user.stat.currentStarter
                             if (starter != null && starter != Starter.NONE) {
                                 if (starter == Starter.FUSE && slots > 20) player.sendMessage(Formatting.error("Данный стартовый набор недоступен в выбранном типе игры."))
-                                else B.postpone(5 * 20) { starter.consumer(user.player!!) }
+                                else after(5 * 20) { starter.consumer(user.player!!) }
                             }
                             ModTransfer().integer(0).send("box:start", user.player)
                             user.stat.games++
@@ -236,9 +241,10 @@ class Box : JavaPlugin() {
                                 teams.minByOrNull { it.players.size }!!.players.add(player.uniqueId)
 
                             // Скорборды
+                            val scoreboardService = IScoreboardService.get()
                             val address = UUID.randomUUID().toString()
                             val objective =
-                                scoreboardService().getPlayerObjective(player.uniqueId, address)
+                                scoreboardService.getPlayerObjective(player.uniqueId, address)
                             objective.displayName = "Бедроковая коробка"
                             val group = objective.startGroup("Игра")
                             teams.forEach {
@@ -253,10 +259,10 @@ class Box : JavaPlugin() {
                                     val pTime = sessionDurability + 10 - time
                                     "§7Авторестарт " + String.format("%02d:%02d", pTime / 60, pTime % 60)
                                 }
-                            scoreboardService().setCurrentObjective(player.uniqueId, address)
+                            scoreboardService.setCurrentObjective(player.uniqueId, address)
                         }
                         // Отпрака игроков по домам
-                        B.postpone(1) {
+                        after {
                             // Генерация комнат
                             Generator.generateRooms(zero, size, size, size, 10, 5)
                                 .forEachIndexed { index, location ->
@@ -314,15 +320,15 @@ class Box : JavaPlugin() {
                     waitingBar.updateMessage()
                     if (Bukkit.getOnlinePlayers().size == slots && time < Status.STARTING.lastSecond - 10) {
                         time = Status.STARTING.lastSecond - 10
-                    } else if (time == Status.STARTING.lastSecond - 10 && Bukkit.getOnlinePlayers().size + 1 < slots) {
+                    } else if (time == Status.STARTING.lastSecond - 10 && Bukkit.getOnlinePlayers().size + 2 < slots) {
                         time = 0
                         return@runTaskTimer
                     }
-                    if (time == Status.STARTING.lastSecond - 10 && Bukkit.getOnlinePlayers().size + 1 >= slots) {
+                    if (time == Status.STARTING.lastSecond - 10 && Bukkit.getOnlinePlayers().size + 2 >= slots) {
                         Generator.generateCube(zero, size, size, size)
                         return@runTaskTimer
                     }
-                    if (Bukkit.getOnlinePlayers().size + 1 < slots) {
+                    if (Bukkit.getOnlinePlayers().size + 2 < slots) {
                         time = 0
                         return@runTaskTimer
                     }
@@ -404,9 +410,9 @@ class Box : JavaPlugin() {
                 Status.END -> {
                     status = Status.CLOSE
                     // Рестарт игры
-                    B.bc(Formatting.error("Перезагрузка..."))
+                    Bukkit.getOnlinePlayers().forEach { it.sendMessage(Formatting.error("Перезагрузка...")) }
                     waitingBar.updateMessage()
-                    B.postpone(100) {
+                    after(100) {
                         teams.forEach {
                             it.players.forEach { player ->
                                 try {
@@ -425,8 +431,8 @@ class Box : JavaPlugin() {
                         Bukkit.unloadWorld(worldMeta.world, false)
                         time = 0
                         status = Status.STARTING
-                        B.postpone(20) {
-                            transfer(Bukkit.getOnlinePlayers().map { it.uniqueId }, RealmId.of(hub))
+                        after(20) {
+                            ITransferService.get().transferBatch(Bukkit.getOnlinePlayers().map { it.uniqueId }, RealmId.of(hub))
 
                             if (gameCounter == MAX_GAME_STREAK_COUNT) {
                                 Bukkit.shutdown()
