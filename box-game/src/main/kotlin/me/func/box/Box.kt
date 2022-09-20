@@ -168,7 +168,7 @@ class Box : JavaPlugin() {
             when {
                 contains(ServerType.BOX1X4.address) -> serverType = ServerType.BOX1X4
                 contains(ServerType.BOX4X4.address) -> serverType = ServerType.BOX4X4
-                contains(ServerType.BOXLUCKY.address) -> serverType = ServerType.BOXLUCKY
+                contains(ServerType.BOX8.address) -> serverType = ServerType.BOX8
                 else -> serverType = ServerType.ANY
             }
         }
