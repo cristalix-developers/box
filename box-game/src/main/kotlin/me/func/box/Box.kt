@@ -1,6 +1,7 @@
 package me.func.box
 
 import clepto.bukkit.B
+import clepto.cristalix.Cristalix.scoreboardService
 import dev.implario.bukkit.item.item
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.games5e.sdk.cristalix.MapLoader
@@ -241,10 +242,9 @@ class Box : JavaPlugin() {
                                 teams.minByOrNull { it.players.size }!!.players.add(player.uniqueId)
 
                             // Скорборды
-                            val scoreboardService = IScoreboardService.get()
                             val address = UUID.randomUUID().toString()
                             val objective =
-                                scoreboardService.getPlayerObjective(player.uniqueId, address)
+                                scoreboardService().getPlayerObjective(player.uniqueId, address)
                             objective.displayName = "Бедроковая коробка"
                             val group = objective.startGroup("Игра")
                             teams.forEach {
@@ -259,7 +259,7 @@ class Box : JavaPlugin() {
                                     val pTime = sessionDurability + 10 - time
                                     "§7Авторестарт " + String.format("%02d:%02d", pTime / 60, pTime % 60)
                                 }
-                            scoreboardService.setCurrentObjective(player.uniqueId, address)
+                            scoreboardService().setCurrentObjective(player.uniqueId, address)
                         }
                         // Отпрака игроков по домам
                         after {
