@@ -99,14 +99,16 @@ object QuestGenerator {
         BattlePassQuest("Сломайте блоки в режиме 1x4", ServerType.BOX1X4, QuestType.BLOCKBREAK,  70 * 9)
     ).map { it.apply { exp = 140 } }
 
-    fun generate() = listOf(
-        easyQuests.random(),
-        easyQuests.random(),
-        easyQuests.random(),
-        rareQuests.random(),
-        rareQuests.random(),
-        specialQuests.random(),
-        easyQuests.random(),
-        rareQuests.random()
-    )
+    fun generate() : List<BattlePassQuest> {
+        val quests = mutableListOf<BattlePassQuest>()
+        quests.add(easyQuests.filter { !quests.contains(it) }.random())
+        quests.add(easyQuests.filter { !quests.contains(it) }.random())
+        quests.add(easyQuests.filter { !quests.contains(it) }.random())
+        quests.add(rareQuests.filter { !quests.contains(it) }.random())
+        quests.add(rareQuests.filter { !quests.contains(it) }.random())
+        quests.add(specialQuests.filter { !quests.contains(it) }.random())
+        quests.add(easyQuests.filter { !quests.contains(it) }.random())
+        quests.add(rareQuests.filter { !quests.contains(it) }.random())
+        return quests.toList()
+    }
 }
