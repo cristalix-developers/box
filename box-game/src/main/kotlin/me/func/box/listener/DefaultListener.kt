@@ -32,7 +32,6 @@ import org.bukkit.event.entity.*
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
-import org.bukkit.material.Button
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -440,16 +439,15 @@ object Winner {
                     )
                     meta.power = 0
                     firework.fireworkMeta = meta
-
-                    addStatWhenServerType(user, true)
                 }
+                addStatWhenServerType(user!!, true)
             }
             Bukkit.getOnlinePlayers().forEach {
                 if (list[0].players.contains(it.uniqueId))
                     return@forEach
                 it.sendTitle("§cПОРАЖЕНИЕ", "§cвы проиграли")
-                addStatWhenServerType(app.getUser(it)!!, false)
 
+                addStatWhenServerType(app.getUser(it)!!, false)
             }
             app.status = Status.END
         }
@@ -461,10 +459,8 @@ object Winner {
 
     private fun addStatWhenServerType(user: User, isWin: Boolean) {
         when(app.serverType) {
-            ServerType.BOX1X4 -> addStats(user, isWin, ServerType.ANY, ServerType.BOX1X4)
-            ServerType.BOX4X4 -> addStats(user, isWin, ServerType.ANY, ServerType.BOX4X4)
-            ServerType.BOXLUCKY -> addStats(user, isWin, ServerType.ANY, ServerType.BOXLUCKY)
             ServerType.ANY -> addStats(user, isWin, ServerType.ANY)
+            else -> addStats(user, isWin,  app.serverType, ServerType.ANY)
         }
     }
 
