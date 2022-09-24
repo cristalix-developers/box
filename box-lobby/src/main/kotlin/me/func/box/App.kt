@@ -31,6 +31,7 @@ import ru.cristalix.core.CoreApi
 import ru.cristalix.core.account.IAccountService
 import ru.cristalix.core.inventory.IInventoryService
 import ru.cristalix.core.inventory.InventoryService
+import ru.cristalix.core.invoice.IInvoiceService
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.party.IPartyService
 import ru.cristalix.core.party.PartyService
@@ -88,6 +89,7 @@ class App : JavaPlugin() {
         core.registerService(IPartyService::class.java, PartyService(ISocketClient.get()))
         core.registerService(ITransferService::class.java, TransferService(ISocketClient.get()))
         core.registerService(IInventoryService::class.java, InventoryService())
+        core.registerService(IInvoiceService::class.java, IInvoiceService.get())
 
         kensuke = BukkitKensuke.setup(this)
         kensuke.addGlobalUserManager(userManager)

@@ -23,6 +23,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import ru.cristalix.core.formatting.Formatting
+import ru.cristalix.core.invoice.IInvoiceService
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.network.packages.GetAccountBalancePackage
 import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage
@@ -46,9 +47,7 @@ class DonateViewer : Listener {
             if (isDonate)
                 vault = "donate"
             money = if (isDonate) {
-                val balance = app.socketClient.writeAndAwaitResponse<GetAccountBalancePackage>(
-                    GetAccountBalancePackage(player.uniqueId)
-                ).get(1, TimeUnit.SECONDS).balanceData
+                val balance = IInvoiceService.get().getBalanceData(player.uniqueId).get()
                 "Кристаликов ${balance.coins + balance.crystals}"
             } else {
                 "Монет " + stat.money
