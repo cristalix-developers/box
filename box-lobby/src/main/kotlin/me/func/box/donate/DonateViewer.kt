@@ -3,7 +3,9 @@ package me.func.box.donate
 import dev.implario.bukkit.item.item
 import me.func.box.app
 import me.func.box.battlepass.BattlePassManager
+import me.func.box.battlepass.BattlePassManager.rewards
 import me.func.box.cosmetic.*
+import me.func.box.reward.WeekRewards
 import me.func.mod.Anime
 import me.func.mod.reactive.ReactiveButton
 import me.func.mod.ui.Glow
@@ -16,6 +18,7 @@ import me.func.mod.world.Npc
 import me.func.mod.world.Npc.location
 import me.func.mod.world.Npc.onClick
 import me.func.protocol.data.color.GlowColor
+import me.func.protocol.data.emoji.Emoji
 import me.func.protocol.ui.menu.Button
 import me.func.protocol.world.npc.NpcBehaviour
 import org.bukkit.Location
@@ -44,7 +47,7 @@ class DonateViewer : Listener {
             rows = 3
             columns = 3
             if (isDonate)
-                vault = "donate"
+                vault = Emoji.DONATE
             money = if (isDonate) {
                 val balance = app.socketClient.writeAndAwaitResponse<GetAccountBalancePackage>(
                     GetAccountBalancePackage(player.uniqueId)
@@ -182,6 +185,18 @@ class DonateViewer : Listener {
                         true,
                         *BreakBedEffect.values()
                     ) { button, effect -> button.item(effect.getIcon()) }
+                }
+            }, button {
+                title = "Ежедневки"
+                description = "посмотрите ежедневные награды"
+                item = item { type = Material.PAPER }
+                onClick { player, _, _ ->
+                    Anime.openDailyRewardMenu(
+                        player,
+                        app.getUser(player).stat.rewardStreak,
+                        WeekRewards.values().map { it.reward },
+                        true
+                    )
                 }
             }
         )

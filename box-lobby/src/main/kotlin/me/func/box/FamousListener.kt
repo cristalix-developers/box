@@ -52,13 +52,12 @@ object FamousListener : Listener {
             if ((stat.rewardStreak > 0 && now - stat.lastEnter > 24 * 60 * 60 * 1000) || stat.rewardStreak > 6) {
                 stat.rewardStreak = 0
             }
+
+            val rewards = WeekRewards.values().map { it.reward }
+
             if (now - stat.dailyClaimTimestamp > 14 * 60 * 60 * 1000) {
                 stat.dailyClaimTimestamp = now
-                Anime.openDailyRewardMenu(
-                    player,
-                    stat.rewardStreak,
-                    *WeekRewards.values().map { it.reward }.toTypedArray()
-                )
+                Anime.openDailyRewardMenu(player, stat.rewardStreak, rewards)
 
                 val dailyReward = WeekRewards.values()[stat.rewardStreak]
                 player.sendMessage(Formatting.fine("Ваша ежедневная награда: " + dailyReward.reward.title))

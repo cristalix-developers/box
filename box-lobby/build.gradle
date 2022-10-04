@@ -30,7 +30,7 @@ dependencies {
     implementation 'implario:bukkit-worker-core:2.1.20'
 
     implementation 'me.func:world-api:1.0.7'
-    implementation 'me.func:animation-api:3.0.3'
+    implementation 'me.func:animation-api:3.5.4'
     implementation 'dev.implario:kensuke-client-bukkit:2.1.10'
     implementation 'ru.cristalix:boards-bukkit-api:3.0.15'
 }

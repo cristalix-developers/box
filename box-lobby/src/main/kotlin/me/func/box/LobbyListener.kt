@@ -3,6 +3,8 @@ package me.func.box
 import dev.implario.bukkit.item.item
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
+import me.func.mod.ui.scoreboard.ScoreBoard
+import me.func.mod.util.after
 import me.func.protocol.world.marker.Marker
 import me.func.protocol.world.marker.MarkerSign
 import org.bukkit.Bukkit
@@ -17,6 +19,7 @@ import ru.cristalix.core.realm.RealmId
 import ru.cristalix.core.transfer.ITransferService
 
 class LobbyListener : Listener {
+
     private val navigationItem = item {
         type = Material.COMPASS
         text("&2Навигатор")
@@ -43,6 +46,17 @@ class LobbyListener : Listener {
     }
 
     private val marker = Marker(-249.5, 112.6, 26.5, MarkerSign.WARNING)
+
+    private val scoreboard = ScoreBoard.builder()
+        .key("lobby")
+        .header("Бедроковая коробка")
+        .dynamic("Монеты") { app.getUser(it).stat.money }
+        .dynamic("Игр сыграно") { app.getUser(it).stat.games }
+        .dynamic("Побед") { app.getUser(it).stat.wins }
+        .dynamic("Убийств") { app.getUser(it).stat.kills }
+        .dynamic("Смертей") { app.getUser(it).stat.deaths }
+        .build()
+
     @EventHandler
     fun PlayerJoinEvent.handle() {
         player.inventory.clear()
@@ -52,7 +66,7 @@ class LobbyListener : Listener {
         player.inventory.setItem(4, profileItem)
         player.inventory.setItem(8, hubItem)
 
-        val money = app.getUser(player).stat.money ?: 0
+        val money = app.getUser(player).stat.money
         if (money >= 5000) {
             Bukkit.getScheduler().runTaskLater(app, {
                 Anime.marker(player, marker)
@@ -61,6 +75,10 @@ class LobbyListener : Listener {
 
         if (app.getUser(player).stat.progress?.advanced == true)
             player.displayName = "${player.displayName} §6*"
+
+        after {
+            ScoreBoard.subscribe("lobby", player)
+        }
     }
 
     @EventHandler

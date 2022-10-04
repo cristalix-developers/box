@@ -66,10 +66,11 @@ object UserCommands {
                     rows = 5,
                     columns = 1,
                 )
+                selection.hint = ""
                 it.logs.reversed().forEach {
                     selection.add(
                         button {
-                            hint = null
+                            hint = ""
                             item = getMaterial(it.action)
                             title = it.action.name
                             description = "${it.data}§7, время: ${getDateTime(it.timestamp)}"
