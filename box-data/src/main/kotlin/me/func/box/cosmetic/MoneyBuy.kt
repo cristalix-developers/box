@@ -42,6 +42,6 @@ enum class MoneyBuy(
     override fun getIcon(): ItemStack = itemStack
 
     override fun give(user: User) {
-        user.stat.money += money
+        user.giveMoney(money)
     }
 }

@@ -44,7 +44,7 @@ object Lootbox : Listener {
                         Anime.killboardMessage(player, Formatting.error("Недостаточно средств!"))
                         return@onClick
                     }
-                    user.stat.money -= 5000
+                    user.giveMoney(-5000)
                     open(user)
                 }
             }
@@ -54,7 +54,7 @@ object Lootbox : Listener {
     fun open(user: User) {
         val moneyDrop = (Math.random() * 300).toInt() + 100
 
-        user.stat.money += moneyDrop
+        user.giveMoney(moneyDrop)
 
         var drop = ListUtils.random(dropList) as Donate
 
@@ -68,7 +68,7 @@ object Lootbox : Listener {
             else {
                 if (user.stat.swords!!.contains(drop)) {
                     user.player!!.sendMessage(Formatting.fine("У вас уже есть §b" + drop.getTitle() + "§f, замена на §e2000§f монет!"))
-                    user.stat.money += 2000
+                    user.giveMoney(2000)
                 } else
                     user.stat.swords!!.add(drop as Sword)
             }
@@ -81,7 +81,7 @@ object Lootbox : Listener {
             else {
                 if (user.stat.skins!!.contains(drop.getCode())) {
                     user.player!!.sendMessage(Formatting.fine("У вас уже есть §b" + drop.getTitle() + "§f, замена на §e2000§f монет!"))
-                    user.stat.money += 2000
+                    user.giveMoney(2000)
                 } else
                     user.stat.skins!!.add(drop.getCode())
             }

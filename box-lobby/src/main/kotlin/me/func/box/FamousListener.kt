@@ -1,7 +1,10 @@
 package me.func.box
 
+import me.func.box.battlepass.BattlePassManager.rewards
 import me.func.box.reward.WeekRewards
 import me.func.mod.Anime
+import me.func.mod.ui.menu.button
+import me.func.mod.ui.menu.dailyReward
 import me.func.mod.util.after
 import me.func.protocol.ui.indicator.Indicators
 import org.bukkit.GameMode
@@ -38,10 +41,12 @@ object FamousListener : Listener {
             player.teleport(app.spawn)
             player.allowFlight = true
 
-            Anime.hideIndicator(player, Indicators.HEALTH, Indicators.HUNGER, Indicators.EXP, Indicators.ARMOR)
 
             val user = app.getUser(player)
             val stat = user.stat
+
+            Anime.hideIndicator(player, Indicators.HEALTH, Indicators.HUNGER, Indicators.EXP, Indicators.ARMOR)
+            user.moneyPanel.send(player)
 
             stat.lastSeenName = player.displayName
 
@@ -53,14 +58,23 @@ object FamousListener : Listener {
                 stat.rewardStreak = 0
             }
 
-            val rewards = WeekRewards.values().map { it.reward }
-
             if (now - stat.dailyClaimTimestamp > 14 * 60 * 60 * 1000) {
+
                 stat.dailyClaimTimestamp = now
-                Anime.openDailyRewardMenu(player, stat.rewardStreak, rewards)
+
+                dailyReward {
+
+                    currentDay = stat.rewardStreak
+                    storage = WeekRewards.values().map { data ->
+                        button {
+                            title = data.title
+                            item = data.icon
+                        }
+                    }.toMutableList()
+                }.open(player)
 
                 val dailyReward = WeekRewards.values()[stat.rewardStreak]
-                player.sendMessage(Formatting.fine("Ваша ежедневная награда: " + dailyReward.reward.title))
+                player.sendMessage(Formatting.fine("Ваша ежедневная награда: " + dailyReward.title))
                 dailyReward.give(user)
                 stat.rewardStreak++
             }

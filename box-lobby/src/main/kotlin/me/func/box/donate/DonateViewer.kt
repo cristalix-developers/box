@@ -3,7 +3,6 @@ package me.func.box.donate
 import dev.implario.bukkit.item.item
 import me.func.box.app
 import me.func.box.battlepass.BattlePassManager
-import me.func.box.battlepass.BattlePassManager.rewards
 import me.func.box.cosmetic.*
 import me.func.box.reward.WeekRewards
 import me.func.mod.Anime
@@ -11,6 +10,7 @@ import me.func.mod.reactive.ReactiveButton
 import me.func.mod.ui.Glow
 import me.func.mod.ui.menu.button
 import me.func.mod.ui.menu.confirmation.Confirmation
+import me.func.mod.ui.menu.dailyReward
 import me.func.mod.ui.menu.selection
 import me.func.mod.util.command
 import me.func.mod.util.nbt
@@ -19,7 +19,6 @@ import me.func.mod.world.Npc.location
 import me.func.mod.world.Npc.onClick
 import me.func.protocol.data.color.GlowColor
 import me.func.protocol.data.emoji.Emoji
-import me.func.protocol.ui.menu.Button
 import me.func.protocol.world.npc.NpcBehaviour
 import org.bukkit.Location
 import org.bukkit.Material
@@ -28,7 +27,6 @@ import org.bukkit.event.Listener
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.invoice.IInvoiceService
 import ru.cristalix.core.network.ISocketClient
-import ru.cristalix.core.network.packages.GetAccountBalancePackage
 import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage
 import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage
 import java.util.concurrent.TimeUnit
@@ -50,7 +48,7 @@ class DonateViewer : Listener {
             if (isDonate)
                 vault = Emoji.DONATE
             money = if (isDonate) {
-                val balance = IInvoiceService.get().getBalanceData(player.uniqueId).get()
+                val balance = IInvoiceService.get().getBalanceData(player.uniqueId)[1, TimeUnit.SECONDS]
                 "Кристаликов ${balance.coins + balance.crystals}"
             } else {
                 "Монет " + stat.money
@@ -101,7 +99,7 @@ class DonateViewer : Listener {
                             Glow.animate(player, 0.4, GlowColor.RED)
                             return@onClick
                         }
-                        stat.money -= pos.getPrice()
+                        user.giveMoney(-pos.getPrice())
                         pos.give(user)
                         Glow.animate(player, 0.4, GlowColor.GREEN)
                     }
@@ -190,12 +188,16 @@ class DonateViewer : Listener {
                 description = "посмотрите ежедневные награды"
                 item = item { type = Material.PAPER }
                 onClick { player, _, _ ->
-                    Anime.openDailyRewardMenu(
-                        player,
-                        app.getUser(player).stat.rewardStreak,
-                        WeekRewards.values().map { it.reward },
-                        true
-                    )
+                    dailyReward {
+                        currentDay = app.getUser(player).stat.rewardStreak
+                        taken = true
+                        storage = WeekRewards.values().map { data ->
+                            button {
+                                title = data.title
+                                item = data.icon
+                            }
+                        }.toMutableList()
+                    }.open(player)
                 }
             }
         )

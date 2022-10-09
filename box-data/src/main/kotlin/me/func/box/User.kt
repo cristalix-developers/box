@@ -7,6 +7,9 @@ import me.func.box.cosmetic.KillMessage
 import me.func.box.cosmetic.Starter
 import me.func.box.cosmetic.Sword
 import me.func.box.quest.QuestGenerator
+import me.func.mod.reactive.ReactivePanel
+import me.func.protocol.data.color.GlowColor
+import me.func.protocol.data.emoji.Emoji
 import me.func.protocol.ui.battlepass.BattlePassUserData
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
@@ -42,6 +45,12 @@ class User(session: KensukeSession, stat: Stat?, oldStat: Stat?) : IBukkitKensuk
     override fun getSession() = session
     private var connection: PlayerConnection? = null
 
+    val moneyPanel = ReactivePanel.builder()
+        .color(GlowColor.GOLD)
+        .progress(0.5)
+        .text(Emoji.COIN + " " + stat?.money)
+        .build()
+
     fun sendPacket(packet: Packet<*>) {
         if (player == null)
             return
@@ -51,14 +60,17 @@ class User(session: KensukeSession, stat: Stat?, oldStat: Stat?) : IBukkitKensuk
     }
 
     fun giveMoney(toGive: Int) {
-        player!!.sendMessage("§eПолучено $toGive монет.")
-        MinecraftServer.SERVER.postToNextTick {
-            player!!.spigot().sendMessage(
-                ChatMessageType.ACTION_BAR,
-                TextComponent("§e§l+$toGive монет")
-            )
+        if (toGive > 0) {
+            player!!.sendMessage("§eПолучено $toGive монет.")
+            MinecraftServer.SERVER.postToNextTick {
+                player!!.spigot().sendMessage(
+                    ChatMessageType.ACTION_BAR,
+                    TextComponent("§e§l+$toGive монет")
+                )
+            }
         }
         stat.money += toGive
+        moneyPanel.text = Emoji.COIN + " " + stat.money
     }
 
     init {
@@ -74,11 +86,15 @@ class User(session: KensukeSession, stat: Stat?, oldStat: Stat?) : IBukkitKensuk
                 claimedRewards = mutableListOf()
                 data = QuestGenerator.generate()
             } ?: Stat(
-                UUID.fromString(session.userId), arrayListOf("hi"), "", 0, 0, 0, 0, 0, 0, 0, null, 500, mutableListOf(
+                UUID.fromString(session.userId), arrayListOf("hi"), "", 0, 0, 0, 0, 0, 0, 0, null, 500,
+                mutableListOf(
                     Starter.NONE
-                ), Starter.NONE, mutableListOf(
+                ),
+                Starter.NONE,
+                mutableListOf(
                     Sword.NONE
-                ), Sword.NONE, 0, KillMessage.NONE,
+                ),
+                Sword.NONE, 0, KillMessage.NONE,
                 mutableListOf(
                     KillMessage.NONE
                 ),

@@ -31,6 +31,6 @@ enum class BattlePassKit(
         nbt("other", skin)
     }
 
-    override fun give(user: User) { user.stat.money += money }
+    override fun give(user: User) { user.giveMoney(money) }
 
 }
