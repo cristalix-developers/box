@@ -46,8 +46,6 @@ class User(session: KensukeSession, stat: Stat?, oldStat: Stat?) : IBukkitKensuk
     private var connection: PlayerConnection? = null
 
     val moneyPanel = ReactivePanel.builder()
-        .color(GlowColor.GOLD)
-        .progress(0.5)
         .text(Emoji.COIN + " " + stat?.money)
         .build()
 
