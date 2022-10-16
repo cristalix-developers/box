@@ -12,7 +12,7 @@ enum class BattlePassKit(
     private val skin: String
 ) : Donate {
     SMALL(Rare.COMMON, "Пара монет", 500, "coin"),
-    MEDIUM(Rare.RARE, "Пачка моент", 2500, "coin2"),
+    MEDIUM(Rare.RARE, "Пачка монет", 2500, "coin2"),
     BIG(Rare.EPIC, "Коробка монет", 8000, "coin3"),
     EPIC(Rare.LEGENDARY, "Гора монет", 16000, "coin5");
 
